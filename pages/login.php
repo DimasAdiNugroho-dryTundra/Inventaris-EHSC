@@ -1,0 +1,92 @@
+<?php
+require('server/auth.php');
+require('layouts/headerLogin.php');
+?>
+
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner py-6">
+            <!-- Login -->
+            <div class="card">
+                <div class="card-body">
+                    <!-- Logo -->
+                    <?php require('layouts/logoLogin.php'); ?>
+                    <!-- /Logo -->
+                    <h4 class="mb-1">Selamat Datang ;)</h4>
+                    <p class="mb-6">Silahkan Masuk</p>
+
+                    <?php if (isset($error_message) && !empty($error_message)): ?>
+                        <div class="alert alert-solid-danger d-flex align-items-center" role="alert">
+                            <span class="alert-icon rounded">
+                                <i class="ti ti-ban"></i>
+                            </span>
+                            <?php echo $error_message; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form id="formAuthentication" class="mb-4" method="post">
+                        <div class="mb-6">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                placeholder="Masukan username anda" autofocus />
+                        </div>
+                        <div class="mb-6 form-password-toggle">
+                            <label class="form-label" for="password">Password</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="password" class="form-control" name="password"
+                                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                    aria-describedby="password" />
+                                <span class="input-group-text cursor-pointer toggle-password"><i
+                                        class="ti ti-eye-off"></i></span>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <button class="btn btn-primary d-grid w-100" type="submit" name="login">Masuk</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /Register -->
+        </div>
+    </div>
+</div>
+
+<script src="../../assets/vendor/libs/jquery/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.toggle-password').on('click', function () {
+            const input = $(this).siblings('input');
+            const icon = $(this).find('i');
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('ti-eye-off').addClass('ti-eye');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('ti-eye').addClass('ti-eye-off');
+            }
+        });
+    });
+</script>
+
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+<script src="../../assets/vendor/libs/popper/popper.js"></script>
+<script src="../../assets/vendor/js/bootstrap.js"></script>
+<script src="../../assets/vendor/libs/node-waves/node-waves.js"></script>
+<script src="../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="../../assets/vendor/libs/hammer/hammer.js"></script>
+<script src="../../assets/vendor/libs/i18n/i18n.js"></script>
+<script src="../../assets/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="../../assets/vendor/js/menu.js"></script>
+<!-- endbuild -->
+
+<!-- Vendors JS -->
+<script src="../../assets/vendor/libs/@form-validation/popular.js"></script>
+<script src="../../assets/vendor/libs/@form-validation/bootstrap5.js"></script>
+<script src="../../assets/vendor/libs/@form-validation/auto-focus.js"></script>
+
+<!-- Main JS -->
+<script src="../../assets/js/main.js"></script>
+
+<!-- Page JS -->
+<script src="../../assets/js/pages-auth.js"></script>

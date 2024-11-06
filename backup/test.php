@@ -1,0 +1,1 @@
+<?php include('../../backend/sessionHandler.php') ?>
