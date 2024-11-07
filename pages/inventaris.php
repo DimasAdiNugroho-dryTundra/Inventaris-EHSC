@@ -10,6 +10,7 @@ require('../layouts/header.php');
         <?php require('../layouts/sidePanel.php'); ?>
 
         <div class="layout-page">
+            <?php require('../layouts/navbar.php'); ?>
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -88,23 +89,25 @@ require('../layouts/header.php');
                                         <th>Departemen</th>
                                         <th>Kategori</th>
                                         <th>Nama Barang</th>
-                                        <th>Jumlah</th>
+                                        <th>Jumlah Awal</th>
+                                        <th>Jumlah Akhir</th>
                                         <th>Satuan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $no = $offset + 1;
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                    ?>
+    $no = $offset + 1;
+    while ($row = mysqli_fetch_assoc($result)) {
+    ?>
                                     <tr>
                                         <td><?php echo $no++; ?></td>
                                         <td><?php echo $row['kode_inventaris']; ?></td>
                                         <td><?php echo $row['nama_departemen']; ?></td>
                                         <td><?php echo $row['nama_kategori']; ?></td>
                                         <td><?php echo $row['nama_barang']; ?></td>
-                                        <td><?php echo $row['jumlah']; ?></td>
+                                        <td><?php echo $row['jumlah_awal']; ?></td>
+                                        <td><?php echo $row['jumlah_akhir']; ?></td>
                                         <td><?php echo $row['satuan']; ?></td>
                                         <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"

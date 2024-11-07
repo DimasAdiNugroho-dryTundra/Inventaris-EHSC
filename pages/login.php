@@ -36,8 +36,9 @@ require('layouts/headerLogin.php');
                                 <input type="password" id="password" class="form-control" name="password"
                                     placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                                     aria-describedby="password" />
-                                <span class="input-group-text cursor-pointer toggle-password"><i
-                                        class="ti ti-eye-off"></i></span>
+                                <span class="input-group-text cursor-pointer toggle-password">
+                                    <i class="ti ti-eye-off"></i>
+                                </span>
                             </div>
                         </div>
                         <div class="mb-6">
@@ -53,22 +54,25 @@ require('layouts/headerLogin.php');
 
 <script src="../../assets/vendor/libs/jquery/jquery.js"></script>
 <script>
-    $(document).ready(function () {
-        $('.toggle-password').on('click', function () {
-            const input = $(this).siblings('input');
-            const icon = $(this).find('i');
-            if (input.attr('type') === 'password') {
-                input.attr('type', 'text');
-                icon.removeClass('ti-eye-off').addClass('ti-eye');
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleButton = document.querySelector('.toggle-password');
+        const passwordInput = document.querySelector('#password');
+        const icon = toggleButton.querySelector('i');
+        toggleButton.addEventListener('click', function () {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('ti-eye-off');
+                icon.classList.add('ti-eye');
             } else {
-                input.attr('type', 'password');
-                icon.removeClass('ti-eye').addClass('ti-eye-off');
+                passwordInput.type = 'password';
+                icon.classList.remove('ti-eye');
+                icon.classList.add('ti-eye-off');
             }
         });
     });
 </script>
 
-<!-- Core JS -->
+<!-- Core JSJS -->
 <!-- build:js assets/vendor/js/core.js -->
 <script src="../../assets/vendor/libs/popper/popper.js"></script>
 <script src="../../assets/vendor/js/bootstrap.js"></script>

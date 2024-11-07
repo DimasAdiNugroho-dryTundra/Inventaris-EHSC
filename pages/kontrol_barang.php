@@ -33,6 +33,7 @@ $totalPages = ceil($totalRow / $limit);
 
 // Proses penambahan kontrol barang
 if (isset($_POST['tambahKontrol'])) {
+    
     $data = [
         'id_user' => $_SESSION['id_user'],
         'id_inventaris' => $_POST['id_inventaris'],
@@ -101,6 +102,7 @@ if (isset($_GET['delete'])) {
         <?php require('../layouts/sidePanel.php'); ?>
 
         <div class="layout-page">
+            <?php require('../layouts/navbar.php'); ?>
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <!-- Header -->
@@ -500,48 +502,33 @@ if (isset($_GET['delete'])) {
             const selectedOption = inventarisSelect.options[inventarisSelect.selectedIndex];
             const totalStock = selectedOption.getAttribute('data-stock');
 
-            if (status === '1') {
-                jumlahField.readOnly = true;
-                keteranganField.readOnly = true;
-                jumlahField.value = totalStock;
-                keteranganField.value = 'Barang dalam kondisi baik';
-                jumlahField.classList.add('bg-light');
-                keteranganField.classList.add('bg-light');
-            } else {
-                jumlahField.readOnly = false;
-                keteranganField.readOnly = false;
-                jumlahField.value = '';
-                keteranganField.value = '';
-                jumlahField.max = totalStock;
-                jumlahField.classList.remove('bg-light');
-                keteranganField.classList.remove('bg-light');
+            // Mengatur nilai default untuk keterangan berdasarkan status
+            switch (status) {
+                case '1': // Baik
+                    keteranganField.value = 'Barang dalam kondisi baik';
+                    break;
+                case '2': // Pindah
+                    keteranganField.value = 'Barang dalam kondisi pindah';
+                    break;
+                case '3': // Rusak
+                    keteranganField.value = 'Barang dalam kondisi rusak';
+                    break;
+                case '4': // Hilang
+                    keteranganField.value = 'Barang dalam kondisi hilang';
+                    break;
+            }
 
-                switch (status) {
-                    case '2':
-                        keteranganField.value = 'Barang dalam kondisi pindah';
-                        break;
-                    case '3':
-                        keteranganField.value = 'Barang dalam kondisi rusak';
-                        break;
-                    case '4':
-                        keteranganField.value = 'Barang dalam kondisi hilang';
-                        break;
-                }
-            }
+            // Mengatur batas maksimal jumlah
+            jumlahField.max = totalStock;
         } else {
-            if (status === '1') {
-                jumlahField.readOnly = true;
-                keteranganField.readOnly = true;
-                keteranganField.value = 'Barang dalam kondisi baik';
-                jumlahField.classList.add('bg-light');
-                keteranganField.classList.add('bg-light');
-            } else {
-                jumlahField.readOnly = false;
-                keteranganField.readOnly = false;
-                jumlahField.classList.remove('bg-light');
-                keteranganField.classList.remove('bg-light');
-            }
+            // Logika untuk modal edit, jika diperlukan
         }
+
+        // Pastikan field jumlah dan keterangan tidak readonly
+        jumlahField.readOnly = false;
+        keteranganField.readOnly = false;
+        jumlahField.classList.remove('bg-light');
+        keteranganField.classList.remove('bg-light');
     }
 
     // Handler untuk perubahan pada select inventaris
@@ -564,5 +551,6 @@ if (isset($_GET['delete'])) {
         });
     });
     </script>
+
 
     <?php require('../layouts/assetsFooter.php'); ?>

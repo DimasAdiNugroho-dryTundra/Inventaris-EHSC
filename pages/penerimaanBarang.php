@@ -10,6 +10,7 @@ require('../layouts/header.php');
         <?php require('../layouts/sidePanel.php'); ?>
 
         <div class="layout-page">
+        <?php require('../layouts/navbar.php'); ?>
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <div class="d-flex justify-content-between align-items-center mb-2">

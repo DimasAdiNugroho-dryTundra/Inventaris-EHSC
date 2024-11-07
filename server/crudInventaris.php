@@ -8,20 +8,25 @@ $offset = ($page - 1) * $limit;
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 
 // Query untuk menampilkan data inventaris dengan join ke departemen dan kategori
-$query = "SELECT i.*, d.nama_departemen, k.nama_kategori, 
-          CASE 
+$query = "SELECT i.*, 
+           d.nama_departemen, 
+           k.nama_kategori, 
+           (i.jumlah - IFNULL((SELECT SUM(jumlah) FROM kerusakan_barang WHERE kode_barang = i.kode_inventaris), 0) 
+                             - IFNULL((SELECT SUM(jumlah) FROM perpindahan_barang WHERE kode_barang = i.kode_inventaris), 0) 
+                             - IFNULL((SELECT SUM(jumlah) FROM kehilangan_barang WHERE kode_barang = i.kode_inventaris), 0)) AS jumlah_akhir,
+           CASE 
+               WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
+               ELSE i.nama_barang 
+           END as nama_barang
+    FROM inventaris i
+    JOIN departemen d ON i.id_departemen = d.id_departemen
+    JOIN kategori k ON i.id_kategori = k.id_kategori
+    LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
+    WHERE CASE 
               WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
               ELSE i.nama_barang 
-          END as nama_barang
-          FROM inventaris i
-          JOIN departemen d ON i.id_departemen = d.id_departemen
-          JOIN kategori k ON i.id_kategori = k.id_kategori
-          LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
-          WHERE CASE 
-                    WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
-                    ELSE i.nama_barang 
-                END LIKE '%$search%'
-          LIMIT $limit OFFSET $offset";
+          END LIKE '%$search%'
+    LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 
 // Hitung total data untuk pagination
