@@ -28,7 +28,7 @@ $search = isset($_POST['search']) ? $_POST['search'] : '';
 
 // Ambil data untuk ditampilkan
 $result = getKontrolBarang($conn, $search, $limit, $offset);
-$totalRow = getTotalKontrolBarang($conn, $search);
+$totalRow = getTotalKontrolBarang($conn);
 $totalPages = ceil($totalRow / $limit);
 
 // Proses penambahan kontrol barang
@@ -233,26 +233,8 @@ if (isset($_GET['delete'])) {
                                             <td class="align-middle">
                                                 <?php echo date('d/m/Y', strtotime($row['tanggal'])); ?></td>
                                             <td class="align-middle"><?php echo $statusText; ?></td>
-                                            <td class="align-middle">
-                                                <?php 
-        switch($row['status']) {
-            case 1:
-                echo $row['jumlah_inventaris'];
-                break;
-            case 2:
-                echo $row['jumlah_pindah'] ?? '0';
-                break;
-            case 3:
-                echo $row['jumlah_rusak'] ?? '0';
-                break;
-            case 4:
-                echo $row['jumlah_hilang'] ?? '0';
-                break;
-            default:
-                echo '0';
-        }
-    ?>
-                                            </td>
+                                            <td class="align-middle"><?php echo $row['jumlah']; ?></td>
+
                                             <td class="align-middle"><?php echo $row['keterangan']; ?></td>
                                             <td class="align-middle">
                                                 <div class="d-flex gap-2">
@@ -317,25 +299,8 @@ if (isset($_GET['delete'])) {
                                                             <div class="mb-3">
                                                                 <label class="form-label">Jumlah</label>
                                                                 <input type="number" name="jumlah" class="form-control"
-                                                                    value="<?php 
-                                // Menampilkan jumlah sesuai dengan status barang
-                                switch($row['status']) {
-                                    case 1:
-                                        echo $row['jumlah_inventaris'];
-                                        break;
-                                    case 2:
-                                        echo $row['jumlah_pindah'] ?? '0';
-                                        break;
-                                    case 3:
-                                        echo $row['jumlah_rusak'] ?? '0';
-                                        break;
-                                    case 4:
-                                        echo $row['jumlah_hilang'] ?? '0';
-                                        break;
-                                    default:
-                                        echo '0';
-                                }
-                            ?>" required>
+                                                                    value="<?php echo $row['jumlah']; ?>" required>
+
                                                             </div>
 
                                                             <div class="mb-3">
@@ -433,14 +398,13 @@ if (isset($_GET['delete'])) {
                                                     <?php
         $invResult = getAvailableInventaris($conn);
         while ($inv = mysqli_fetch_assoc($invResult)) {
-            echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . $inv['sisa_belum_terkontrol'] . "'>" 
+            echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . "'>" 
                  . $inv['kode_inventaris'] . " - " 
-                 . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . $inv['sisa_belum_terkontrol'] . " " . $inv['satuan'] . ")</option>";
+                 . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . " " . $inv['satuan'] . ")</option>";
         }
         ?>
                                                 </select>
                                             </div>
-
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal</label>
                                                 <input type="date" name="tanggal" class="form-control" required>
@@ -520,8 +484,7 @@ if (isset($_GET['delete'])) {
 
             // Mengatur batas maksimal jumlah
             jumlahField.max = totalStock;
-        } else {
-            // Logika untuk modal edit, jika diperlukan
+            jumlahField.value = ''; // Reset value
         }
 
         // Pastikan field jumlah dan keterangan tidak readonly
