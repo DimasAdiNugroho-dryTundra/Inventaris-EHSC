@@ -48,7 +48,7 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="kontrol_barang.php" class="menu-link">
+            <a href="kontrolBarang.php" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-box-align-bottom-left"></i>
                 Kontrol Barang
             </a>
