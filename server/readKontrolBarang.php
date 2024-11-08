@@ -11,7 +11,7 @@ function getKontrolBarang($conn, $search = '', $limit = 5, $offset = 0)
               JOIN user u ON kb.id_user = u.id_user
               WHERE i.kode_inventaris LIKE '%$search%'
               OR i.nama_barang LIKE '%$search%'
-              ORDER BY kb.tanggal DESC, kb.id_kontrol_barang DESC
+              ORDER BY kb.id_kontrol_barang DESC
               LIMIT $limit OFFSET $offset";
 
     return mysqli_query($conn, $query);
