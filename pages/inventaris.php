@@ -106,7 +106,7 @@ require('../layouts/header.php');
                                         <td><?php echo $row['nama_departemen']; ?></td>
                                         <td><?php echo $row['nama_kategori']; ?></td>
                                         <td><?php echo $row['nama_barang']; ?></td>
-                                        <td><?php echo $row['jumlah_awal']; ?></td>
+                                        <td><?php echo $row['jumlah']; ?></td>
                                         <td><?php echo $row['jumlah_akhir']; ?></td>
                                         <td><?php echo $row['satuan']; ?></td>
                                         <td>

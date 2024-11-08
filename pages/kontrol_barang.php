@@ -207,24 +207,24 @@ if (isset($_GET['delete'])) {
                                     </thead>
                                     <tbody>
                                         <?php
-            $no = $offset + 1;
-            while ($row = mysqli_fetch_assoc($result)) {
-                $statusText = '';
-                switch($row['status']) {
-                    case 1:
-                        $statusText = '<span class="badge bg-success">Baik</span>';
-                        break;
-                    case 2:
-                        $statusText = '<span class="badge bg-warning">Pindah</span>';
-                        break;
-                    case 3:
-                        $statusText = '<span class="badge bg-danger">Rusak</span>';
-                        break;
-                    case 4:
-                        $statusText = '<span class="badge bg-dark">Hilang</span>';
-                        break;
-                }
-            ?>
+    $no = $offset + 1;
+    while ($row = mysqli_fetch_assoc($result)) {
+        $statusText = '';
+        switch($row['status']) {
+            case 1:
+                $statusText = '<span class="badge bg-success">Baik</span>';
+                break;
+            case 2:
+                $statusText = '<span class="badge bg-warning">Pindah</span>';
+                break;
+            case 3:
+                $statusText = '<span class="badge bg-danger">Rusak</span>';
+                break;
+            case 4:
+                $statusText = '<span class="badge bg-dark">Hilang</span>';
+                break;
+        }
+    ?>
                                         <tr>
                                             <td class="align-middle"><?php echo $no++; ?></td>
                                             <td class="align-middle"><?php echo $row['kode_inventaris']; ?></td>
@@ -233,26 +233,8 @@ if (isset($_GET['delete'])) {
                                             <td class="align-middle">
                                                 <?php echo date('d/m/Y', strtotime($row['tanggal'])); ?></td>
                                             <td class="align-middle"><?php echo $statusText; ?></td>
-                                            <td class="align-middle">
-                                                <?php 
-        switch($row['status']) {
-            case 1:
-                echo $row['jumlah_inventaris'];
-                break;
-            case 2:
-                echo $row['jumlah_pindah'] ?? '0';
-                break;
-            case 3:
-                echo $row['jumlah_rusak'] ?? '0';
-                break;
-            case 4:
-                echo $row['jumlah_hilang'] ?? '0';
-                break;
-            default:
-                echo '0';
-        }
-    ?>
-                                            </td>
+                                            <td class="align-middle"><?php echo $row['jumlah']; ?></td>
+                                            <!-- Menampilkan jumlah kontrol dari tabel kontrol_barang -->
                                             <td class="align-middle"><?php echo $row['keterangan']; ?></td>
                                             <td class="align-middle">
                                                 <div class="d-flex gap-2">

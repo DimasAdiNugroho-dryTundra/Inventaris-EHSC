@@ -10,35 +10,32 @@ $id_inventaris = $_GET['id'] ?? '';
 
 // Query untuk mengambil data inventaris dan barang yang terkait
 $query = "SELECT 
-            i.jumlah AS jumlah_baik, 
-            i.kode_inventaris,
-            i.satuan,
-            d.nama_departemen, 
-            k.nama_kategori,
-            CASE 
-                WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
-                ELSE i.nama_barang 
-            END as nama_barang,
-            -- Hitung jumlah barang rusak
-            (SELECT COALESCE(SUM(kr.jumlah), 0)
-             FROM kerusakan_barang kr
-             JOIN kontrol_barang kb ON kr.id_kontrol_barang = kb.id_kontrol_barang
-             WHERE kb.id_inventaris = i.id_inventaris) as total_rusak,
-            -- Hitung jumlah barang hilang
-            (SELECT COALESCE(SUM(kh.jumlah), 0)
-             FROM kehilangan_barang kh
-             JOIN kontrol_barang kb ON kh.id_kontrol_barang = kb.id_kontrol_barang
-             WHERE kb.id_inventaris = i.id_inventaris) as total_hilang,
-            -- Hitung jumlah barang pindah
-            (SELECT COALESCE(SUM(pp.jumlah), 0)
-             FROM perpindahan_barang pp
-             JOIN kontrol_barang kb ON pp.id_kontrol_barang = kb.id_kontrol_barang
-             WHERE kb.id_inventaris = i.id_inventaris) as total_pindah
-          FROM inventaris i
-          JOIN departemen d ON i.id_departemen = d.id_departemen
-          JOIN kategori k ON i.id_kategori = k.id_kategori
-          LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
-          WHERE i.id_inventaris = '$id_inventaris'";
+        i.jumlah AS jumlah_awal,
+        i.kode_inventaris,
+        i.satuan,
+        d.nama_departemen, 
+        k.nama_kategori,
+        CASE 
+            WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
+            ELSE i.nama_barang 
+        END as nama_barang,
+        COALESCE((SELECT SUM(kb.jumlah) 
+                   FROM kontrol_barang kb 
+                   WHERE kb.id_inventaris = i.id_inventaris AND kb.status = 'baik'), 0) AS jumlah_baik,
+        COALESCE((SELECT SUM(kb.jumlah) 
+                   FROM kontrol_barang kb 
+                   WHERE kb.id_inventaris = i.id_inventaris AND kb.status = 'rusak'), 0) AS total_rusak,
+        COALESCE((SELECT SUM(kb.jumlah) 
+                   FROM kontrol_barang kb 
+                   WHERE kb.id_inventaris = i.id_inventaris AND kb.status = 'hilang'), 0) AS total_hilang,
+        COALESCE((SELECT SUM(kb.jumlah) 
+                   FROM kontrol_barang kb 
+                   WHERE kb.id_inventaris = i.id_inventaris AND kb.status = 'pindah'), 0) AS total_pindah
+    FROM inventaris i
+    JOIN departemen d ON i.id_departemen = d.id_departemen
+    JOIN kategori k ON i.id_kategori = k.id_kategori
+    LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
+    WHERE i.id_inventaris = '$id_inventaris'";
 
 $result = mysqli_query($conn, $query);
 $inventaris = mysqli_fetch_assoc($result);
@@ -49,8 +46,8 @@ if (!$inventaris) {
     exit;
 }
 
-// Cek apakah barang sudah dikontrol
-$sudah_dikontrol = ($inventaris['total_rusak'] > 0 || $inventaris['total_hilang'] > 0 || $inventaris['total_pindah'] > 0);
+// Hitung total kontrol
+$total_kontrol = $inventaris['jumlah_baik'] + $inventaris['total_rusak'] + $inventaris['total_hilang'] + $inventaris['total_pindah'];
 ?>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -93,29 +90,13 @@ $sudah_dikontrol = ($inventaris['total_rusak'] > 0 || $inventaris['total_hilang'
                                                     <th>Kategori</th>
                                                     <td>: <?php echo $inventaris['nama_kategori']; ?></td>
                                                 </tr>
+                                                <tr>
+                                                    <th>Jumlah Awal</th>
+                                                    <td>:
+                                                        <?php echo $inventaris['jumlah_awal'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                </tr>
                                             </table>
-                                        </div>
-                                        <div class="col-md-6 text-center">
-                                            <!-- QR Code section -->
-                                            <div class="mb-4">
-                                                <h6>QR Code</h6>
-                                                <?php if (isset($inventaris['kode_inventaris'])): ?>
-                                                <img src="../server/generateQRCode.php?id=<?php echo $inventaris['kode_inventaris']; ?>"
-                                                    alt="QR Code" class="img-fluid" style="max-width: 200px;">
-                                                <div class="mt-2">
-                                                    <small
-                                                        class="text-muted"><?php echo htmlspecialchars($inventaris['kode_inventaris']); ?></small>
-                                                </div>
-                                                <div class="mt-3">
-                                                    <a href="../report/printQRCode.php?id=<?php echo $id_inventaris; ?>"
-                                                        class="btn btn-primary">
-                                                        <i class="ti ti-printer"></i> Cetak QR Code
-                                                    </a>
-                                                </div>
-                                                <?php else: ?>
-                                                <p>QR Code tidak tersedia</p>
-                                                <?php endif; ?>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -134,7 +115,6 @@ $sudah_dikontrol = ($inventaris['total_rusak'] > 0 || $inventaris['total_hilang'
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <?php if ($sudah_dikontrol): ?>
                                                         <tr class="text-center">
                                                             <td class="text-success">
                                                                 <?php echo $inventaris['jumlah_baik'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
@@ -149,26 +129,44 @@ $sudah_dikontrol = ($inventaris['total_rusak'] > 0 || $inventaris['total_hilang'
                                                                 <?php echo $inventaris['total_pindah'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
                                                             </td>
                                                         </tr>
-                                                        <?php else: ?>
-                                                        <tr class="text-center">
-                                                            <td colspan="4" class="text-muted">
-                                                                Barang belum dikontrol.
-                                                            </td>
-                                                        </tr>
-                                                        <?php endif; ?>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Keterangan Kontrol -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="mb-3">Keterangan Kontrol</h6>
+                                            <div class="alert 
+                                                <?php
+                                                if ($total_kontrol == 0) {
+                                                    echo 'alert-danger">Tidak ada barang yang dikontrol.';
+                                                } elseif ($total_kontrol < $inventaris['jumlah_awal']) {
+                                                    echo 'alert-warning">Sebagian barang telah dikontrol.';
+                                                } else {
+                                                    echo 'alert-success">Semua barang telah dikontrol.';
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Jumlah Terkontrol -->
+                                    <div class=" row">
+                                                <div class="col-12">
+                                                    <h6 class="mb-3">Jumlah Terkontrol</h6>
+                                                    <p>
+                                                        <?php echo 'Jumlah Terkontrol: ' . $total_kontrol . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php require('../layouts/footer.php'); ?>
                                 </div>
                             </div>
                         </div>
+                        <?php require('../layouts/assetsFooter.php'); ?>
                     </div>
-                </div>
-                <?php require('../layouts/footer.php'); ?>
-            </div>
-        </div>
-    </div>
-    <?php require('../layouts/assetsFooter.php'); ?>
-</div>
