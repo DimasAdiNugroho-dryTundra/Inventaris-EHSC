@@ -1,8 +1,8 @@
 <?php
 require('../server/sessionHandler.php');
 require('../server/configDB.php');
-require('../server/crudKontrolBarang.php');
 require('../layouts/header.php');
+
 
 // Ambil tahun yang tersedia dari database
 $cawu = isset($_POST['cawu']) ? $_POST['cawu'] : (isset($_GET['cawu']) ? $_GET['cawu'] : 1);
@@ -15,43 +15,19 @@ $year = intval($year);
 $currentYear = date('Y');
 $years = range($currentYear - 5, $currentYear + 5); // Tahun dari 5 tahun lalu hingga 5 tahun ke depan
 
-// Tentukan tanggal berdasarkan cawu
-$startDate = '';
-$endDate = '';
+// Tentukan nama file berdasarkan cawu yang dipilih
+$crudFile = '';
 if ($cawu == 1) {
-    $startDate = "$year-01-01";
-    $endDate = "$year-04-30";
+    $crudFile = 'crudKontrolBarangCawuSatu.php';
 } elseif ($cawu == 2) {
-    $startDate = "$year-05-01";
-    $endDate = "$year-08-31";
+    $crudFile = 'crudKontrolBarangCawuDua.php';
 } elseif ($cawu == 3) {
-    $startDate = "$year-09-01";
-    $endDate = "$year-12-31";
+    $crudFile = 'crudKontrolBarangCawuTiga.php';
 }
 
-// Tentukan tabel berdasarkan cawu
-$table = '';
-$idColumn = '';
-if ($cawu == 1) {
-    $table = 'kontrol_barang_cawu_satu';
-    $idColumn = 'id_kontrol_barang_cawu_satu';
-} elseif ($cawu == 2) {
-    $table = 'kontrol_barang_cawu_dua';
-    $idColumn = 'id_kontrol_barang_cawu_dua';
-} elseif ($cawu == 3) {
-    $table = 'kontrol_barang_cawu_tiga';
-    $idColumn = 'id_kontrol_barang_cawu_tiga';
-}
+// Include file CRUD yang sesuai
+require("../server/$crudFile");
 
-// Query untuk mengambil data kontrol barang berdasarkan cawu dan tahun
-$query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, u.nama as nama_petugas 
-          FROM $table kb 
-          JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
-          JOIN user u ON kb.id_user = u.id_user 
-          WHERE YEAR(kb.tanggal_kontrol) = '$year' 
-          ORDER BY kb.$idColumn DESC";
-
-$result = mysqli_query($conn, $query);
 ?>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -137,18 +113,19 @@ $result = mysqli_query($conn, $query);
                                         <button class="btn btn-outline-secondary" type="submit">Cari</button>
                                     </div>
                                 </form>
-
                             </div>
                             <!-- Form limit -->
                             <div class="col-md-6">
                                 <form method="GET" class="d-flex justify-content-end align-items-center">
-                                    <label for="limit" class="form-label me-2">Tampilkan:</label>
-                                    <select id="limit" name="limit" class="form-select"
-                                        onchange="changeLimit(this.value)">
-                                        <option value="5" <?php echo $limit == 5 ? 'selected' : ''; ?>>5</option>
-                                        <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
-                                        <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
-                                    </select>
+                                    <div class="flex-grow-1">
+                                        <label for="limit" class="form-label">Tampilkan</label>
+                                        <select id="limit" name="limit" class="form-select"
+                                            onchange="changeLimit(this.value)">
+                                            <option value="5" <?php echo $limit == 5 ? 'selected' : ''; ?>>5</option>
+                                            <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
+                                            <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
+                                        </select>
+                                    </div>
                                     <!-- Menyertakan parameter lain yang sedang aktif -->
                                     <input type="hidden" name="page" value="<?php echo $page; ?>">
                                     <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
@@ -156,7 +133,6 @@ $result = mysqli_query($conn, $query);
                                 </form>
                             </div>
                         </div>
-
 
                         <!-- Dropdown for Cawu and Year -->
                         <div class="row p-3">
@@ -190,8 +166,6 @@ $result = mysqli_query($conn, $query);
                                 </form>
                             </div>
                         </div>
-
-
 
                         <!-- Table -->
                         <div class="table-responsive text-nowrap">
@@ -250,12 +224,11 @@ $result = mysqli_query($conn, $query);
                                                 </button>
                                             </div>
                                         </td>
-
                                     </tr>
 
                                     <!-- Modal Edit -->
                                     <div class="modal fade"
-                                        id="editModal<?php echo $row['id_kontrol_barang_cawu_dua']; ?>" tabindex="-1"
+                                        id="editModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>" tabindex="-1"
                                         aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
@@ -268,7 +241,7 @@ $result = mysqli_query($conn, $query);
                                                     <form method="POST">
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="id_kontrol"
-                                                            value="<?php echo $row['id_kontrol_barang_cawu_dua']; ?>">
+                                                            value="<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
                                                         <input type="hidden" name="id_inventaris"
                                                             value="<?php echo $row['id_inventaris']; ?>">
 
@@ -323,7 +296,7 @@ $result = mysqli_query($conn, $query);
 
                                     <!-- Modal Delete -->
                                     <div class="modal fade"
-                                        id="deleteModal<?php echo $row['id_kontrol_barang_cawu_dua']; ?>" tabindex="-1"
+                                        id="deleteModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>" tabindex="-1"
                                         aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
@@ -338,7 +311,7 @@ $result = mysqli_query($conn, $query);
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Batal</button>
-                                                    <a href="?delete=<?php echo $row['id_kontrol_barang_cawu_dua']; ?>"
+                                                    <a href="?delete=<?php echo $row['id_kontrol_barang_cawu_satu']; ?>"
                                                         class="btn btn-danger">Hapus</a>
                                                 </div>
                                             </div>
@@ -393,19 +366,20 @@ $result = mysqli_query($conn, $query);
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST">
+                                    <form method="POST" id="tambahKontrolForm">
                                         <div class="mb-3">
                                             <label class="form-label">Inventaris</label>
-                                            <select name="id_inventaris" class="form-select" required>
+                                            <select name="id_inventaris" class="form-select" required
+                                                onchange="updateStockInfo(this)">
                                                 <option value="">Pilih Barang</option>
                                                 <?php
-                            $invResult = getAvailableInventaris($conn, $cawu, $year);
-                            while ($inv = mysqli_fetch_assoc($invResult)) {
-                                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . "'>" 
-                                    . $inv['kode_inventaris'] . " - " 
-                                    . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . " " . $inv['satuan'] . ")</option>";
-                            }
-                            ?>
+                                    $invResult = getAvailableInventaris($conn, $year);
+                                    while ($inv = mysqli_fetch_assoc($invResult)) {
+                                        echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . "'>"
+                                            . $inv['kode_inventaris'] . " - "
+                                            . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . " " . $inv['satuan'] . ")</option>";
+                                    }
+                                    ?>
                                             </select>
                                         </div>
                                         <div class="mb-3">
@@ -416,7 +390,7 @@ $result = mysqli_query($conn, $query);
                                         <div class="mb-3">
                                             <label class="form-label">Status</label>
                                             <select name="status" class="form-select" required
-                                                onchange="toggleInputs(this.value, 'add')">
+                                                onchange="updateKeterangan()">
                                                 <option value="1">Baik</option>
                                                 <option value="2">Pindah</option>
                                                 <option value="3">Rusak</option>
@@ -426,23 +400,20 @@ $result = mysqli_query($conn, $query);
 
                                         <div class="mb-3">
                                             <label class="form-label">Jumlah</label>
-                                            <input type="number" name="jumlah" id="jumlah-add" class="form-control"
-                                                required>
+                                            <input type="number" name="jumlah" class="form-control" min="1" required>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Keterangan</label>
-                                            <textarea name="keterangan" id="keterangan-add" class="form-control"
-                                                rows="3" required>Barang dalam kondisi baik</textarea>
+                                            <textarea name="keterangan" class="form-control" rows="3"
+                                                required></textarea>
                                         </div>
 
-                                        <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
-                                        <input type="hidden" name="year" value="<?php echo $year; ?>">
-
-                                        <button type="submit" name="tambahKontrol"
-                                            class="btn btn-primary">Tambah</button>
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Batal</button>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -451,59 +422,92 @@ $result = mysqli_query($conn, $query);
 
                 </div>
             </div>
-            <!-- Footer -->
-            <?php require('../layouts/footer.php'); ?>
-            <div class="content-backdrop fade"></div>
         </div>
     </div>
-    <div class="layout-overlay layout-menu-toggle"></div>
-    <div class="drag-target"></div>
 </div>
 
-<!-- JavaScript untuk mengatur field yang bisa diisi -->
 <script>
-function toggleInputs(status, prefix) {
-    const jumlahField = document.getElementById('jumlah-' + prefix);
-    const keteranganField = document.getElementById('keterangan-' + prefix);
+document.addEventListener('DOMContentLoaded', function() {
+    // Fungsi untuk mengupdate keterangan berdasarkan status
+    window.updateKeterangan = function() {
+        const statusSelects = document.querySelectorAll('select[name="status"]');
+        statusSelects.forEach(select => {
+            const keteranganField = select.closest('form').querySelector(
+                'textarea[name="keterangan"]');
+            switch (select.value) {
+                case "1":
+                    keteranganField.value = "Barang dalam kondisi baik.";
+                    break;
+                case "2":
+                    keteranganField.value = "Barang dipindahkan.";
+                    break;
+                case "3":
+                    keteranganField.value = "Barang dalam kondisi rusak.";
+                    break;
+                case "4":
+                    keteranganField.value = "Barang dinyatakan hilang.";
+                    break;
+                default:
+                    keteranganField.value = ""; // Kosongkan jika tidak ada status yang dipilih
+                    break;
+            }
+        });
+    };
 
-    if (prefix === 'add') {
-        const inventarisSelect = document.querySelector('select[name="id_inventaris"]');
-        const selectedOption = inventarisSelect.options[inventarisSelect.selectedIndex];
-        const totalStock = selectedOption.getAttribute('data-stock');
+    // Validasi untuk form tambah kontrol
+    const tambahForm = document.querySelector("#tambahKontrolForm");
+    if (tambahForm) {
+        tambahForm.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        // Mengatur nilai default untuk keterangan berdasarkan status
-        switch (status) {
-            case '1': // Baik
-                keteranganField.value = 'Barang dalam kondisi baik';
-                break;
-            case '2': // Pindah
-                keteranganField.value = 'Barang dalam kondisi pindah';
-                break;
-            case '3': // Rusak
-                keteranganField.value = 'Barang dalam kondisi rusak';
-                break;
-            case '4': // Hilang
-                keteranganField.value = 'Barang hilang';
-                break;
-        }
-        jumlahField.value = totalStock; // Mengatur jumlah berdasarkan stok yang tersedia
-        jumlahField.readOnly = false; // Mengizinkan pengguna untuk mengedit
+            // Reset semua validasi sebelumnya
+            this.querySelectorAll('.is-invalid').forEach(element => {
+                element.classList.remove('is-invalid');
+                const nextElement = element.nextElementSibling;
+                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
+                    nextElement.remove();
+                }
+            });
+
+            let isValid = true;
+            const inputs = this.querySelectorAll('input[required], textarea[required]');
+            const jumlahInput = this.querySelector('input[name="jumlah"]');
+            const stockElement = this.querySelector('select[name="id_inventaris"] option:checked');
+            const stock = stockElement ? parseInt(stockElement.getAttribute('data-stock')) : 0;
+
+            // Cek setiap input required
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+
+                    // Tambah pesan error untuk input kosong
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback';
+                    errorDiv.textContent =
+                        `Kolom ${input.previousElementSibling.textContent.toLowerCase()} wajib diisi!`;
+                    input.parentNode.appendChild(errorDiv);
+                }
+            });
+
+            // Validasi jumlah tidak melebihi stock
+            if (parseInt(jumlahInput.value) > stock) {
+                isValid = false;
+                jumlahInput.classList.add('is-invalid');
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback';
+                errorDiv.textContent = `Jumlah tidak boleh melebihi sisa stock: ${stock}`;
+                jumlahInput.parentNode.appendChild(errorDiv);
+            }
+
+            // Jika semua valid, submit form
+            if (isValid) {
+                this.submit();
+            }
+        });
     }
-}
-
-function changeLimit(limit) {
-    var currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('limit', limit);
-    currentUrl.searchParams.set('page', '1'); // Reset ke halaman pertama
-
-    // Pastikan parameter cawu dan year tetap ada
-    var cawu = currentUrl.searchParams.get('cawu') || '<?php echo $cawu; ?>';
-    var year = currentUrl.searchParams.get('year') || '<?php echo $year; ?>';
-
-    currentUrl.searchParams.set('cawu', cawu);
-    currentUrl.searchParams.set('year', year);
-
-    window.location.href = currentUrl.toString();
-}
+});
 </script>
-<?php require('../layouts/assetsFooter.php'); ?>
+
+<?php require('../layouts/assetsFooter.php') ?>
