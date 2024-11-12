@@ -5,8 +5,14 @@ require('../layouts/header.php');
 
 
 // Ambil tahun yang tersedia dari database
-$cawu = isset($_POST['cawu']) ? $_POST['cawu'] : (isset($_GET['cawu']) ? $_GET['cawu'] : 1);
-$year = isset($_POST['year']) ? $_POST['year'] : (isset($_GET['year']) ? $_GET['year'] : date('Y'));
+$cawu = isset($_SESSION['cawu']) ? $_SESSION['cawu'] : (isset($_POST['cawu']) ? $_POST['cawu'] : (isset($_GET['cawu']) ? $_GET['cawu'] : 1));
+$year = isset($_SESSION['year']) ? $_SESSION['year'] : (isset($_POST['year']) ? $_POST['year'] : (isset($_GET['year']) ? $_GET['year'] : date('Y')));
+
+if (isset($_POST['cawu']) || isset($_POST['year'])) {
+    // User telah memilih Cawu atau tahun baru, hapus nilai session
+    unset($_SESSION['cawu']);
+    unset($_SESSION['year']);
+}
 
 // Pastikan $cawu dan $year adalah integer
 $cawu = intval($cawu);
@@ -272,6 +278,8 @@ require("../server/$crudFile");
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="id_kontrol"
                                                             value="<?php echo $row[$cawuIdField]; ?>">
+                                                        <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
+                                                        <input type="hidden" name="year" value="<?php echo $year; ?>">
                                                         <input type="hidden" name="id_inventaris"
                                                             value="<?php echo $row['id_inventaris']; ?>">
 
@@ -340,7 +348,7 @@ require("../server/$crudFile");
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Batal</button>
-                                                    <a href="kontrolBarang.php?delete=<?php echo $row[$cawuIdField]; ?>"
+                                                    <a href="kontrolBarang.php?delete=<?php echo $row[$cawuIdField]; ?>&cawu=<?php echo $cawu; ?>&year=<?php echo $year; ?>"
                                                         class="btn btn-danger">Hapus</a>
                                                 </div>
                                             </div>
@@ -408,6 +416,8 @@ require("../server/$crudFile");
                                 <div class="modal-body">
                                     <form method="POST" action="kontrolBarang.php" id="tambahKontrolForm">
                                         <input type="hidden" name="tambahKontrol" value="1">
+                                        <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
+                                        <input type="hidden" name="year" value="<?php echo $year; ?>">
                                         <div class="mb-3">
                                             <label class="form-label">Inventaris</label>
                                             <select name="id_inventaris" class="form-select" required>

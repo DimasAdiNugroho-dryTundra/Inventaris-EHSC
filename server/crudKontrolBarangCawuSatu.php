@@ -101,7 +101,10 @@ if (isset($_POST['tambahKontrol'])) {
     } else {
         $_SESSION['error_message'] = "Gagal menambahkan kontrol barang: " . mysqli_error($conn);
     }
-    echo "Error: " . mysqli_error($conn);
+    
+    $_SESSION['cawu'] = $cawu;
+    $_SESSION['year'] = $tahun_kontrol;
+    
     header("Location: kontrolBarang.php");
     exit();
 }
@@ -130,6 +133,9 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $_SESSION['error_message'] = "Gagal mengubah kontrol barang: " . mysqli_error($conn);
     }
 
+    $_SESSION['cawu'] = $cawu;
+    $_SESSION['year'] = $tahun_kontrol;
+
     header("Location: kontrolBarang.php");
     exit();
 }
@@ -145,6 +151,9 @@ if (isset($_GET['delete'])) {
     } else {
         $_SESSION['error_message'] = "Gagal menghapus kontrol barang: " . mysqli_error($conn);
     }
+
+    $_SESSION['cawu'] = $cawu;
+    $_SESSION['year'] = $tahun_kontrol;
 
     header("Location: kontrolBarang.php");
     exit();

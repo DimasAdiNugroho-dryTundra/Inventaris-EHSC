@@ -85,12 +85,12 @@
                 </li>
             </ul>
         </li> -->
-        <!-- <li class="menu-item">
+        <li class="menu-item">
             <a class="btn d-block gap-2 col-lg-10 mx-auto btn-danger waves-effect waves-light"
                 href="../server/sessionDestroy.php">
                 Keluar
                 <span class="ti-xs ti ti-logout"></span>
             </a>
-        </li> -->
+        </li>
     </ul>
 </aside>

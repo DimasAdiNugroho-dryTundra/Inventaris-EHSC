@@ -74,6 +74,9 @@ if (isset($_POST['tambahKontrol'])) {
     $status_kontrol = $_POST['status'];
     $keterangan = $_POST['keterangan'];
 
+    // Ambil tahun dari tanggal_kontrol
+    $tahun_kontrol = date('Y', strtotime($tanggal_kontrol));
+
     // Validasi tanggal sesuai dengan cawu yang dipilih
     $valid_date = true;
     $date_error = '';
@@ -90,14 +93,18 @@ if (isset($_POST['tambahKontrol'])) {
     }
 
     // Lanjutkan dengan proses insert
-    $query = "INSERT INTO $table (id_inventaris, id_user, tanggal_kontrol, jumlah_kontrol, status_kontrol, keterangan) 
-              VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$jumlah_kontrol', '$status_kontrol', '$keterangan')";
+    $query = "INSERT INTO $table (id_inventaris, id_user, tanggal_kontrol, tahun_kontrol, jumlah_kontrol, status_kontrol, keterangan) 
+              VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$tahun_kontrol', '$jumlah_kontrol', '$status_kontrol', '$keterangan')";
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Kontrol barang berhasil ditambahkan!";
     } else {
         $_SESSION['error_message'] = "Gagal menambahkan kontrol barang: " . mysqli_error($conn);
     }
+
+    $_SESSION['cawu'] = $cawu;
+    $_SESSION['year'] = $tahun_kontrol;
+    
     header("Location: kontrolBarang.php");
     exit();
 }
@@ -127,6 +134,9 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $_SESSION['error_message'] = "Gagal mengubah kontrol barang: " . mysqli_error($conn);
     }
 
+    $_SESSION['cawu'] = $cawu;
+    $_SESSION['year'] = $tahun_kontrol;
+
     header("Location: kontrolBarang.php");
     exit();
 }
@@ -143,6 +153,9 @@ if (isset($_GET['delete'])) {
     } else {
         $_SESSION['error_message'] = "Gagal menghapus kontrol barang: " . mysqli_error($conn);
     }
+
+    $_SESSION['cawu'] = $cawu;
+    $_SESSION['year'] = $tahun_kontrol;
 
     header("Location: kontrolBarang.php");
     exit();
