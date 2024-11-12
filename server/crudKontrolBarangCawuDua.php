@@ -110,17 +110,18 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $status_kontrol = $_POST['status'];
     $keterangan = $_POST['keterangan'];
 
-    // Data untuk update
-    $data = [
-        'id_kontrol' => $id_kontrol,
-        'tanggal_kontrol' => $tanggal_kontrol,
-        'jumlah_kontrol' => $jumlah_kontrol,
-        'status_kontrol' => $status_kontrol,
-        'keterangan' => $keterangan
-    ];
+    // Ambil tahun dari tanggal_kontrol
+    $tahun_kontrol = date('Y', strtotime($tanggal_kontrol));
 
-    // Panggil fungsi untuk memperbarui kontrol barang
-    if (updateKontrolBarang($conn, $data, $table)) {
+    $query = "UPDATE $table SET 
+              tanggal_kontrol = '$tanggal_kontrol', 
+              tahun_kontrol = '$tahun_kontrol', 
+              jumlah_kontrol = '$jumlah_kontrol', 
+              status_kontrol = '$status_kontrol', 
+              keterangan = '$keterangan' 
+              WHERE $idColumn = '$id_kontrol'";
+
+    if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Kontrol barang berhasil diubah!";
     } else {
         $_SESSION['error_message'] = "Gagal mengubah kontrol barang: " . mysqli_error($conn);
@@ -129,6 +130,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     header("Location: kontrolBarang.php");
     exit();
 }
+
 
 // Proses penghapusan kontrol barang
 if (isset($_GET['delete'])) {
@@ -144,18 +146,5 @@ if (isset($_GET['delete'])) {
 
     header("Location: kontrolBarang.php");
     exit();
-}
-
-// Fungsi untuk memperbarui kontrol barang
-function updateKontrolBarang($conn, $data, $table) {
-    global $idColumn; // Memastikan kolom ID yang benar digunakan
-    $query = "UPDATE $table SET 
-              tanggal_kontrol = '{$data['tanggal_kontrol']}', 
-              jumlah_kontrol = '{$data['jumlah_kontrol']}', 
-              status_kontrol = '{$data['status_kontrol']}', 
-              keterangan = '{$data['keterangan']}'
-              WHERE $idColumn = '{$data['id_kontrol']}'";
-    
-    return mysqli_query($conn, $query);
 }
 ?>

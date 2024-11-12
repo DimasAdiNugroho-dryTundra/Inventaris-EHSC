@@ -59,8 +59,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $harga_satuan = (int) $harga_satuan;
     $status = $_POST['status'];
 
-    // Validasi tanggal
-    if (!empty($tanggal_permintaan)) {
         $query = "UPDATE permintaan_barang SET 
                   id_departemen = '$id_departemen', 
                   nama_barang = '$nama_barang', 
@@ -76,9 +74,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         } else {
             $_SESSION['error_message'] = "Gagal mengubah permintaan barang: " . mysqli_error($conn);
         }
-    } else {
-        $_SESSION['error_message'] = "Tanggal permintaan tidak boleh kosong!";
-    }
     header("Location: permintaanBarang.php");
     exit();
 }

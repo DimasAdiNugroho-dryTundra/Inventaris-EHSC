@@ -25,6 +25,16 @@ if ($cawu == 1) {
     $crudFile = 'crudKontrolBarangCawuTiga.php';
 }
 
+// Tentukan nama field ID kontrol barang berdasarkan cawu yang dipilih
+$cawuIdField = '';
+if ($cawu == 1) {
+    $cawuIdField = 'id_kontrol_barang_cawu_satu';
+} elseif ($cawu == 2) {
+    $cawuIdField = 'id_kontrol_barang_cawu_dua';
+} elseif ($cawu == 3) {
+    $cawuIdField = 'id_kontrol_barang_cawu_tiga';
+}
+
 // Include file CRUD yang sesuai
 require("../server/$crudFile");
 
@@ -55,17 +65,6 @@ require("../server/$crudFile");
                         </div>
                     </div>
 
-                    <!-- Informasi Petugas -->
-                    <div class="card">
-                        <div class="card-body pb-0">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="badge bg-label-primary p-2 me-2">
-                                    <i class="ti ti-user"></i>
-                                </div>
-                                <h5 class="mb-0">Petugas: <?php echo $_SESSION['nama']; ?></h5>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Alert Messages -->
                     <?php if (isset($_SESSION['error_message'])): ?>
@@ -89,6 +88,14 @@ require("../server/$crudFile");
                     <?php unset($_SESSION['success_message']); endif; ?>
 
                     <div class="card">
+                        <div class="card-body pb-0">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="badge bg-label-primary p-2 me-2">
+                                    <i class="ti ti-user"></i>
+                                </div>
+                                <h5 class="mb-0">Petugas: <?php echo $_SESSION['nama']; ?></h5>
+                            </div>
+                        </div>
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Kontrol Barang
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -97,8 +104,61 @@ require("../server/$crudFile");
                             </button>
                         </h4>
 
-                        <!-- Search, Cawu and Year Dropdown -->
+                        <!-- Dropdown Cawu dan Tahun -->
                         <div class="row p-3">
+                            <div class="col-12">
+                                <div class="alert alert-info d-flex align-items-center" role="alert">
+                                    <i class="ti ti-info-circle me-2"></i>
+                                    Untuk mengatur data kontrol, silahkan memilih cawu dan tahun terlebih dahulu.
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <form method="POST">
+                                        <div class="mb-2">
+                                            <label for="cawu" class="form-label">Cawu</label>
+                                            <select id="cawu" name="cawu" class="form-select"
+                                                onchange="this.form.submit()">
+                                                <option value="1" <?php if ($cawu == 1) echo 'selected'; ?>>Cawu 1
+                                                </option>
+                                                <option value="2" <?php if ($cawu == 2) echo 'selected'; ?>>Cawu 2
+                                                </option>
+                                                <option value="3" <?php if ($cawu == 3) echo 'selected'; ?>>Cawu 3
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <input type="hidden" name="year" value="<?php echo $year; ?>">
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="POST">
+                                        <div class="mb-2">
+                                            <label for="year" class="form-label">Tahun</label>
+                                            <select id="year" name="year" class="form-select"
+                                                onchange="this.form.submit()">
+                                                <?php foreach ($years as $yr): ?>
+                                                <option value="<?php echo $yr; ?>"
+                                                    <?php if ($year == $yr) echo 'selected'; ?>>
+                                                    <?php echo $yr; ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Tampilkan informasi cawu dan tahun yang dipilih -->
+                            <div class="row p-3">
+                                <div class="col-md-12">
+                                    <div class="alert alert-secondary" role="alert">
+                                        Anda telah memilih Cawu <?php echo $cawu; ?> untuk tahun <?php echo $year; ?>.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Search, Cawu and Year Dropdown -->
                             <div class="col-md-6">
                                 <form method="POST" class="d-flex">
                                     <div class="flex-grow-1 me-2">
@@ -121,48 +181,18 @@ require("../server/$crudFile");
                                         <label for="limit" class="form-label">Tampilkan</label>
                                         <select id="limit" name="limit" class="form-select"
                                             onchange="changeLimit(this.value)">
-                                            <option value="5" <?php echo $limit == 5 ? 'selected' : ''; ?>>5</option>
-                                            <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
-                                            <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20</option>
+                                            <option value="5" <?php echo $limit == 5 ? 'selected' : ''; ?>>5
+                                            </option>
+                                            <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10
+                                            </option>
+                                            <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20
+                                            </option>
                                         </select>
                                     </div>
                                     <!-- Menyertakan parameter lain yang sedang aktif -->
                                     <input type="hidden" name="page" value="<?php echo $page; ?>">
                                     <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
                                     <input type="hidden" name="year" value="<?php echo $year; ?>">
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Dropdown for Cawu and Year -->
-                        <div class="row p-3">
-                            <div class="col-md-6">
-                                <form method="POST">
-                                    <div class="mb-3">
-                                        <label for="cawu" class="form-label">Cawu</label>
-                                        <select id="cawu" name="cawu" class="form-select" onchange="this.form.submit()">
-                                            <option value="1" <?php if ($cawu == 1) echo 'selected'; ?>>Cawu 1</option>
-                                            <option value="2" <?php if ($cawu == 2) echo 'selected'; ?>>Cawu 2</option>
-                                            <option value="3" <?php if ($cawu == 3) echo 'selected'; ?>>Cawu 3</option>
-                                        </select>
-                                    </div>
-                                    <input type="hidden" name="year" value="<?php echo $year; ?>">
-                                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                                </form>
-                            </div>
-                            <div class="col-md-6">
-                                <form method="POST">
-                                    <div class="mb-3">
-                                        <label for="year" class="form-label">Tahun</label>
-                                        <select id="year" name="year" class="form-select" onchange="this.form.submit()">
-                                            <?php foreach ($years as $yr): ?>
-                                            <option value="<?php echo $yr; ?>"
-                                                <?php if ($year == $yr) echo 'selected'; ?>><?php echo $yr; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
-                                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
                                 </form>
                             </div>
                         </div>
@@ -184,23 +214,24 @@ require("../server/$crudFile");
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $no = $offset + 1;
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        $statusText = '';
-                                        switch ($row['status_kontrol']) {
-                                            case 1:
-                                                $statusText = '<span class="badge bg-success">Baik</span>';
-                                                break;
-                                            case 2:
-                                                $statusText = '<span class="badge bg-warning">Pindah</span>';
-                                                break;
-                                            case 3:
-                                                $statusText = '<span class="badge bg-danger">Rusak</span>';
-                                                break;
-                                            case 4:
-                                                $statusText = '<span class="badge bg-dark">Hilang</span>';
-                                                break;
-                                        }
+                                    if (mysqli_num_rows($result) > 0) {
+                                        $no = $offset + 1;
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            $statusText = '';
+                                            switch ($row['status_kontrol']) {
+                                                case 1:
+                                                    $statusText = '<span class="badge bg-success">Baik</span>';
+                                                    break;
+                                                case 2:
+                                                    $statusText = '<span class="badge bg-warning">Pindah</span>';
+                                                    break;
+                                                case 3:
+                                                    $statusText = '<span class="badge bg-danger">Rusak</span>';
+                                                    break;
+                                                case 4:
+                                                    $statusText = '<span class="badge bg-dark">Hilang</span>';
+                                                    break;
+                                            }
                                     ?>
                                     <tr>
                                         <td class="align-middle"><?php echo $no++; ?></td>
@@ -214,12 +245,12 @@ require("../server/$crudFile");
                                         <td class="align-middle">
                                             <div class="d-flex gap-2">
                                                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#editModal<?php echo $row[$idColumn]; ?>">
+                                                    data-bs-target="#editModal<?php echo $row[$cawuIdField]; ?>">
                                                     Edit
                                                 </button>
                                                 <button type="button" class="btn btn-danger btn-sm"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal<?php echo $row[$idColumn]; ?>">
+                                                    data-bs-target="#deleteModal<?php echo $row[$cawuIdField]; ?>">
                                                     Delete
                                                 </button>
                                             </div>
@@ -227,9 +258,8 @@ require("../server/$crudFile");
                                     </tr>
 
                                     <!-- Modal Edit -->
-                                    <div class="modal fade"
-                                        id="editModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>" tabindex="-1"
-                                        aria-hidden="true">
+                                    <div class="modal fade" id="editModal<?php echo $row[$cawuIdField]; ?>"
+                                        tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -238,10 +268,10 @@ require("../server/$crudFile");
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST">
+                                                    <form method="POST" action="kontrolBarang.php">
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="id_kontrol"
-                                                            value="<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
+                                                            value="<?php echo $row[$cawuIdField]; ?>">
                                                         <input type="hidden" name="id_inventaris"
                                                             value="<?php echo $row['id_inventaris']; ?>">
 
@@ -295,9 +325,8 @@ require("../server/$crudFile");
                                     </div>
 
                                     <!-- Modal Delete -->
-                                    <div class="modal fade"
-                                        id="deleteModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>" tabindex="-1"
-                                        aria-hidden="true">
+                                    <div class="modal fade" id="deleteModal<?php echo $row[$cawuIdField]; ?>"
+                                        tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -311,16 +340,27 @@ require("../server/$crudFile");
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Batal</button>
-                                                    <a href="?delete=<?php echo $row['id_kontrol_barang_cawu_satu']; ?>"
+                                                    <a href="kontrolBarang.php?delete=<?php echo $row[$cawuIdField]; ?>"
                                                         class="btn btn-danger">Hapus</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <?php 
+                                            } // End of while loop
+                                        } else { // Jika tidak ada data
+                                        ?>
+                                    <tr>
+                                        <td colspan="8" class="text-center">Tidak ada data kontrol barang untuk
+                                            Cawu
+                                            <?php echo $cawu; ?> tahun <?php echo $year; ?>.</td>
+                                    </tr>
                                     <?php } ?>
                                 </tbody>
                             </table>
                         </div>
+
 
                         <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mt-4">
@@ -366,49 +406,44 @@ require("../server/$crudFile");
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST" id="tambahKontrolForm">
+                                    <form method="POST" action="kontrolBarang.php" id="tambahKontrolForm">
+                                        <input type="hidden" name="tambahKontrol" value="1">
                                         <div class="mb-3">
                                             <label class="form-label">Inventaris</label>
-                                            <select name="id_inventaris" class="form-select" required
-                                                onchange="updateStockInfo(this)">
+                                            <select name="id_inventaris" class="form-select" required>
                                                 <option value="">Pilih Barang</option>
                                                 <?php
-                                    $invResult = getAvailableInventaris($conn, $year);
-                                    while ($inv = mysqli_fetch_assoc($invResult)) {
-                                        echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . "'>"
-                                            . $inv['kode_inventaris'] . " - "
-                                            . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . " " . $inv['satuan'] . ")</option>";
-                                    }
-                                    ?>
+            $invResult = getAvailableInventaris($conn, $year);
+            while ($inv = mysqli_fetch_assoc($invResult)) {
+                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . "'>"
+                    . $inv['kode_inventaris'] . " - "
+                    . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . " " . $inv['satuan'] . ")</option>";
+            }
+            ?>
                                             </select>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Tanggal</label>
                                             <input type="date" name="tanggal" class="form-control" required>
                                         </div>
-
                                         <div class="mb-3">
                                             <label class="form-label">Status</label>
-                                            <select name="status" class="form-select" required
-                                                onchange="updateKeterangan()">
+                                            <select name="status" class="form-select" required>
                                                 <option value="1">Baik</option>
                                                 <option value="2">Pindah</option>
                                                 <option value="3">Rusak</option>
                                                 <option value="4">Hilang</option>
                                             </select>
                                         </div>
-
                                         <div class="mb-3">
                                             <label class="form-label">Jumlah</label>
                                             <input type="number" name="jumlah" class="form-control" min="1" required>
                                         </div>
-
                                         <div class="mb-3">
                                             <label class="form-label">Keterangan</label>
                                             <textarea name="keterangan" class="form-control" rows="3"
                                                 required></textarea>
                                         </div>
-
                                         <div class="d-flex justify-content-end gap-2">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
@@ -426,88 +461,6 @@ require("../server/$crudFile");
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Fungsi untuk mengupdate keterangan berdasarkan status
-    window.updateKeterangan = function() {
-        const statusSelects = document.querySelectorAll('select[name="status"]');
-        statusSelects.forEach(select => {
-            const keteranganField = select.closest('form').querySelector(
-                'textarea[name="keterangan"]');
-            switch (select.value) {
-                case "1":
-                    keteranganField.value = "Barang dalam kondisi baik.";
-                    break;
-                case "2":
-                    keteranganField.value = "Barang dipindahkan.";
-                    break;
-                case "3":
-                    keteranganField.value = "Barang dalam kondisi rusak.";
-                    break;
-                case "4":
-                    keteranganField.value = "Barang dinyatakan hilang.";
-                    break;
-                default:
-                    keteranganField.value = ""; // Kosongkan jika tidak ada status yang dipilih
-                    break;
-            }
-        });
-    };
 
-    // Validasi untuk form tambah kontrol
-    const tambahForm = document.querySelector("#tambahKontrolForm");
-    if (tambahForm) {
-        tambahForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            // Reset semua validasi sebelumnya
-            this.querySelectorAll('.is-invalid').forEach(element => {
-                element.classList.remove('is-invalid');
-                const nextElement = element.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
-                    nextElement.remove();
-                }
-            });
-
-            let isValid = true;
-            const inputs = this.querySelectorAll('input[required], textarea[required]');
-            const jumlahInput = this.querySelector('input[name="jumlah"]');
-            const stockElement = this.querySelector('select[name="id_inventaris"] option:checked');
-            const stock = stockElement ? parseInt(stockElement.getAttribute('data-stock')) : 0;
-
-            // Cek setiap input required
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-
-                    // Tambah pesan error untuk input kosong
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'invalid-feedback';
-                    errorDiv.textContent =
-                        `Kolom ${input.previousElementSibling.textContent.toLowerCase()} wajib diisi!`;
-                    input.parentNode.appendChild(errorDiv);
-                }
-            });
-
-            // Validasi jumlah tidak melebihi stock
-            if (parseInt(jumlahInput.value) > stock) {
-                isValid = false;
-                jumlahInput.classList.add('is-invalid');
-
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'invalid-feedback';
-                errorDiv.textContent = `Jumlah tidak boleh melebihi sisa stock: ${stock}`;
-                jumlahInput.parentNode.appendChild(errorDiv);
-            }
-
-            // Jika semua valid, submit form
-            if (isValid) {
-                this.submit();
-            }
-        });
-    }
-});
-</script>
 
 <?php require('../layouts/assetsFooter.php') ?>
