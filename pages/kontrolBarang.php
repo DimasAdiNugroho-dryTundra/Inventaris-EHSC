@@ -4,14 +4,18 @@ require('../server/configDB.php');
 require('../layouts/header.php');
 
 
-// Ambil tahun yang tersedia dari database
-$cawu = isset($_SESSION['cawu']) ? $_SESSION['cawu'] : (isset($_POST['cawu']) ? $_POST['cawu'] : (isset($_GET['cawu']) ? $_GET['cawu'] : 1));
-$year = isset($_SESSION['year']) ? $_SESSION['year'] : (isset($_POST['year']) ? $_POST['year'] : (isset($_GET['year']) ? $_GET['year'] : date('Y')));
+// Ambil tahun dan cawu dari session atau POST
+$cawu = isset($_SESSION['cawu']) ? $_SESSION['cawu'] : (isset($_POST['cawu']) ? intval($_POST['cawu']) : 1);
+$year = isset($_SESSION['year']) ? $_SESSION['year'] : (isset($_POST['year']) ? intval($_POST['year']) : date('Y'));
 
-if (isset($_POST['cawu']) || isset($_POST['year'])) {
-    // User telah memilih Cawu atau tahun baru, hapus nilai session
-    unset($_SESSION['cawu']);
-    unset($_SESSION['year']);
+// Simpan ke session jika ada perubahan
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['cawu'])) {
+        $_SESSION['cawu'] = intval($_POST['cawu']);
+    }
+    if (isset($_POST['year'])) {
+        $_SESSION['year'] = intval($_POST['year']);
+    }
 }
 
 // Pastikan $cawu dan $year adalah integer

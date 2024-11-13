@@ -7,8 +7,8 @@ $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian dan filter
-$cawu = isset($_POST['cawu']) ? (int)$_POST['cawu'] : 3; // Set default cawu ke 3
-$year = isset($_POST['year']) ? (int)$_POST['year'] : date('Y');
+$cawu = isset($_POST['cawu']) ? (int) $_POST['cawu'] : 3; // Set default cawu ke 3
+$year = isset($_POST['year']) ? (int) $_POST['year'] : date('Y');
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 
 // Tentukan tabel dan rentang tanggal berdasarkan cawu
@@ -41,7 +41,8 @@ $totalRows = $totalRow['total'];
 $totalPages = ceil($totalRows / $limit);
 
 // Fungsi untuk menghitung total kontrol barang
-function getTotalKontrolBarang($conn, $table) {
+function getTotalKontrolBarang($conn, $table)
+{
     $query = "SELECT SUM(jumlah_kontrol) as total FROM $table"; // Menghitung total jumlah dari kontrol_barang
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
@@ -49,7 +50,8 @@ function getTotalKontrolBarang($conn, $table) {
 }
 
 // Get available inventaris for dropdown
-function getAvailableInventaris($conn, $year) {
+function getAvailableInventaris($conn, $year)
+{
     $query = "SELECT i.*, 
               COALESCE(kb.jumlah_kontrol, 0) as jumlah_terkontrol,
               i.jumlah - COALESCE(kb.jumlah_kontrol, 0) as sisa_belum_terkontrol
@@ -102,9 +104,10 @@ if (isset($_POST['tambahKontrol'])) {
         $_SESSION['error_message'] = "Gagal menambahkan kontrol barang: " . mysqli_error($conn);
     }
 
-    $_SESSION['cawu'] = $cawu;
-    $_SESSION['year'] = $tahun_kontrol;
-    
+    $cawu = $_SESSION['cawu'];
+    $year = $_SESSION['year'];
+
+
     header("Location: kontrolBarang.php");
     exit();
 }
@@ -134,8 +137,9 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $_SESSION['error_message'] = "Gagal mengubah kontrol barang: " . mysqli_error($conn);
     }
 
-    $_SESSION['cawu'] = $cawu;
-    $_SESSION['year'] = $tahun_kontrol;
+    $cawu = $_SESSION['cawu'];
+    $year = $_SESSION['year'];
+
 
     header("Location: kontrolBarang.php");
     exit();
@@ -154,8 +158,9 @@ if (isset($_GET['delete'])) {
         $_SESSION['error_message'] = "Gagal menghapus kontrol barang: " . mysqli_error($conn);
     }
 
-    $_SESSION['cawu'] = $cawu;
-    $_SESSION['year'] = $tahun_kontrol;
+    $cawu = $_SESSION['cawu'];
+    $year = $_SESSION['year'];
+
 
     header("Location: kontrolBarang.php");
     exit();

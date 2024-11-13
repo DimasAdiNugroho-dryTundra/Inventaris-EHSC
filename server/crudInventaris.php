@@ -250,35 +250,21 @@ function deleteInventaris($conn, $id_inventaris)
     mysqli_begin_transaction($conn);
 
     try {
-        // 1. Hapus data di tabel kehilangan_barang
-        $query1 = "DELETE kb FROM kehilangan_barang kb
-                  JOIN kontrol_barang kb2 ON kb.id_kontrol_barang = kb2.id_kontrol_barang
-                  WHERE kb2.id_invetaris = '$id_inventaris'";
+        // 1. Hapus data di tabel kontrol_barang_cawu_satu
+        $query1 = "DELETE FROM kontrol_barang_cawu_satu WHERE id_inventaris = '$id_inventaris'";
         mysqli_query($conn, $query1);
 
-        // 2. Hapus data di tabel kerusakan_barang
-        $query2 = "DELETE krb FROM kerusakan_barang krb
-                  JOIN kontrol_barang kb2 ON krb.id_kontrol_barang = kb2.id_kontrol_barang
-                  WHERE kb2.id_invetaris = '$id_inventaris'";
+        // 2. Hapus data di tabel kontrol_barang_cawu_dua
+        $query2 = "DELETE FROM kontrol_barang_cawu_dua WHERE id_inventaris = '$id_inventaris'";
         mysqli_query($conn, $query2);
 
-        // 3. Hapus data di tabel perpindahan_barang
-        $query3 = "DELETE pb FROM perpindahan_barang pb
-                  JOIN kontrol_barang kb2 ON pb.id_kontrol_barang = kb2.id_kontrol_barang
-                  WHERE kb2.id_invetaris = '$id_inventaris'";
+        // 3. Hapus data di tabel kontrol_barang_cawu_tiga
+        $query3 = "DELETE FROM kontrol_barang_cawu_tiga WHERE id_inventaris = '$id_inventaris'";
         mysqli_query($conn, $query3);
 
-        // 4. Hapus data di tabel kontrol_barang
-        $query4 = "DELETE FROM kontrol_barang WHERE id_invetaris = '$id_inventaris'";
+        // 4. Hapus data di tabel inventaris
+        $query4 = "DELETE FROM inventaris WHERE id_inventaris = '$id_inventaris'";
         mysqli_query($conn, $query4);
-
-        // 5. Hapus data di tabel arsip_inventaris
-        $query5 = "DELETE FROM arsip_inventaris WHERE id_inventaris = '$id_inventaris'";
-        mysqli_query($conn, $query5);
-
-        // 6. Hapus data di tabel inventaris
-        $query6 = "DELETE FROM inventaris WHERE id_inventaris = '$id_inventaris'";
-        mysqli_query($conn, $query6);
 
         // Commit transaction
         mysqli_commit($conn);
