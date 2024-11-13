@@ -72,20 +72,46 @@ function getAvailableInventaris($conn, $year)
 if (isset($_POST['tambahKontrol'])) {
     $id_inventaris = $_POST['id_inventaris'];
     $tanggal_kontrol = $_POST['tanggal'];
-    $jumlah_kontrol = $_POST['jumlah'];
-    $status_kontrol = $_POST['status'];
-    $keterangan = $_POST['keterangan'];
+    $year = date('Y', strtotime($tanggal_kontrol)); // Ambil tahun dari tanggal kontrol
 
-    // Ambil tahun dari tanggal_kontrol
-    $tahun_kontrol = date('Y', strtotime($tanggal_kontrol));
+    // Validasi jika tidak ada status yang dipilih
+    if (empty($_POST['status'])) {
+        $_SESSION['error_message'] = "Harap pilih setidaknya satu status.";
+        header("Location: kontrolBarang.php");
+        exit();
+    }
+
+    $status_kontrol = isset($_POST['status']) ? $_POST['status'] : [];
+    $jumlah_kontrol = [];
+    $keterangan = [];
+
+    foreach ($status_kontrol as $status) {
+        if ($status == 1) { // Status Baik
+            $jumlah_kontrol[] = $_POST['jumlah_baik'];
+            $keterangan[] = $_POST['keterangan_baik'];
+        } elseif ($status == 2) { // Status Pindah
+            $jumlah_kontrol[] = $_POST['jumlah_pindah'];
+            $keterangan[] = $_POST['keterangan_pindah'];
+        } elseif ($status == 3) { // Status Rusak
+            $jumlah_kontrol[] = $_POST['jumlah_rusak'];
+            $keterangan[] = $_POST['keterangan_rusak'];
+        } elseif ($status == 4) { // Status Hilang
+            $jumlah_kontrol[] = $_POST['jumlah_hilang'];
+            $keterangan[] = $_POST['keterangan_hilang'];
+        } else {
+            $_SESSION['error_message'] = "Harap pilih status yang valid.";
+            header("Location: kontrolBarang.php");
+            exit();
+        }
+    }
 
     // Validasi tanggal sesuai dengan cawu yang dipilih
     $valid_date = true;
     $date_error = '';
 
-    if (strtotime($tanggal_kontrol) < strtotime("$year-05-01") || strtotime($tanggal_kontrol) > strtotime("$year-08-31")) {
+    if (strtotime($tanggal_kontrol) < strtotime("$year-01-01") || strtotime($tanggal_kontrol) > strtotime("$year-04-30")) {
         $valid_date = false;
-        $date_error = "Tanggal harus berada di antara 1 Mei - 31 Agustus $year";
+        $date_error = "Tanggal harus berada di antara 1 Januari - 30 April $year";
     }
 
     if (!$valid_date) {
@@ -95,13 +121,16 @@ if (isset($_POST['tambahKontrol'])) {
     }
 
     // Lanjutkan dengan proses insert
-    $query = "INSERT INTO $table (id_inventaris, id_user, tanggal_kontrol, tahun_kontrol, jumlah_kontrol, status_kontrol, keterangan) 
-              VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$tahun_kontrol', '$jumlah_kontrol', '$status_kontrol', '$keterangan')";
+    for ($i = 0; $i < count($status_kontrol); $i++) {
+        $query = "INSERT INTO $table (id_inventaris, id_user, tanggal_kontrol, tahun_kontrol, jumlah_kontrol, status_kontrol, keterangan) 
+                  VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$year', '{$jumlah_kontrol[$i]}', '{$status_kontrol[$i]}', '{$keterangan[$i]}')";
 
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['success_message'] = "Kontrol barang berhasil ditambahkan!";
-    } else {
-        $_SESSION['error_message'] = "Gagal menambahkan kontrol barang: " . mysqli_error($conn);
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['success_message'] = "Kontrol barang berhasil ditambahkan!";
+        } else {
+            $_SESSION['error_message'] = "Gagal menambahkan kontrol barang: " . mysqli_error($conn);
+            break;
+        }
     }
 
     header("Location: kontrolBarang.php");

@@ -23,22 +23,13 @@
         </div>
         <!-- Form limit -->
         <div class="col-md-6">
-            <form method="GET" class="d-flex justify-content-end align-items-center">
-                <div class="flex-grow-1">
-                    <label for="limit" class="form-label">Tampilkan</label>
-                    <select id="limit" name="limit" class="form-select" onchange="changeLimit(this.value)">
-                        <option value="5" <?php echo $limit == 5 ? 'selected' : ''; ?>>5
-                        </option>
-                        <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10
-                        </option>
-                        <option value="20" <?php echo $limit == 20 ? 'selected' : ''; ?>>20
-                        </option>
-                    </select>
-                </div>
-                <!-- Menyertakan parameter lain yang sedang aktif -->
-                <input type="hidden" name="page" value="<?php echo $page; ?>">
-                <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
-                <input type="hidden" name="year" value="<?php echo $year; ?>">
+            <form class="flex-grow-1 me-2">
+                <label for="limit" class="form-label">Tampilkan</label>
+                <select id="limit" class="select2 form-select" onchange="changeLimit(this.value);">
+                    <option value="5" <?php if ($limit == 5) echo 'selected'; ?>>5</option>
+                    <option value="10" <?php if ($limit == 10) echo 'selected'; ?>>10</option>
+                    <option value="20" <?php if ($limit == 20) echo 'selected'; ?>>20</option>
+                </select>
             </form>
         </div>
     </div>
@@ -200,8 +191,8 @@
                 </div>
 
                 <?php 
-                                            } // End of while loop
-                                        } else { // Jika tidak ada data
+                                            } 
+                                        } else { 
                                         ?>
                 <tr>
                     <td colspan="8" class="text-center">Tidak ada data kontrol barang untuk
@@ -260,41 +251,94 @@
                     <input type="hidden" name="tambahKontrol" value="1">
                     <input type="hidden" name="cawu" value="<?php echo $cawu; ?>">
                     <input type="hidden" name="year" value="<?php echo $year; ?>">
+
                     <div class="mb-3">
                         <label class="form-label">Inventaris</label>
                         <select name="id_inventaris" class="form-select" required>
                             <option value="">Pilih Barang</option>
                             <?php
-            $invResult = getAvailableInventaris($conn, $year);
-            while ($inv = mysqli_fetch_assoc($invResult)) {
+                            $invResult = getAvailableInventaris($conn, $year);
+                            while ($inv = mysqli_fetch_assoc($invResult)) {
                 echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . "'>"
                     . $inv['kode_inventaris'] . " - "
                     . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . ($inv['jumlah'] - $inv['jumlah_terkontrol']) . " " . $inv['satuan'] . ")</option>";
-            }
-            ?>
+                            }
+                            ?>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Tanggal</label>
                         <input type="date" name="tanggal" class="form-control" required>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select" required>
-                            <option value="1">Baik</option>
-                            <option value="2">Pindah</option>
-                            <option value="3">Rusak</option>
-                            <option value="4">Hilang</option>
-                        </select>
+                        <label class="form-label">Status</label><br>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="statusBaik" name="status[]" value="1"
+                                onclick="toggleInput(this)">
+                            <label class="form-check-label" for="statusBaik">Baik</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="statusPindah" name="status[]" value="2"
+                                onclick="toggleInput(this)">
+                            <label class="form-check-label" for="statusPindah">Pindah</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="statusRusak" name="status[]" value="3"
+                                onclick="toggleInput(this)">
+                            <label class="form-check-label" for="statusRusak">Rusak</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="statusHilang" name="status[]" value="4"
+                                onclick="toggleInput(this)">
+                            <label class="form-check-label" for="statusHilang">Hilang</label>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Jumlah</label>
-                        <input type="number" name="jumlah" class="form-control" min="1" required>
+
+                    <div id="inputContainer" style="display: none;">
+                        <div class="status-input" id="inputBaik" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Jumlah Baik</label>
+                                <input type="number" name="jumlah_baik" class="form-control" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Keterangan Baik</label>
+                                <textarea name="keterangan_baik" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="status-input" id="inputPindah" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Jumlah Pindah</label>
+                                <input type="number" name="jumlah_pindah" class="form-control" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Keterangan Pindah</label>
+                                <textarea name="keterangan_pindah" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="status-input" id="inputRusak" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Jumlah Rusak</label>
+                                <input type="number" name="jumlah_rusak" class="form-control" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Keterangan Rusak</label>
+                                <textarea name="keterangan_rusak" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="status-input" id="inputHilang" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Jumlah Hilang</label>
+                                <input type="number" name="jumlah_hilang" class="form-control" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Keterangan Hilang</label>
+                                <textarea name="keterangan_hilang" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Keterangan</label>
-                        <textarea name="keterangan" class="form-control" rows="3" required></textarea>
-                    </div>
+
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-primary">Simpan</button>
@@ -304,3 +348,54 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleInput(checkbox) {
+    const inputContainer = document.getElementById('inputContainer');
+    const inputBaik = document.getElementById('inputBaik');
+    const inputPindah = document.getElementById('inputPindah');
+    const inputRusak = document.getElementById('inputRusak');
+    const inputHilang = document.getElementById('inputHilang');
+
+    inputContainer.style.display = 'block'; // Tampilkan container input
+
+    // Sembunyikan semua input
+    inputBaik.style.display = 'none';
+    inputPindah.style.display = 'none';
+    inputRusak.style.display = 'none';
+    inputHilang.style.display = 'none';
+
+    // Tampilkan input sesuai dengan checkbox yang dicentang
+    if (document.getElementById('statusBaik').checked) {
+        inputBaik.style.display = 'block';
+    }
+    if (document.getElementById('statusPindah').checked) {
+        inputPindah.style.display = 'block';
+    }
+    if (document.getElementById('statusRusak').checked) {
+        inputRusak.style.display = 'block';
+    }
+    if (document.getElementById('statusHilang').checked) {
+        inputHilang.style.display = 'block';
+    }
+
+    // Jika tidak ada checkbox yang dicentang, sembunyikan container input
+    if (!document.getElementById('statusBaik').checked &&
+        !document.getElementById('statusPindah').checked &&
+        !document.getElementById('statusRusak').checked &&
+        !document.getElementById('statusHilang').checked) {
+        inputContainer.style.display = 'none';
+    }
+}
+
+function changeLimit(value) {
+    // Ambil parameter lain yang sedang aktif
+    var page = "<?php echo $page; ?>";
+    var cawu = "<?php echo $cawu; ?>";
+    var year = "<?php echo $year; ?>";
+
+    // Buat URL baru dengan parameter limit yang baru
+    var newUrl = "kontrolBarang.php?limit=" + value + "&page=" + page + "&cawu=" + cawu + "&year=" + year;
+    window.location.href = newUrl;
+}
+</script>
