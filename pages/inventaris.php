@@ -115,7 +115,7 @@ require('../layouts/header.php');
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_inventaris']; ?>">Delete</button>
                                             <a href="detail_inventaris.php?id=<?php echo $row['id_inventaris']; ?>"
-                                                class="btn btn-primary btn-sm">Lihat Detail</a>
+                                                class="btn btn-primary btn-sm">Detail</a>
                                         </td>
                                     </tr>
 

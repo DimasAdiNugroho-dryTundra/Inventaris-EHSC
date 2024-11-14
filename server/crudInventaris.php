@@ -11,9 +11,18 @@ $search = isset($_POST['search']) ? $_POST['search'] : '';
 $query = "SELECT i.*, 
          d.nama_departemen, 
          k.nama_kategori,
-         (i.jumlah - IFNULL((SELECT SUM(jumlah_kontrol) FROM kontrol_barang_cawu_satu WHERE id_inventaris = i.id_inventaris AND status_kontrol != 1), 0)
-          - IFNULL((SELECT SUM(jumlah_kontrol) FROM kontrol_barang_cawu_dua WHERE id_inventaris = i.id_inventaris AND status_kontrol != 1), 0)
-          - IFNULL((SELECT SUM(jumlah_kontrol) FROM kontrol_barang_cawu_tiga WHERE id_inventaris = i.id_inventaris AND status_kontrol != 1), 0)) AS jumlah_akhir,
+         (IFNULL((SELECT SUM(jumlah_baik) FROM kontrol_barang_cawu_satu WHERE id_inventaris = i.id_inventaris), 0) +
+          IFNULL((SELECT SUM(jumlah_baik) FROM kontrol_barang_cawu_dua WHERE id_inventaris = i.id_inventaris), 0) +
+          IFNULL((SELECT SUM(jumlah_baik) FROM kontrol_barang_cawu_tiga WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_satu WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_dua WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_tiga WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_satu WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_dua WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_tiga WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_satu WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_dua WHERE id_inventaris = i.id_inventaris), 0) -
+          IFNULL((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_tiga WHERE id_inventaris = i.id_inventaris), 0)) AS jumlah_akhir,
          CASE 
              WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang
              ELSE i.nama_barang

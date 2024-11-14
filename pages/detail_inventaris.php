@@ -18,67 +18,7 @@ $query = "SELECT
         CASE 
             WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
             ELSE i.nama_barang 
-        END as nama_barang,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 1 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_satu 
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS jumlah_baik,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 3 THEN jumlah_kontrol ELSE 0 END) 
-            FROM kontrol_barang_cawu_satu
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_rusak,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 4 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_satu
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_hilang,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 2 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_satu
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_pindah,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 1 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_dua
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS jumlah_baik_dua,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 3 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_dua
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_rusak_dua,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 4 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_dua
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_hilang_dua,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 2 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_dua
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_pindah_dua,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 1 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_tiga
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS jumlah_baik_tiga,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 3 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_tiga
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_rusak_tiga,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 4 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_tiga
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_hilang_tiga,
-        COALESCE((
-            SELECT SUM(CASE WHEN status_kontrol = 2 THEN jumlah_kontrol ELSE 0 END)
-            FROM kontrol_barang_cawu_tiga
-            WHERE id_inventaris = i.id_inventaris
-        ), 0) AS total_pindah_tiga
+        END as nama_barang
     FROM inventaris i
     JOIN departemen d ON i.id_departemen = d.id_departemen
     JOIN kategori k ON i.id_kategori = k.id_kategori
@@ -94,12 +34,32 @@ if (!$inventaris) {
     exit;
 }
 
-// Hitung total kontrol
-$total_baik = $inventaris['jumlah_baik'] + $inventaris['jumlah_baik_dua'] + $inventaris['jumlah_baik_tiga'];
-$total_rusak = $inventaris['total_rusak'] + $inventaris['total_rusak_dua'] + $inventaris['total_rusak_tiga'];
-$total_hilang = $inventaris['total_hilang'] + $inventaris['total_hilang_dua'] + $inventaris['total_hilang_tiga'];
-$total_pindah = $inventaris['total_pindah'] + $inventaris['total_pindah_dua'] + $inventaris['total_pindah_tiga'];
-$total_kontrol = $total_baik + $total_rusak + $total_hilang + $total_pindah;
+// Query untuk mengambil data kontrol barang dari cawu 1, 2, dan 3
+$cawu_queries = [
+    "SELECT tahun_kontrol, SUM(jumlah_baik) AS jumlah_baik, SUM(jumlah_rusak) AS total_rusak, 
+            SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang
+     FROM kontrol_barang_cawu_satu
+     WHERE id_inventaris = '$id_inventaris'
+     GROUP BY tahun_kontrol",
+
+    "SELECT tahun_kontrol, SUM(jumlah_baik) AS jumlah_baik, SUM(jumlah_rusak) AS total_rusak, 
+            SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang
+     FROM kontrol_barang_cawu_dua
+     WHERE id_inventaris = '$id_inventaris'
+     GROUP BY tahun_kontrol",
+
+    "SELECT tahun_kontrol, SUM(jumlah_baik) AS jumlah_baik, SUM(jumlah_rusak) AS total_rusak, 
+            SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang
+     FROM kontrol_barang_cawu_tiga
+     WHERE id_inventaris = '$id_inventaris'
+     GROUP BY tahun_kontrol"
+];
+
+$cawu_data = [];
+foreach ($cawu_queries as $query) {
+    $result = mysqli_query($conn, $query);
+    $cawu_data[] = mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
 ?>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -172,77 +132,142 @@ $total_kontrol = $total_baik + $total_rusak + $total_hilang + $total_pindah;
                                                 <?php endif; ?>
                                             </div>
                                         </div>
-
-                                        <!-- Tabel Status Barang -->
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h6 class="mb-3">Status Barang</h6>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered">
-                                                        <thead class="table-light">
-                                                            <tr class="text-center">
-                                                                <th>Barang Baik</th>
-                                                                <th>Barang Rusak</th>
-                                                                <th>Barang Hilang</th>
-                                                                <th>Barang Pindah</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr class="text-center">
-                                                                <td class="text-success">
-                                                                    <?php echo $total_baik . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
-                                                                </td>
-                                                                <td class="text-danger">
-                                                                    <?php echo $total_rusak . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
-                                                                </td>
-                                                                <td class="text-warning">
-                                                                    <?php echo $total_hilang . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
-                                                                </td>
-                                                                <td class="text-info">
-                                                                    <?php echo $total_pindah . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Keterangan Kontrol -->
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h6 class="mb-3">Keterangan Kontrol</h6>
-                                                <div class="alert 
-                                                <?php
-                                                if ($total_kontrol == 0) {
-                                                    echo 'alert-danger">Tidak ada barang yang dikontrol.';
-                                                } elseif ($total_kontrol < $inventaris['jumlah_awal']) {
-                                                    echo 'alert-warning">Sebagian barang telah dikontrol.';
-                                                } else {
-                                                    echo 'alert-success">Semua barang telah dikontrol.';
-                                                }
-                                                ?>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Jumlah Terkontrol -->
-                                        <div class=" row">
-                                                    <div class="col-12">
-                                                        <h6 class="mb-3">Jumlah Terkontrol</h6>
-                                                        <p>
-                                                            <?php echo 'Jumlah Terkontrol: ' . $total_kontrol . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
+
+                                    <!-- Tabel Status Barang untuk Cawu 1 -->
+                                    <h6 class="mb-3">Status Barang Cawu 1</h6>
+                                    <div class="table-responsive mb-3">
+                                        <table class="table table-bordered">
+                                            <thead class="table-light">
+                                                <tr class="text-center">
+                                                    <th>Tahun</th>
+                                                    <th>Barang Baik</th>
+                                                    <th>Barang Rusak</th>
+                                                    <th>Barang Hilang</th>
+                                                    <th>Barang Pindah</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php if (empty($cawu_data[0])): ?>
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Tidak ada data untuk Cawu 1.
+                                                    </td>
+                                                </tr>
+                                                <?php else: ?>
+                                                <?php foreach ($cawu_data[0] as $row): ?>
+                                                <tr class="text-center">
+                                                    <td><?php echo $row['tahun_kontrol']; ?></td>
+                                                    <td class="text-success">
+                                                        <?php echo $row['jumlah_baik'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-danger">
+                                                        <?php echo $row['total_rusak'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-info">
+                                                        <?php echo $row['total_pindah'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-warning">
+                                                        <?php echo $row['total_hilang'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Tabel Status Barang untuk Cawu 2 -->
+                                    <h6 class="mb-3">Status Barang Cawu 2</h6>
+                                    <div class="table-responsive mb-3">
+                                        <table class="table table-bordered">
+                                            <thead class="table-light">
+                                                <tr class="text-center">
+                                                    <th>Tahun</th>
+                                                    <th>Barang Baik</th>
+                                                    <th>Barang Rusak</th>
+                                                    <th>Barang Pindah</th>
+                                                    <th>Barang Hilang</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php if (empty($cawu_data[1])): ?>
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Tidak ada data untuk Cawu 2.
+                                                    </td>
+                                                </tr>
+                                                <?php else: ?>
+                                                <?php foreach ($cawu_data[1] as $row): ?>
+                                                <tr class="text-center">
+                                                    <td><?php echo $row['tahun_kontrol']; ?></td>
+                                                    <td class="text-success">
+                                                        <?php echo $row['jumlah_baik'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-danger">
+                                                        <?php echo $row['total_rusak'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-info">
+                                                        <?php echo $row['total_pindah'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-warning">
+                                                        <?php echo $row['total_hilang'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Tabel Status Barang untuk Cawu 3 -->
+                                    <h6 class="mb-3">Status Barang Cawu 3</h6>
+                                    <div class="table-responsive mb-3">
+                                        <table class="table table-bordered">
+                                            <thead class="table-light">
+                                                <tr class="text-center">
+                                                    <th>Tahun</th>
+                                                    <th>Barang Baik</th>
+                                                    <th>Barang Rusak</th>
+                                                    <th>Barang Pindah</th>
+                                                    <th>Barang Hilang</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php if (empty($cawu_data[2])): ?>
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Tidak ada data untuk Cawu 3.
+                                                    </td>
+                                                </tr>
+                                                <?php else: ?>
+                                                <?php foreach ($cawu_data[2] as $row): ?>
+                                                <tr class="text-center">
+                                                    <td><?php echo $row['tahun_kontrol']; ?></td>
+                                                    <td class="text-success">
+                                                        <?php echo $row['jumlah_baik'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-danger">
+                                                        <?php echo $row['total_rusak'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-info">
+                                                        <?php echo $row['total_pindah'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                    <td class="text-warning">
+                                                        <?php echo $row['total_hilang'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
                                 </div>
                             </div>
-                        </div><?php require('../layouts/footer.php'); ?>
+                        </div>
                     </div>
                 </div>
-                <?php require('../layouts/assetsFooter.php'); ?>
+                <?php require('../layouts/footer.php'); ?>
             </div>
+            <?php require('../layouts/assetsFooter.php'); ?>
         </div>
+    </div>
+</div>

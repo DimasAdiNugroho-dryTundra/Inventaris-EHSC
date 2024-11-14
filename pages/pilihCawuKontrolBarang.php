@@ -38,7 +38,7 @@ require('../layouts/header.php');
                                         additional content.
                                         This content is a little bit longer.
                                     </p>
-                                    <a href="javascript:void(0)" class="btn btn-primary">Pilih</a>
+                                    <a href="kontrolBarangCawuSatu.php" class="btn btn-primary">Pilih</a>
                                 </div>
                             </div>
                         </div>
@@ -52,7 +52,7 @@ require('../layouts/header.php');
                                         additional content.
                                         This content is a little bit longer.
                                     </p>
-                                    <a href="javascript:void(0)" class="btn btn-primary">Pilih</a>
+                                    <a href="kontrolBarangCawuDua.php" class="btn btn-primary">Pilih</a>
                                 </div>
                             </div>
                         </div>
@@ -60,12 +60,12 @@ require('../layouts/header.php');
                             <div class="card h-100 text-center">
                                 <img class="card-img-top" src="../upload/user/1.png" alt="Card image cap" />
                                 <div class="card-body">
-                                    <h5 class="card-title">Caturwulan Ke-2</h5>
+                                    <h5 class="card-title">Caturwulan Ke-3</h5>
                                     <p class="card-text">
                                         This is a longer card with supporting text below as a natural lead-in to
                                         additional content.
                                     </p>
-                                    <a href="javascript:void(0)" class="btn btn-primary">Pilih</a>
+                                    <a href="kontrolBarangCawuTiga.php" class="btn btn-primary">Pilih</a>
                                 </div>
                             </div>
                         </div>
