@@ -374,14 +374,14 @@ $totalPages = ceil($totalRows / $limit);
                                                     <select name="id_inventaris" class="form-select" required>
                                                         <option value="">Pilih Barang</option>
                                                         <?php
-                            $invResult = getAvailableInventaris($conn, $year, $table);
-                            while ($inv = mysqli_fetch_assoc($invResult)) {
-                                $jumlahBelumTerkontrol = $inv['jumlah'] - $inv['jumlah_terkontrol'];
-                                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . $jumlahBelumTerkontrol . "'>"
-                                    . $inv['kode_inventaris'] . " - "
-                                    . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . $jumlahBelumTerkontrol . " " . $inv['satuan'] . ")</option>";
-                            }
-                            ?>
+                                                            $invResult = getAvailableInventaris($conn, $year, $table);
+                                                            while ($inv = mysqli_fetch_assoc($invResult)) {
+                                                                $jumlahBelumTerkontrol = $inv['jumlah'] - $inv['jumlah_terkontrol'];
+                                                                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . $jumlahBelumTerkontrol . "'>"
+                                                                    . $inv['kode_inventaris'] . " - "
+                                                                    . $inv['nama_barang'] . " (Jumlah Awal: " . $inv['jumlah'] . ", Belum terkontrol: " . $jumlahBelumTerkontrol . " " . $inv['satuan'] . ")</option>";
+                                                            }
+                                                        ?>
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">

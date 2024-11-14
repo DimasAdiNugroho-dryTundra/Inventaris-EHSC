@@ -59,8 +59,6 @@ function getAvailableInventaris($conn, $year, $table) {
     return mysqli_query($conn, $query);
 }
 
-
-
 // Fungsi untuk menghitung total kontrol barang
 function getTotalkontrolBarangCawuSatu($conn, $table)
 {

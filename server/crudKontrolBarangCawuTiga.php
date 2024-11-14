@@ -14,8 +14,8 @@ $search = isset($_POST['search']) ? $_POST['search'] : '';
 // Tentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_tiga';
 $idColumn = 'id_kontrol_barang_cawu_tiga';
-$startDate = "$year-01-01";
-$endDate = "$year-04-30";
+$startDate = "$year-09-01";
+$endDate = "$year-12-31";
 
 // Query untuk mengambil data kontrol barang dengan filter tanggal
 $query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, u.nama as nama_petugas 
@@ -42,16 +42,16 @@ $totalPages = ceil($totalRows / $limit);
 
 function getAvailableInventaris($conn, $year, $table) {
     $query = "SELECT 
-            i.id_inventaris, 
-            i.kode_inventaris, 
-            i.nama_barang, 
-            i.jumlah, 
-            i.satuan,
+                i.id_inventaris, 
+                i.kode_inventaris, 
+                i.nama_barang, 
+                i.jumlah, 
+                i.satuan,
             IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
                      FROM $table 
                      WHERE id_inventaris = i.id_inventaris 
                      AND YEAR(tanggal_kontrol) = '$year'), 0) AS jumlah_terkontrol
-        FROM inventaris i 
+            FROM inventaris i 
         WHERE (i.jumlah - IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
                                    FROM $table 
                                    WHERE id_inventaris = i.id_inventaris 
@@ -59,8 +59,6 @@ function getAvailableInventaris($conn, $year, $table) {
 
     return mysqli_query($conn, $query);
 }
-
-
 
 // Fungsi untuk menghitung total kontrol barang
 function getTotalkontrolBarangCawuTiga($conn, $table)
@@ -86,9 +84,9 @@ if (isset($_POST['tambahKontrol'])) {
     $valid_date = true;
     $date_error = '';
 
-    if (strtotime($tanggal_kontrol) < strtotime("$year-09-01") || strtotime($tanggal_kontrol) > strtotime("$year-04-31")) {
+    if (strtotime($tanggal_kontrol) < strtotime("$year-09-01") || strtotime($tanggal_kontrol) > strtotime("$year-12-31")) {
         $valid_date = false;
-        $date_error = "Tanggal harus berada di antara 1 September - 30 Desember $year";
+        $date_error = "Tanggal harus berada di antara 1 September - 31 Desember $year";
     }
 
     if (!$valid_date) {

@@ -1,7 +1,7 @@
 <?php
 require('../server/sessionHandler.php');
 require('../server/configDB.php');
-require('../server/crudKontrolBarangCawuSatu.php');
+require('../server/crudKontrolBarangCawuTiga.php');
 require('../layouts/header.php');
 
 // Ambil tahun dari POST
@@ -34,7 +34,7 @@ $totalPages = ceil($totalRows / $limit);
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
-                            <h2 class="mb-1">Manajemen Kontrol Barang</h2>
+                            <h2 class="mb-1">Kontrol Barang Caturwulan 3</h2>
                         </div>
                         <div class="mt-3">
                             <nav aria-label="breadcrumb">
@@ -42,7 +42,7 @@ $totalPages = ceil($totalRows / $limit);
                                     <li class="breadcrumb-item">
                                         <a href="dashboard.php">Dashboard</a>
                                     </li>
-                                    <li class="breadcrumb-item active">Manajemen Kontrol Barang</li>
+                                    <li class="breadcrumb-item active">Kontrol Barang Caturwulan 3</li>
                                 </ol>
                             </nav>
                         </div>
@@ -218,7 +218,7 @@ $totalPages = ceil($totalRows / $limit);
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Edit Kontrol Barang</h5>
+                                                            <h5 class="modal-title">Edit Kontrol Barang Cawu 3</h5>
                                                             <button type="button" class="btn-close"
                                                                 data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
@@ -294,7 +294,8 @@ $totalPages = ceil($totalRows / $limit);
                                                                 data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            Apakah Anda yakin ingin menghapus data kontrol barang ini?
+                                                            Apakah Anda yakin ingin menghapus data kontrol barang cawu 3
+                                                            ini?
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
@@ -311,7 +312,8 @@ $totalPages = ceil($totalRows / $limit);
                                     } else {
                                     ?>
                                             <tr>
-                                                <td colspan="9" class="text-center">Tidak ada data kontrol barang untuk
+                                                <td colspan="9" class="text-center">Tidak ada data kontrol barang cawu 3
+                                                    untuk
                                                     tahun <?php echo $year; ?>.</td>
                                             </tr>
                                             <?php } ?>
@@ -358,7 +360,7 @@ $totalPages = ceil($totalRows / $limit);
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Tambah Kontrol Barang</h5>
+                                            <h5 class="modal-title">Tambah Kontrol Barang Cawu 3</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
@@ -372,14 +374,14 @@ $totalPages = ceil($totalRows / $limit);
                                                     <select name="id_inventaris" class="form-select" required>
                                                         <option value="">Pilih Barang</option>
                                                         <?php
-                            $invResult = getAvailableInventaris($conn, $year, $table);
-                            while ($inv = mysqli_fetch_assoc($invResult)) {
-                                $jumlahBelumTerkontrol = $inv['jumlah'] - $inv['jumlah_terkontrol'];
-                                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . $jumlahBelumTerkontrol . "'>"
-                                    . $inv['kode_inventaris'] . " - "
-                                    . $inv['nama_barang'] . " (Total: " . $inv['jumlah'] . ", Belum terkontrol: " . $jumlahBelumTerkontrol . " " . $inv['satuan'] . ")</option>";
-                            }
-                            ?>
+                                                            $invResult = getAvailableInventaris($conn, $year, $table);
+                                                            while ($inv = mysqli_fetch_assoc($invResult)) {
+                                                                $jumlahBelumTerkontrol = $inv['jumlah'] - $inv['jumlah_terkontrol'];
+                                                                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . $jumlahBelumTerkontrol . "'>"
+                                                                    . $inv['kode_inventaris'] . " - "
+                                                                    . $inv['nama_barang'] . " (Jumlah Awal: " . $inv['jumlah'] . ", Belum terkontrol: " . $jumlahBelumTerkontrol . " " . $inv['satuan'] . ")</option>";
+                                                            }
+                                                        ?>
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">

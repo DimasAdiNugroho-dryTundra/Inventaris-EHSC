@@ -13,8 +13,8 @@ $search = isset($_POST['search']) ? $_POST['search'] : '';
 // Tentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_dua';
 $idColumn = 'id_kontrol_barang_cawu_dua';
-$startDate = "$year-01-01";
-$endDate = "$year-04-30";
+$startDate = "$year-05-01";
+$endDate = "$year-08-31";
 
 // Query untuk mengambil data kontrol barang dengan filter tanggal
 $query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, u.nama as nama_petugas 
