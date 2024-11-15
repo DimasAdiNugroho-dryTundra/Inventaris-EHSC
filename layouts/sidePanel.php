@@ -53,7 +53,18 @@
                 Kontrol Barang
             </a>
         </li>
-
+        <li class="menu-item">
+            <a href="kerusakanBarang.php" class="menu-link">
+                <i class="menu-icon tf-icons ti ti-box-align-bottom-left"></i>
+                Kerusakan Barang
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="perpindahanBarang.php" class="menu-link">
+                <i class="menu-icon tf-icons ti ti-box-align-bottom-left"></i>
+                Perpindahan Barang
+            </a>
+        </li>
 
         <!-- <li class="menu-item">
             <a class="menu-link menu-toggle">

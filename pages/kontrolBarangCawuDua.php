@@ -178,21 +178,21 @@ $totalPages = ceil($totalRows / $limit);
                                         while ($row = mysqli_fetch_assoc($result)) {
                                     ?>
                                             <tr>
-                                                <td class="align-middle text-center"><?php echo $no++; ?></td>
-                                                <td class="align-middle text-center">
+                                                <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                                <td class="text-center align-middle">
                                                     <?php echo $row['kode_inventaris']; ?></td>
-                                                <td class="align-middle text-center"><?php echo $row['nama_barang']; ?>
+                                                <td class="text-center align-middle"><?php echo $row['nama_barang']; ?>
                                                 </td>
-                                                <td class="align-middle text-center">
+                                                <td class="text-center align-middle">
                                                     <?php echo date('d/m/Y', strtotime($row['tanggal_kontrol'])); ?>
                                                 </td>
-                                                <td class="align-middle text-center"><?php echo $row['jumlah_baik']; ?>
+                                                <td class="text-center align-middle"><?php echo $row['jumlah_baik']; ?>
                                                 </td>
-                                                <td class="align-middle text-center"><?php echo $row['jumlah_rusak']; ?>
+                                                <td class="text-center align-middle"><?php echo $row['jumlah_rusak']; ?>
                                                 </td>
-                                                <td class="align-middle text-center">
+                                                <td class="text-center align-middle">
                                                     <?php echo $row['jumlah_pindah']; ?></td>
-                                                <td class="align-middle text-center">
+                                                <td class="text-center align-middle">
                                                     <?php echo $row['jumlah_hilang']; ?></td>
                                                 <td class="align-middle">
                                                     <div class="d-flex gap-2 justify-content-center">
