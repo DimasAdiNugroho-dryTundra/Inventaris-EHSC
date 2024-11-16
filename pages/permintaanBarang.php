@@ -124,7 +124,7 @@ require('../layouts/header.php');
                                                 data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Delete</button>
-                                            <a href="laporan_permintaan.php?id=<?php echo $row['id_permintaan']; ?>"
+                                            <a href="../report/printLaporanPermintaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
                                                 class="btn btn-primary btn-sm">Laporan</a>
                                         </td>
                                     </tr>

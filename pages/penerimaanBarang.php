@@ -10,7 +10,7 @@ require('../layouts/header.php');
         <?php require('../layouts/sidePanel.php'); ?>
 
         <div class="layout-page">
-        <?php require('../layouts/navbar.php'); ?>
+            <?php require('../layouts/navbar.php'); ?>
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -113,7 +113,7 @@ require('../layouts/header.php');
                                                 data-bs-target="#modal-update-<?php echo $row['id_penerimaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_penerimaan']; ?>">Delete</button>
-                                            <a href="laporan_penerimaan.php?id=<?php echo $row['id_permintaan']; ?>"
+                                            <a href="../report/printLaporanPenerimaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
                                                 class="btn btn-primary btn-sm">Laporan</a>
                         </div>
                         </td>

@@ -65,6 +65,12 @@
                 Perpindahan Barang
             </a>
         </li>
+        <li class="menu-item">
+            <a href="kehilanganBarang.php" class="menu-link">
+                <i class="menu-icon tf-icons ti ti-box-align-bottom-left"></i>
+                Kehilangan Barang
+            </a>
+        </li>
 
         <!-- <li class="menu-item">
             <a class="menu-link menu-toggle">

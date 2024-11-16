@@ -1,0 +1,118 @@
+<?php
+// Pengaturan untuk pagination
+$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Penanganan pencarian
+$search = isset($_POST['search']) ? $_POST['search'] : '';
+$query = "SELECT pb.*, i.nama_barang, i.kode_inventaris 
+          FROM kehilangan_barang pb
+          JOIN inventaris i ON pb.id_inventaris = i.id_inventaris 
+          WHERE i.nama_barang LIKE '%$search%' OR i.kode_inventaris LIKE '%$search%'
+          LIMIT $limit OFFSET $offset";
+$result = mysqli_query($conn, $query);
+
+// Hitung total data untuk pagination
+$totalQuery = "SELECT COUNT(*) as total FROM kehilangan_barang pb
+               JOIN inventaris i ON pb.id_inventaris = i.id_inventaris 
+               WHERE i.nama_barang LIKE '%$search%' OR i.kode_inventaris LIKE '%$search%'";
+$totalResult = mysqli_query($conn, $totalQuery);
+$totalRow = mysqli_fetch_assoc($totalResult);
+$totalPages = ceil($totalRow['total'] / $limit);
+
+// Fungsi untuk mendapatkan data kehilangan barang
+function getKehilanganBarang($conn) {
+    $query = "SELECT i.id_inventaris, i.kode_inventaris, i.nama_barang, k.jumlah_hilang, 
+            'Caturwulan 1' as cawu, k.tanggal_kontrol
+        FROM kontrol_barang_cawu_satu k
+        JOIN inventaris i ON k.id_inventaris = i.id_inventaris
+        LEFT JOIN kehilangan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_kehilangan
+        WHERE k.jumlah_hilang > 0 AND pb.id_inventaris IS NULL
+        
+        UNION ALL
+        
+        SELECT i.id_inventaris, i.kode_inventaris, i.nama_barang, k.jumlah_hilang, 
+               'Caturwulan 2' as cawu, k.tanggal_kontrol
+        FROM kontrol_barang_cawu_dua k
+        JOIN inventaris i ON k.id_inventaris = i.id_inventaris
+        LEFT JOIN kehilangan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_kehilangan
+        WHERE k.jumlah_hilang > 0 AND pb.id_inventaris IS NULL
+        
+        UNION ALL
+        
+        SELECT i.id_inventaris, i.kode_inventaris, i.nama_barang, k.jumlah_hilang, 
+               'Caturwulan 3' as cawu, k.tanggal_kontrol
+        FROM kontrol_barang_cawu_tiga k
+        JOIN inventaris i ON k.id_inventaris = i.id_inventaris
+        LEFT JOIN kehilangan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_kehilangan
+        WHERE k.jumlah_hilang > 0 AND pb.id_inventaris IS NULL";
+    return mysqli_query($conn, $query);
+}
+
+
+// Proses penambahan kehilangan barang
+if (isset($_POST['tambahKehilangan'])) {
+    $id_inventaris = $_POST['id_inventaris'];
+    $tanggal_kehilangan = $_POST['tanggal_kehilangan'];
+    $cawu = $_POST['cawu'];
+    $jumlah_kehilangan = $_POST['jumlah_kehilangan'];
+    $keterangan = $_POST['keterangan'];
+
+    $query = "INSERT INTO kehilangan_barang (id_inventaris, tanggal_kehilangan, cawu, 
+              jumlah_kehilangan, keterangan)
+              VALUES ('$id_inventaris', '$tanggal_kehilangan', '$cawu', 
+              '$jumlah_kehilangan', '$keterangan')";
+
+    if (mysqli_query($conn, $query)) {
+        $_SESSION['success_message'] = "Data kehilangan barang berhasil ditambahkan!";
+    } else {
+        $_SESSION['error_message'] = "Gagal menambahkan data kehilangan barang: " . mysqli_error($conn);
+    }
+
+    header("Location: kehilanganBarang.php");
+    exit();
+}
+
+// Proses update kehilangan barang
+if (isset($_POST['action']) && $_POST['action'] == 'update') {
+    $id_kehilangan_barang = $_POST['id_kehilangan_barang'];
+    $tanggal_kehilangan = $_POST['tanggal_kehilangan'];
+    $cawu = $_POST['cawu'];
+    $jumlah_kehilangan = $_POST['jumlah_kehilangan'];
+    $keterangan = $_POST['keterangan'];
+
+    $query = "UPDATE kehilangan_barang SET 
+              tanggal_kehilangan = '$tanggal_kehilangan',
+              cawu = '$cawu',
+              jumlah_kehilangan = '$jumlah_kehilangan',
+              keterangan = '$keterangan'
+              WHERE id_kehilangan_barang = $id_kehilangan_barang";
+
+    if (mysqli_query($conn, $query)) {
+        $_SESSION['success_message'] = "Data kehilangan barang berhasil diperbarui!";
+    } else {
+        $_SESSION['error_message'] = "Gagal memperbarui data kehilangan barang: " . mysqli_error($conn);
+    }
+
+    header("Location: kehilanganBarang.php");
+    exit();
+}
+
+// Proses delete kehilangan barang
+if (isset($_GET['delete'])) {
+    $id_kehilangan_barang = $_GET['delete'];
+
+    // Hapus data dari database
+    $query = "DELETE FROM kehilangan_barang WHERE id_kehilangan_barang = $id_kehilangan_barang";
+
+    if (mysqli_query($conn, $query)) {
+        $_SESSION['success_message'] = "Data kehilangan barang berhasil dihapus!";
+    } else {
+        $_SESSION['error_message'] = "Gagal menghapus data kehilangan barang: " . mysqli_error($conn);
+    }
+
+    header("Location: kehilanganBarang.php");
+    exit();
+}
+?>
