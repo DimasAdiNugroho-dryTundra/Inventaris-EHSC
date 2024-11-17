@@ -18,6 +18,8 @@ function login($username, $password)
             // Verifikasi berhasil, buat sesi
             $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['nama'] = $user['nama'];
+            $_SESSION['jabatan'] = $user['jabatan'];
+            $_SESSION['hak_akses'] = $user['hak_akses']; // Menyimpan hak akses
 
             return true; // Login sukses
         } else {
@@ -34,9 +36,14 @@ if (isset($_POST['login'])) {
 
     $login_result = login($username, $password);
     if ($login_result === true) {
-        // Redirect ke dashboard
-        header("Location:pages/dashboard.php");
-        exit();
+        // Cek status aktif
+        if ($_SESSION['hak_akses'] == 0) {
+            $error_message = "Akun Anda belum aktif. Silakan hubungi operator.";
+        } else {
+            // Redirect ke dashboard
+            header("Location: pages/dashboard.php");
+            exit();
+        }
     } else {
         // Tampilkan pesan kesalahan
         $error_message = $login_result;

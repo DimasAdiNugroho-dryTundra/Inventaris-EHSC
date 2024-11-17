@@ -16,12 +16,12 @@ require('layouts/headerLogin.php');
                     <p class="mb-6">Silahkan Masuk</p>
 
                     <?php if (isset($error_message) && !empty($error_message)): ?>
-                        <div class="alert alert-solid-danger d-flex align-items-center" role="alert">
-                            <span class="alert-icon rounded">
-                                <i class="ti ti-ban"></i>
-                            </span>
-                            <?php echo $error_message; ?>
-                        </div>
+                    <div class="alert alert-solid-danger d-flex align-items-center" role="alert">
+                        <span class="alert-icon rounded">
+                            <i class="ti ti-ban"></i>
+                        </span>
+                        <?php echo $error_message; ?>
+                    </div>
                     <?php endif; ?>
 
                     <form id="formAuthentication" class="mb-4" method="post">
@@ -54,22 +54,22 @@ require('layouts/headerLogin.php');
 
 <script src="../../assets/vendor/libs/jquery/jquery.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggleButton = document.querySelector('.toggle-password');
-        const passwordInput = document.querySelector('#password');
-        const icon = toggleButton.querySelector('i');
-        toggleButton.addEventListener('click', function () {
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('ti-eye-off');
-                icon.classList.add('ti-eye');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('ti-eye');
-                icon.classList.add('ti-eye-off');
-            }
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.querySelector('.toggle-password');
+    const passwordInput = document.querySelector('#password');
+    const icon = toggleButton.querySelector('i');
+    toggleButton.addEventListener('click', function() {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('ti-eye-off');
+            icon.classList.add('ti-eye');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('ti-eye');
+            icon.classList.add('ti-eye-off');
+        }
     });
+});
 </script>
 
 <!-- Core JSJS -->

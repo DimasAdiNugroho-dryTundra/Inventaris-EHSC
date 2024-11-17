@@ -29,6 +29,7 @@ require('../layouts/header.php');
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
                                 <h1>halo</h1>
+                                <p>Jabatan: <?php echo $_SESSION['jabatan']; ?></p>
                             </div>
                         </div>
                         <div class="row row-cols-1 row-cols-md-3 g-6 mb-12">

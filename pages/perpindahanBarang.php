@@ -1,7 +1,7 @@
 <?php
 // File: perpindahanBarang.php
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../server/crudPerpindahanBarang.php'); 
 require('../layouts/header.php');
 ?>

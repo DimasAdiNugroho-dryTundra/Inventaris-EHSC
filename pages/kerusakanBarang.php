@@ -1,7 +1,7 @@
 <?php
 // File: kerusakanBarang.php
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../server/crudKerusakanBarang.php'); // Ganti dengan file CRUD yang sesuai
 require('../layouts/header.php');
 ?>

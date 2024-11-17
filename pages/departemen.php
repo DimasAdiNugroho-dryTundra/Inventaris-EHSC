@@ -1,7 +1,7 @@
 <?php
 // File: departemen.php
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../server/crudDepartemen.php'); 
 require('../layouts/header.php');
 ?>

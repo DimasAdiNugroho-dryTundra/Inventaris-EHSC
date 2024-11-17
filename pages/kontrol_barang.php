@@ -1,6 +1,6 @@
 <?php
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../server/readKontrolBarang.php');
 require('../server/createKontrolBarang.php');
 require('../server/updateKontrolBarang.php');

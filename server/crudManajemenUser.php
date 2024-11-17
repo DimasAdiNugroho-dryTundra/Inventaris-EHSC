@@ -65,6 +65,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $jabatan = $_POST['jabatan'];
+    $hak_akses = $_POST['hak_akses'];
     $password = !empty($_POST['password']) ? md5($_POST['password']) : null;
 
     // Mulai query update

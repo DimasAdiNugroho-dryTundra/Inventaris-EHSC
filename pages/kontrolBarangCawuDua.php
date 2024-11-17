@@ -1,6 +1,6 @@
 <?php
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../server/crudKontrolBarangCawuDua.php');
 require('../layouts/header.php');
 

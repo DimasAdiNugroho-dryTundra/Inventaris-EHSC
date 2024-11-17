@@ -1,6 +1,6 @@
 <?php
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../server/crudManajemenUser.php');
 require('../layouts/header.php');
 ?>
@@ -13,7 +13,7 @@ require('../layouts/header.php');
             <!-- navbar -->
 
             <div class="content-wrapper">
-            <?php require('../layouts/navbar.php'); ?>
+                <?php require('../layouts/navbar.php'); ?>
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
@@ -42,7 +42,6 @@ require('../layouts/header.php');
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         <?php unset($_SESSION['error_message']); ?>
-                        <!-- Hapus pesan setelah ditampilkan -->
                         <?php endif; ?>
 
                         <?php if (isset($_SESSION['success_message'])): ?>
@@ -61,7 +60,6 @@ require('../layouts/header.php');
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#tambahUserModal">Tambah User</button>
                         </h4>
-
 
                         <!-- Form Pencarian dan Pagination -->
                         <div class="row p-3">
@@ -119,76 +117,110 @@ require('../layouts/header.php');
                                                 data-bs-target="#modal-update-<?php echo $row['id_user']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_user']; ?>">Delete</button>
-
                                         </td>
                                     </tr>
-                                    <?php
-                                        // Modal Update
-                                    echo "
-                                        <div class='modal fade' id='modal-update-" . $row['id_user'] . "' tabindex='-1' aria-labelledby='modalUpdateLabel' aria-hidden='true'>
-                                            <div class='modal-dialog modal-lg modal-dialog-centered' role='document'>
-                                                <div class='modal-content'>
-                                                    <div class='modal-header'>
-                                                        <h4 class='modal-title' id='modalUpdateLabel'>Edit User</h4>
-                                                        <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-                                                    </div>
-                                                    <div class='modal-body'>
-                                                        <form method='post' action='manajemen-user.php' enctype='multipart/form-data'>
-                                                            <input type='hidden' name='action' value='update'>
-                                                            <input type='hidden' name='id_user' value='" . $row['id_user'] . "'>
-                                                            <div class='mb-3'>
-                                                                <label for='username' class='form-label'>Username</label>
-                                                                <input type='text' class='form-control' name='username' value='" . $row['username'] . "' required>
-                                                            </div>
-                                                            <div class='mb-3'>
-                                                                <label for='email' class='form-label'>Email</label>
-                                                                <input type='email' class='form-control' name='email' value='" . $row['email'] . "' required>
-                                                            </div>
-                                                            <div class='mb-3'>
-                                                                <label for='jabatan' class='form-label'>Jabatan</label>
-                                                                <input type='text' class='form-control' name='jabatan' value='" . $row['jabatan'] . "' required>
-                                                            </div>
-                                                            <div class='mb-3'>
-                                                                <label for='password' class='form-label'>Password</label>
-                                                                <input type='password' class='form-control' name='password'>
-                                                            </div>
-                                                            <div class='mb-3'>
-                                                                <label for='foto' class='form-label'>Foto (max 5MB, 1:1 aspect ratio)</label>
-                                                                <input type='file' name='foto' class='form-control' accept='image/*'>
-                                                            </div>
-                                                            <button type='submit' class='btn btn-primary'>Simpan</button>
-                                                        </form>
-                                                    </div>
+
+                                    <!-- Modal Edit -->
+                                    <div class="modal fade" id="modal-update-<?php echo $row['id_user']; ?>"
+                                        tabindex="-1" aria-labelledby="modalUpdateLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title" id="modalUpdateLabel">Edit User</h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="post" action="manajemen-user.php"
+                                                        enctype="multipart/form-data">
+                                                        <input type="hidden" name="action" value="update">
+                                                        <input type="hidden" name="id_user"
+                                                            value="<?php echo $row['id_user']; ?>">
+                                                        <div class="mb-3">
+                                                            <label for="username" class="form-label">Username</label>
+                                                            <input type="text" class="form-control" name="username"
+                                                                value="<?php echo $row['username']; ?>" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="email" class="form-label">Email</label>
+                                                            <input type="email" class="form-control" name="email"
+                                                                value="<?php echo $row['email']; ?>" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="jabatan" class="form-label">Jabatan</label>
+                                                            <select name="jabatan" class="form-select" required>
+                                                                <option value="">Pilih Jabatan</option>
+                                                                <option value="operator"
+                                                                    <?php if ($row['jabatan'] == 'operator') echo 'selected'; ?>>
+                                                                    Operator</option>
+                                                                <option value="administrasi"
+                                                                    <?php if ($row['jabatan'] == 'administrasi') echo 'selected'; ?>>
+                                                                    Administrasi</option>
+                                                                <option value="petugas kontrol"
+                                                                    <?php if ($row['jabatan'] == 'petugas kontrol') echo 'selected'; ?>>
+                                                                    Petugas Kontrol</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="hak_akses" class="form-label">Hak Akses</label>
+                                                            <select name="hak_akses" class="form-select" required>
+                                                                <option value="">Pilih Hak Akses</option>
+                                                                <option value="1"
+                                                                    <?php if ($row['hak_akses'] == 1) echo 'selected'; ?>>
+                                                                    Aktif</option>
+                                                                <option value="0"
+                                                                    <?php if ($row['hak_akses'] == 0) echo 'selected'; ?>>
+                                                                    Non Aktif</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="password" class="form-label">Password</label>
+                                                            <input type="password" class="form-control" name="password">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="foto" class="form-label">Foto (max 5MB, 1:1
+                                                                aspect ratio)</label>
+                                                            <input type="file" name="foto" class="form-control"
+                                                                accept="image/*">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit"
+                                                                class="btn btn-primary">Simpan</button>
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
-                                        </div>";
-                                    
-                                    // modal validasi hapus
-                                    echo"
-                                        <div class='modal fade' id='modal-delete-" . $row['id_user'] . "' tabindex='-1'
-                                            aria-labelledby='modalDeleteLabel' aria-hidden='true'>
-                                            <div class='modal-dialog modal-dialog-centered' role='document'>
-                                                <div class='modal-content'>
-                                                    <div class='modal-header'>
-                                                        <h5 class='modal-title' id='modalDeleteLabel'>Konfirmasi Hapus</h5>
-                                                        <button type='button' class='btn-close' data-bs-dismiss='modal'
-                                                            aria-label='Close'></button>
-                                                    </div>
-                                                    <div class='modal-body'>
-                                                        Apakah Anda yakin ingin menghapus user " . $row['nama'] . "?
-                                                    </div>
-                                                    <div class='modal-footer'>
-                                                        <button type='button' class='btn btn-secondary'
-                                                            data-bs-dismiss='modal'>Batal</button>
-                                                        <form method='get' action='manajemen-user.php'>
-                                                            <input type='hidden' name='delete' value='" . $row['id_user'] . "'>
-                                                            <button type='submit' class='btn btn-danger'>Hapus</button>
-                                                        </form>
-                                                    </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Delete -->
+                                    <div class="modal fade" id="modal-delete-<?php echo $row['id_user']; ?>"
+                                        tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalDeleteLabel">Konfirmasi Hapus</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Apakah Anda yakin ingin menghapus user <?php echo $row['nama']; ?>?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Batal</button>
+                                                    <form method="get" action="manajemen-user.php">
+                                                        <input type="hidden" name="delete"
+                                                            value="<?php echo $row['id_user']; ?>">
+                                                        <button type="submit" class="btn btn-danger">Hapus</button>
+                                                    </form>
                                                 </div>
                                             </div>
-                                        </div>";
-                                    } ?>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>
@@ -217,7 +249,6 @@ require('../layouts/header.php');
                             </ul>
                         </nav>
                     </div>
-
 
                     <!-- Modal Tambah User -->
                     <div class="modal fade" id="tambahUserModal" tabindex="-1" aria-hidden="true">
@@ -248,11 +279,20 @@ require('../layouts/header.php');
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Jabatan</label>
-                                            <input type="text" name="jabatan" class="form-control" required>
+                                            <select name="jabatan" class="form-select" required>
+                                                <option value="">Pilih Jabatan</option>
+                                                <option value="operator">Operator</option>
+                                                <option value="administrasi">Administrasi</option>
+                                                <option value="petugas kontrol">Petugas Kontrol</option>
+                                            </select>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Hak Akses</label>
-                                            <input type="number" name="hak_akses" class="form-control" required>
+                                            <select name="hak_akses" class="form-select" required>
+                                                <option value="">Pilih Hak Akses</option>
+                                                <option value="1">Aktif</option>
+                                                <option value="0">Non Aktif</option>
+                                            </select>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Foto (max 5MB)</label>
@@ -270,13 +310,10 @@ require('../layouts/header.php');
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
             <!-- Footer -->
-            <?php
-            require('../layouts/footer.php');
-            ?>
+            <?php require('../layouts/footer.php'); ?>
             <!-- / Footer -->
 
             <div class="content-backdrop fade"></div>
@@ -294,6 +331,4 @@ require('../layouts/header.php');
 </div>
 <!-- / Layout wrapper -->
 
-<?php
-require('../layouts/assetsFooter.php')
-    ?>
+<?php require('../layouts/assetsFooter.php') ?>

@@ -2,7 +2,7 @@
 // File: detail_inventaris.php
 
 require('../server/sessionHandler.php');
-require('../server/configDB.php');
+require_once('../server/configDB.php');
 require('../layouts/header.php');
 
 // Get inventory ID from URL
