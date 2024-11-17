@@ -46,29 +46,48 @@ if ($result->num_rows > 0) {
     $status = $data['status'];
 
     // Isi konten
-    $pdf->Cell(0, 10, 'LAPORAN PENERIMAAN BARANG', 0, 1, 'C');
+    $pdf->Cell(0, 10, 'LAPORAN PERMINTAAN BARANG', 0, 1, 'C');
     $pdf->Ln(10);
-    $pdf->Cell(0, 5, 'Nomor: ', 0, 1);
-    $pdf->Cell(0, 5, "Tanggal Penerimaan: $tanggal_terima", 0, 1);
+    $pdf->Cell(0, 5, 'No: ', 0, 1);
+    $pdf->Cell(0, 5, "Tanggal: $tanggal_terima", 0, 1);
     $pdf->Cell(0, 5, "Departemen: $departemen", 0, 1);
-    $pdf->Cell(0, 5, "Nama Barang: $nama_barang", 0, 1);
-    $pdf->Cell(0, 5, "Jumlah Diterima: $jumlah $satuan", 0, 1);
-    $pdf->Cell(0, 5, "Status Penerimaan: $status", 0, 1);
+    $pdf->Cell(0, 5, 'Lampiran:', 0, 1);
     $pdf->Ln(5);
+    $pdf->Cell(0, 5, 'Kepada Yth.', 0, 1);
+    $pdf->Cell(0, 5, 'Direksi', 0, 1);
+    $pdf->Cell(0, 5, 'Di Tempat', 0, 1);
+    $pdf->Ln(5);
+    $pdf->Cell(0, 10, 'Dengan Hormat,', 0, 1);
+    $pdf->Ln(5);
+    $pdf->MultiCell(0, 10, 'Laporan ini merinci jenis dan jumlah barang yang telah diterima, diharapkan dapat memastikan kesesuaian dengan permintaan dan kebutuhan. Kami menghargai perhatian dan kerjasama dari pihak terkait dalam proses penerimaan ini.', 0, 'L', 0, 1);
+    $pdf->Ln(5);
+    $pdf->Cell(0, 0, 'Berikut adalah tabel rincian barang yang diterima.', 0, 1);
+    $pdf->Ln(5);
+    $pdf->SetFont('helvetica', '', 12);
 
-    // Tanda Tangan
-    $pdf->Cell(90, 10, 'Diterima Oleh (Admin Gudang)', 0, 0, 'C'); // Kolom Admin Gudang
-    $pdf->Cell(90, 10, 'Diketahui Oleh (Admin ' . $departemen . ')', 0, 1, 'C'); // Kolom Admin Departemen
+    $pdf->Cell(64, 10, 'Nama Barang', 1, 0, 'C');
+    $pdf->Cell(64, 10, 'Jumlah', 1, 0, 'C');
+    $pdf->Cell(64, 10, 'Satuan', 1, 1, 'C');
 
-    // Garis untuk tanda tangan
-    $pdf->Cell(90, 0, '', 'T', 1, 'C'); // Garis horizontal untuk Admin Gudang
-    $pdf->Cell(90, 0, '', 'T', 1, 'C'); // Garis horizontal untuk Admin Departemen
+    // Isi tabel
+    $pdf->SetFont('helvetica', '', 12);
+    $pdf->Cell(64, 10, $nama_barang, 1, 0, 'C');
+    $pdf->Cell(64, 10, $jumlah, 1, 0, 'C');
+    $pdf->Cell(64, 10, $satuan, 1, 1, 'C');
 
-    $pdf->Cell(90, 10, '_______________________', 0, 0, 'C'); // Tempat untuk nama Admin Gudang
-    $pdf->Cell(90, 10, '_______________________', 0, 1, 'C'); // Tempat untuk nama Admin Departemen
+    $pdf->Ln(5);
+    $pdf->MultiCell(0, 10, 'Demikian laporan ini kami buat untuk dapat digunakan sebagaimana mestinya.', 0, 'L', 0, 1);
 
-    $pdf->Cell(90, 10, 'Admin Gudang', 0, 0, 'C'); // Tempat untuk jabatan Admin Gudang
-    $pdf->Cell(90, 10, 'Admin ' . $departemen, 0, 1, 'C'); // Tempat untuk jabatan Admin Departemen
+    $pdf->Ln(5); // Jarak setelah garis
+    $pdf->Cell(90, 10, 'Gudang, ' . $tanggal_terima, 0, 0, 'C');
+    $pdf->Cell(90, 10, $departemen . ', ' . $tanggal_terima, 0, 1, 'C');
+
+    $pdf->Ln(5); // Jarak setelah garis
+    $pdf->Cell(90, 10, '_______________________', 0, 0, 'C');
+    $pdf->Cell(90, 10, '_______________________', 0, 1, 'C');
+
+    $pdf->Cell(90, 10, 'Admin Gudang', 0, 0, 'C');
+    $pdf->Cell(90, 10, 'Admin ' . $departemen, 0, 1, 'C');
 
 } else {
     $pdf->Cell(0, 10, 'Data penerimaan barang tidak ditemukan.', 0, 1, 'C');

@@ -80,6 +80,14 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
+                        <div class="row p-3">
+                            <div class="col-12 d-flex align-content-center">
+                                <a href="scanQRcode.php" class="btn btn-primary">
+                                    <i class="ti ti-qrcode"></i> Scan QR Code
+                                </a>
+                            </div>
+                        </div>
+
                         <div class="table-responsive text-nowrap">
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
