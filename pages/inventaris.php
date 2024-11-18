@@ -105,16 +105,16 @@ require('../layouts/header.php');
                                 </thead>
                                 <tbody>
                                     <?php
-    $no = $offset + 1;
-    while ($row = mysqli_fetch_assoc($result)) {
-    ?>
+                                    $no = $offset + 1;
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                    ?>
                                     <tr>
                                         <td><?php echo $no++; ?></td>
                                         <td><?php echo $row['kode_inventaris']; ?></td>
                                         <td><?php echo $row['nama_departemen']; ?></td>
                                         <td><?php echo $row['nama_kategori']; ?></td>
                                         <td><?php echo $row['nama_barang']; ?></td>
-                                        <td><?php echo $row['jumlah']; ?></td>
+                                        <td><?php echo $row['jumlah_awal']; ?></td>
                                         <td><?php echo $row['jumlah_akhir']; ?></td>
                                         <td><?php echo $row['satuan']; ?></td>
                                         <td>
@@ -158,9 +158,9 @@ require('../layouts/header.php');
                                                         </div>
 
                                                         <div class="mb-3">
-                                                            <label class="form-label">Jumlah</label>
-                                                            <input type="number" name="jumlah" class="form-control"
-                                                                value="<?php echo $row['jumlah']; ?>" required>
+                                                            <label class="form-label">Jumlah Awal</label>
+                                                            <input type="number" name="jumlah_awal" class="form-control"
+                                                                value="<?php echo $row['jumlah_awal']; ?>" required>
                                                         </div>
 
                                                         <div class="mb-3">
@@ -176,20 +176,16 @@ require('../layouts/header.php');
                                                             <select name="id_departemen"
                                                                 class="form-select editDepartemenSelect" required>
                                                                 <?php
-        // Ambil kode departemen dari kode inventaris
-        $kode_parts = explode('/', $row['kode_inventaris']);
-        $kode_departemen = $kode_parts[0];
-        
-        $dept_query = "SELECT * FROM departemen ORDER BY 
-                      CASE WHEN kode_departemen = '$kode_departemen' THEN 0 ELSE 1 END, 
-                      nama_departemen ASC";
-        $dept_result = mysqli_query($conn, $dept_query);
-        while ($dept = mysqli_fetch_assoc($dept_result)) {
-            $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
-            echo "<option value='" . $dept['id_departemen'] . "' " . $selected . ">" 
-                 . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-        }
-        ?>
+                                                                $dept_query = "SELECT * FROM departemen ORDER BY 
+                                                                    CASE WHEN id_departemen = '{$row['id_departemen']}' THEN 0 ELSE 1 END, 
+                                                                    nama_departemen ASC";
+                                                                $dept_result = mysqli_query($conn, $dept_query);
+                                                                while ($dept = mysqli_fetch_assoc($dept_result)) {
+                                                                    $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
+                                                                    echo "<option value='" . $dept['id_departemen'] . "' " . $selected . ">" 
+                                                                        . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
+                                                                }
+                                                                ?>
                                                             </select>
                                                         </div>
                                                         <?php else: ?>
@@ -201,9 +197,9 @@ require('../layouts/header.php');
                                                         </div>
 
                                                         <div class="mb-3">
-                                                            <label class="form-label">Jumlah</label>
+                                                            <label class="form-label">Jumlah Awal</label>
                                                             <input type="number" class="form-control bg-light"
-                                                                value="<?php echo $row['jumlah']; ?>" readonly>
+                                                                value="<?php echo $row['jumlah_awal']; ?>" readonly>
                                                         </div>
 
                                                         <div class="mb-3">
@@ -226,14 +222,14 @@ require('../layouts/header.php');
                                                             <label class="form-label">Kategori</label>
                                                             <select name="id_kategori" class="form-select" required>
                                                                 <?php
-                            $kat_query = "SELECT * FROM kategori";
-                            $kat_result = mysqli_query($conn, $kat_query);
-                            while ($kat = mysqli_fetch_assoc($kat_result)) {
-                                $selected = ($kat['id_kategori'] == $row['id_kategori']) ? 'selected' : '';
-                                echo "<option value='" . $kat['id_kategori'] . "' $selected>" 
-                                     . $kat['nama_kategori'] . "</option>";
-                            }
-                            ?>
+                                                                $kat_query = "SELECT * FROM kategori";
+                                                                $kat_result = mysqli_query($conn, $kat_query);
+                                                                while ($kat = mysqli_fetch_assoc($kat_result)) {
+                                                                    $selected = ($kat['id_kategori'] == $row['id_kategori']) ? 'selected' : '';
+                                                                    echo "<option value='" . $kat['id_kategori'] . "' $selected>" 
+                                                                        . $kat['nama_kategori'] . "</option>";
+                                                                }
+                                                                ?>
                                                             </select>
                                                         </div>
 
@@ -320,6 +316,7 @@ require('../layouts/header.php');
                                 </div>
                                 <div class="modal-body">
                                     <form method="POST">
+                                        <input type="hidden" name="action" value="create">
                                         <div class="mb-3">
                                             <label class="form-label">Jenis Input</label>
                                             <select name="jenis_input" class="form-select" id="jenis_input"
@@ -336,65 +333,79 @@ require('../layouts/header.php');
                                                 <select name="id_penerimaan" class="form-select" id="id_penerimaan"
                                                     onchange="updateDepartemen()">
                                                     <?php
-                                                        $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, d.nama_departemen, d.id_departemen 
-                                                                            FROM penerimaan_barang pb 
-                                                                            JOIN permintaan_barang pmb ON pb.id_permintaan = pmb.id_permintaan
-                                                                            JOIN departemen d ON pmb.id_departemen = d.id_departemen
-                                                                            WHERE pb.id_penerimaan NOT IN (SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)";
-                                                        $penerimaan_result = mysqli_query($conn, $penerimaan_query);
-                                                        while ($penerimaan = mysqli_fetch_assoc($penerimaan_result)) {
-                                                            echo "<option value='" . $penerimaan['id_penerimaan'] . "' 
-                                                                data-departemen='" . $penerimaan['id_departemen'] . "'>" 
-                                                                . $penerimaan['nama_barang'] . " - " 
-                                                                . $penerimaan['nama_departemen'] . "</option>";
-                                                        }
-                                                        ?>
+                                                    $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, d.nama_departemen, d.id_departemen 
+                                                                        FROM penerimaan_barang pb 
+                                                                        JOIN permintaan_barang pmb ON pb.id_permintaan = pmb.id_permintaan
+                                                                        JOIN departemen d ON pmb.id_departemen = d.id_departemen
+                                                                        WHERE pb.id_penerimaan NOT IN (SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)";
+                                                    $penerimaan_result = mysqli_query($conn, $penerimaan_query);
+                                                    while ($penerimaan = mysqli_fetch_assoc($penerimaan_result)) {
+                                                        echo "<option value='" . $penerimaan['id_penerimaan'] . "' 
+                                                            data-departemen='" . $penerimaan['id_departemen'] . "'>" 
+                                                            . $penerimaan['nama_barang'] . " - " 
+                                                            . $penerimaan['nama_departemen'] . "</option>";
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <!-- Form untuk input manual -->
-                                        <div class="mb-3" id="form_manual">
-                                            <label class="form-label">Nama Barang</label>
-                                            <input type="text" name="nama_barang" class="form-control">
-                                            <label class="form-label">Jumlah</label>
-                                            <input type="number" name="jumlah" class="form-control">
-                                            <label class="form-label">Satuan</label>
-                                            <input type="text" name="satuan" class="form-control">
-                                            <label class="form-label">Tanggal Perolehan</label>
-                                            <input type="date" name="tanggal_perolehan" class="form-control">
-                                            <label class="form-label">Departemen</label>
-                                            <select name="id_departemen" class="form-select">
-                                                <?php
-        $dept_query = "SELECT * FROM departemen";
-        $dept_result = mysqli_query($conn, $dept_query);
-        while ($dept = mysqli_fetch_assoc($dept_result)) {
-            echo "<option value='" . $dept['id_departemen'] . "'>" 
-                 . $dept['nama_departemen'] . "</option>";
-        }
-        ?>
-                                            </select>
+                                        <div id="form_manual" style="display: none;">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nama Barang</label>
+                                                <input type="text" name="nama_barang" class="form-control">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Jumlah Awal</label>
+                                                <input type="number" name="jumlah_awal" class="form-control">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Satuan</label>
+                                                <input type="text" name="satuan" class="form-control">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Tanggal Perolehan</label>
+                                                <input type="date" name="tanggal_perolehan" class="form-control">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Departemen</label>
+                                                <select name="id_departemen" class="form-select">
+                                                    <?php
+                                                    $dept_query = "SELECT * FROM departemen";
+                                                    $dept_result = mysqli_query($conn, $dept_query);
+                                                    while ($dept = mysqli_fetch_assoc($dept_result)) {
+                                                        echo "<option value='" . $dept['id_departemen'] . "'>" 
+                                                            . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Kategori</label>
                                             <select name="id_kategori" class="form-select" required>
                                                 <?php
-                            $kat_query = "SELECT * FROM kategori";
-                            $kat_result = mysqli_query($conn, $kat_query);
-                            while ($kat = mysqli_fetch_assoc($kat_result)) {
-                                echo "<option value='" . $kat['id_kategori'] . "'>" 
-                                     . $kat['nama_kategori'] . "</option>";
-                            }
-                            ?>
+                                                $kat_query = "SELECT * FROM kategori";
+                                                $kat_result = mysqli_query($conn, $kat_query);
+                                                while ($kat = mysqli_fetch_assoc($kat_result)) {
+                                                    echo "<option value='" . $kat['id_kategori'] . "'>" 
+                                                        . $kat['nama_kategori'] . "</option>";
+                                                }
+                                                ?>
                                             </select>
                                         </div>
 
                                         <div class="modal-footer">
-                                            <button type="submit" name="tambahInventaris"
-                                                class="btn btn-primary">Tambah</button>
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" name="tambahInventaris"
+                                                class="btn btn-primary">Simpan</button>
                                         </div>
                                     </form>
                                 </div>
@@ -412,103 +423,31 @@ require('../layouts/header.php');
         <div class="drag-target"></div>
     </div>
 
-    <!-- JavaScript untuk toggle form -->
     <script>
-    // Fungsi untuk toggle form tambah inventaris
-    function updateDepartemen() {
-        if (document.getElementById('jenis_input').value === 'penerimaan') {
-            var selectPenerimaan = document.getElementById('id_penerimaan');
-            var selectDepartemen = document.querySelector('select[name="id_departemen"]');
-            var selectedOption = selectPenerimaan.options[selectPenerimaan.selectedIndex];
-            var departemenId = selectedOption.getAttribute('data-departemen');
-
-            // Set nilai departemen dan disabled
-            selectDepartemen.value = departemenId;
-            selectDepartemen.disabled = true;
-        }
-    }
-
     function toggleInputForm() {
-        const jenisInput = document.getElementById('jenis_input').value;
-        const formPenerimaan = document.getElementById('form_penerimaan');
-        const formManual = document.getElementById('form_manual');
-        const selectDepartemen = document.querySelector('select[name="id_departemen"]');
+        var jenisInput = document.getElementById('jenis_input').value;
+        var formPenerimaan = document.getElementById('form_penerimaan');
+        var formManual = document.getElementById('form_manual');
 
         if (jenisInput === 'penerimaan') {
             formPenerimaan.style.display = 'block';
             formManual.style.display = 'none';
-            selectDepartemen.disabled = true;
-            updateDepartemen();
         } else {
             formPenerimaan.style.display = 'none';
             formManual.style.display = 'block';
-            selectDepartemen.disabled = false;
         }
     }
 
-    // Fungsi khusus untuk form edit
-    function initializeEditForms() {
-        // Aktifkan semua dropdown departemen pada form edit untuk input manual
-        document.querySelectorAll('[id^="modal-update-"]').forEach(modal => {
-            const form = modal.querySelector('form');
-            if (form) {
-                const isManualInput = !form.querySelector('input[readonly]');
-                const deptSelect = form.querySelector('select[name="id_departemen"]');
-
-                if (isManualInput && deptSelect) {
-                    deptSelect.disabled = false;
-                }
-            }
-        });
-
-        // Tambahkan event listener untuk setiap form edit
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                // Pastikan semua select yang tidak readonly dapat mengirim nilai
-                this.querySelectorAll('select').forEach(select => {
-                    const isFromPenerimaan = this.querySelector('input[readonly]') !== null;
-                    if (!isFromPenerimaan) {
-                        select.disabled = false;
-                    }
-                });
-            });
-        });
+    function updateDepartemen() {
+        var penerimaan = document.getElementById('id_penerimaan');
+        var selectedOption = penerimaan.options[penerimaan.selectedIndex];
+        var departemenId = selectedOption.getAttribute('data-departemen');
+        document.querySelector('select[name="id_departemen"]').value = departemenId;
     }
 
-    // Event listener saat dokumen dimuat
+    // Initialize the form state
     document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi form tambah
         toggleInputForm();
-
-        // Hilangkan disabled attribute dari semua select departemen untuk input manual
-        document.querySelectorAll('.editDepartemenSelect').forEach(select => {
-            select.removeAttribute('disabled');
-        });
-
-        // Event listener untuk modal edit saat dibuka
-        document.querySelectorAll('[id^="modal-update-"]').forEach(modal => {
-            modal.addEventListener('shown.bs.modal', function() {
-                const form = this.querySelector('form');
-                if (form) {
-                    const isManualInput = !form.querySelector('input[readonly]');
-                    const deptSelect = form.querySelector('.editDepartemenSelect');
-
-                    if (isManualInput && deptSelect) {
-                        deptSelect.removeAttribute('disabled');
-                    }
-                }
-            });
-        });
-
-        // Event listener untuk form submit
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const deptSelect = this.querySelector('.editDepartemenSelect');
-                if (deptSelect) {
-                    deptSelect.removeAttribute('disabled');
-                }
-            });
-        });
     });
     </script>
 
