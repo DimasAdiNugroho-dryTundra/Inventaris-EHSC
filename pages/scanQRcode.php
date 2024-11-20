@@ -44,7 +44,7 @@ function getDetailInventaris($kode)
                   WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
                   ELSE i.nama_barang 
               END as nama_barang,
-              i.jumlah as jumlah_awal,
+              i.jumlah_awal,
               i.satuan
               FROM inventaris i
               JOIN departemen d ON i.id_departemen = d.id_departemen

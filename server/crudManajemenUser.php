@@ -81,7 +81,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $uploadDir = '../upload/user/';
         $foto = $_FILES['foto'];
         $fotoName = basename($foto['name']);
-        $fotoSize = $foto['size']; // Ambil ukuran foto
+        $fotoSize = $foto['size']; 
         $fotoTmp = $foto['tmp_name'];
         $fotoPath = $uploadDir . $fotoName;
 

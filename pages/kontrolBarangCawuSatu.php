@@ -161,7 +161,7 @@ $totalPages = ceil($totalRows / $limit);
                                                 <th rowspan="2" class="text-center align-middle">Kode Inventaris</th>
                                                 <th rowspan="2" class="text-center align-middle">Nama Barang</th>
                                                 <th rowspan="2" class="text-center align-middle">Tanggal</th>
-                                                <th colspan="4" class="text-center">Jumlah</th>
+                                                <th colspan="4" class="text-center align-middle">Jumlah</th>
                                                 <th rowspan="2" class="text-center align-middle">Aksi</th>
                                             </tr>
                                             <tr>
@@ -218,9 +218,9 @@ $totalPages = ceil($totalRows / $limit);
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Edit Kontrol Barang Cawu 1/h5>
-                                                                <button type="button" class="btn-close"
-                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            <h5 class="modal-title">Edit Kontrol Barang Cawu 1</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <form method="POST">
@@ -374,13 +374,11 @@ $totalPages = ceil($totalRows / $limit);
                                                     <select name="id_inventaris" class="form-select" required>
                                                         <option value="">Pilih Barang</option>
                                                         <?php
-                                                            $invResult = getAvailableInventaris($conn, $year, $table);
-                                                            while ($inv = mysqli_fetch_assoc($invResult)) {
-                                                                $jumlahBelumTerkontrol = $inv['jumlah'] - $inv['jumlah_terkontrol'];
-                                                                echo "<option value='" . $inv['id_inventaris'] . "' data-stock='" . $jumlahBelumTerkontrol . "'>"
-                                                                    . $inv['kode_inventaris'] . " - "
-                                                                    . $inv['nama_barang'] . " (Jumlah Awal: " . $inv['jumlah'] . ", Belum terkontrol: " . $jumlahBelumTerkontrol . " " . $inv['satuan'] . ")</option>";
-                                                            }
+                                                        // Ambil data inventaris yang tersedia
+                                                        $result = getAvailableInventaris($conn, $year, 'kontrol_barang_cawu_satu');
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            echo "<option value=\"{$row['id_inventaris']}\">{$row['nama_barang']} (Kode: {$row['kode_inventaris']}, Jumlah: {$row['jumlah']})</option>";
+                                                        }
                                                         ?>
                                                     </select>
                                                 </div>
@@ -463,6 +461,7 @@ $totalPages = ceil($totalRows / $limit);
                     </div>
                 </div>
             </div>
+            <?php require('../layouts/footer.php'); ?>
         </div>
     </div>
 </div>

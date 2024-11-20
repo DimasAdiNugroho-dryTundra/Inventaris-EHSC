@@ -45,18 +45,18 @@ function getAvailableInventaris($conn, $year, $table) {
                 i.id_inventaris, 
                 i.kode_inventaris, 
                 i.nama_barang, 
-                i.jumlah, 
+                i.jumlah_akhir AS jumlah,  -- Menggunakan jumlah_akhir
                 i.satuan,
-            IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
-                     FROM $table 
-                     WHERE id_inventaris = i.id_inventaris 
-                     AND YEAR(tanggal_kontrol) = '$year'), 0) AS jumlah_terkontrol
-            FROM inventaris i 
-        WHERE (i.jumlah - IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
-                                   FROM $table 
-                                   WHERE id_inventaris = i.id_inventaris 
-                                   AND YEAR(tanggal_kontrol) = '$year'), 0)) > 0";
-
+                IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
+                         FROM $table 
+                         WHERE id_inventaris = i.id_inventaris 
+                         AND YEAR(tanggal_kontrol) = '$year'), 0) AS jumlah_terkontrol
+              FROM inventaris i 
+              WHERE (i.jumlah_akhir - IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
+                                                 FROM $table 
+                                                 WHERE id_inventaris = i.id_inventaris 
+                                                 AND YEAR(tanggal_kontrol) = '$year'), 0)) > 0
+              AND i.jumlah_akhir > 0"; // Pastikan hanya mengambil barang yang tersedia
     return mysqli_query($conn, $query);
 }
 

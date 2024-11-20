@@ -11,14 +11,14 @@ http_response_code(404);
     <link rel="stylesheet" href="assets/vendor/css/core.css">
     <link rel="stylesheet" href="assets/vendor/css/theme-default.css">
     <style>
-        .misc-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            text-align: center;
-        }
+    .misc-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+    }
     </style>
 </head>
 

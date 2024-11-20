@@ -61,6 +61,12 @@ $jabatan = isset($_SESSION['jabatan']) ? $_SESSION['jabatan'] : '';
             </a>
         </li>
         <li class="menu-item">
+            <a href="rangkumanInventaris.php" class="menu-link">
+                <i class="menu-icon tf-icons ti ti-box-align-bottom-left"></i>
+                Rangkuman Inventaris
+            </a>
+        </li>
+        <li class="menu-item">
             <a href="pilihCawuKontrolBarang.php" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-box-align-bottom-left"></i>
                 Kontrol Barang

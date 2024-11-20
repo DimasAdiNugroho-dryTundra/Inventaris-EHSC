@@ -10,7 +10,7 @@ $id_inventaris = $_GET['id'] ?? '';
 
 // Query untuk mengambil data inventaris dan barang yang terkait
 $query = "SELECT 
-        i.jumlah AS jumlah_awal,
+        i.jumlah_awal,
         i.kode_inventaris,
         i.satuan,
         d.nama_departemen, 
