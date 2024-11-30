@@ -1,7 +1,7 @@
 <?php
 require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
-require('../server/crudDepartemen.php'); 
+require('../server/crudDepartemen.php');
 require('../layouts/header.php');
 ?>
 <div class="layout-wrapper layout-content-navbar">
@@ -34,9 +34,7 @@ require('../layouts/header.php');
                                 <div class="card-body">
                                     <h5 class="card-title">Caturwulan Ke-1</h5>
                                     <p class="card-text">
-                                        This is a longer card with supporting text below as a natural lead-in to
-                                        additional content.
-                                        This content is a little bit longer.
+                                        1 Januari - 30 April
                                     </p>
                                     <a href="kontrolBarangCawuSatu.php" class="btn btn-primary">Pilih</a>
                                 </div>
@@ -48,9 +46,7 @@ require('../layouts/header.php');
                                 <div class="card-body">
                                     <h5 class="card-title">Caturwulan Ke-2</h5>
                                     <p class="card-text">
-                                        This is a longer card with supporting text below as a natural lead-in to
-                                        additional content.
-                                        This content is a little bit longer.
+                                        1 Mei - 31 Agustus
                                     </p>
                                     <a href="kontrolBarangCawuDua.php" class="btn btn-primary">Pilih</a>
                                 </div>
@@ -62,8 +58,7 @@ require('../layouts/header.php');
                                 <div class="card-body">
                                     <h5 class="card-title">Caturwulan Ke-3</h5>
                                     <p class="card-text">
-                                        This is a longer card with supporting text below as a natural lead-in to
-                                        additional content.
+                                        1 September - 31 Desember
                                     </p>
                                     <a href="kontrolBarangCawuTiga.php" class="btn btn-primary">Pilih</a>
                                 </div>
@@ -73,8 +68,8 @@ require('../layouts/header.php');
 
                 </div>
                 <?php
-            require('../layouts/footer.php');
-            ?>
+                require('../layouts/footer.php');
+                ?>
             </div>
             <!-- Footer -->
 
@@ -92,3 +87,7 @@ require('../layouts/header.php');
     <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
 </div>
+
+<?php
+require('../layouts/assetsFooter.php');
+?>

@@ -72,11 +72,11 @@ require('../layouts/header.php');
                                 <form class="d-flex justify-content-end align-items-center">
                                     <label for="limit" class="label me-2">Tampilkan:</label>
                                     <select id="limit" class="select2 form-select" onchange="location = this.value;">
-                                        <option value="permintaan_barang.php?limit=5"
+                                        <option value="permintaanBarang.php?limit=5"
                                             <?php if ($limit == 5) echo 'selected'; ?>>5</option>
-                                        <option value="permintaan_barang.php?limit=10"
+                                        <option value="permintaanBarang.php?limit=10"
                                             <?php if ($limit == 10) echo 'selected'; ?>>10</option>
-                                        <option value="permintaan_barang.php?limit=20"
+                                        <option value="permintaanBarang.php?limit=20"
                                             <?php if ($limit == 20) echo 'selected'; ?>>20</option>
                                     </select>
                                 </form>
@@ -87,16 +87,16 @@ require('../layouts/header.php');
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Departemen</th>
-                                        <th>Nama</th>
-                                        <th>Tanggal</th>
-                                        <th>Spesifikasi</th>
-                                        <th>Kebutuhan</th>
-                                        <th>Harga</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center align-middle">No</th>
+                                        <th class="text-center align-middle">Departemen</th>
+                                        <th class="text-center align-middle">Barang</th>
+                                        <th class="text-center align-middle">Tanggal</th>
+                                        <th class="text-center align-middle">Spesifikasi</th>
+                                        <th class="text-center align-middle">Kebutuhan</th>
+                                        <th class="text-center align-middle">Harga</th>
+                                        <th class="text-center align-middle">Total</th>
+                                        <th class="text-center align-middle">Status</th>
+                                        <th class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -108,24 +108,27 @@ require('../layouts/header.php');
                                         $status_class = $row['status'] == 1 ? 'text-success' : ($row['status'] == 2 ? 'text-danger' : 'text-warning');
                                     ?>
                                     <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $row['nama_departemen']; ?></td>
-                                        <td><?php echo $row['nama_barang']; ?></td>
-                                        <td><?php echo $row['tanggal_permintaan']; ?></td>
-                                        <td><?php echo $row['spesifikasi']; ?></td>
-                                        <td><?php echo $row['kebutuhan_qty']; ?></td>
-                                        <td>Rp <?php echo number_format($row['harga_satuan'], 0, ',', '.'); ?></td>
-                                        <td>Rp <?php echo number_format($total_harga, 0, ',', '.'); ?></td>
-                                        <td><span
+                                        <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['tanggal_permintaan']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row['spesifikasi']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['kebutuhan_qty']; ?></td>
+                                        <td class="text-center align-middle">Rp
+                                            <?php echo number_format($row['harga_satuan'], 0, ',', '.'); ?></td>
+                                        <td class="text-center align-middle">Rp
+                                            <?php echo number_format($total_harga, 0, ',', '.'); ?></td>
+                                        <td class="text-center align-middle"><span
                                                 class="<?php echo $status_class; ?>"><?php echo $status_text; ?></span>
                                         </td>
                                         <td>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Delete</button>
+                                                data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Hapus</button>
                                             <a href="../report/printLaporanPermintaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
-                                                class="btn btn-primary btn-sm">Laporan</a>
+                                                class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
                                     </tr>
                                     <div class='modal fade' id='modal-update-<?php echo $row['id_permintaan']; ?>'
@@ -139,7 +142,8 @@ require('../layouts/header.php');
                                                         aria-label='Close'></button>
                                                 </div>
                                                 <div class='modal-body'>
-                                                    <form method='POST' enctype='multipart/form-data'>
+                                                    <form method='POST' enctype='multipart/form-data'
+                                                        class="needs-validation" novalidate>
                                                         <input type='hidden' name='action' value='update'>
                                                         <input type='hidden' name='id_permintaan'
                                                             value='<?php echo $row['id_permintaan']; ?>'>
@@ -147,42 +151,58 @@ require('../layouts/header.php');
                                                             <label for='id_departemen'
                                                                 class='form-label'>Departemen</label>
                                                             <select class='form-select' name='id_departemen' required>
+                                                                <option value="">Pilih Departemen</option>
                                                                 <?php
-                            $dept_query = "SELECT * FROM departemen";
-                            $dept_result = mysqli_query($conn, $dept_query);
-                            while ($dept = mysqli_fetch_assoc($dept_result)) {
-                                $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
-                                echo "<option value='" . $dept['id_departemen'] . "' $selected>" . $dept['nama_departemen'] . "</option>";
-                            }
-                            ?>
+        $dept_query = "SELECT * FROM departemen";
+        $dept_result = mysqli_query($conn, $dept_query);
+        while ($dept = mysqli_fetch_assoc($dept_result)) {
+            $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
+            echo "<option value='" . $dept['id_departemen'] . "' $selected>" . $dept['nama_departemen'] . "</option>";
+        }
+        ?>
                                                             </select>
+                                                            <div class="invalid-feedback">Silakan pilih departemen</div>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='nama_barang' class='form-label'>Nama
                                                                 Barang</label>
                                                             <input type='text' class='form-control' name='nama_barang'
-                                                                value='<?php echo $row['nama_barang']; ?>' required>
+                                                                value='<?php echo $row['nama_barang']; ?>' required
+                                                                minlength="3" maxlength="100">
+                                                            <div class="invalid-feedback">Nama barang harus diisi (3-100
+                                                                karakter)</div>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='tanggal_permintaan'
                                                                 class='form-label'>Tanggal</label>
                                                             <input type='date' class='form-control' name='tanggal'
                                                                 value='<?php echo date('Y-m-d', strtotime($row['tanggal_permintaan'])); ?>'
                                                                 required>
+                                                            <div class="invalid-feedback">Tanggal harus diisi</div>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='spesifikasi'
                                                                 class='form-label'>Spesifikasi</label>
-                                                            <textarea class='form-control' name='spesifikasi'
-                                                                required><?php echo $row['spesifikasi']; ?></textarea>
+                                                            <textarea class='form-control' name='spesifikasi' required
+                                                                minlength="10"
+                                                                maxlength="500"><?php echo $row['spesifikasi']; ?></textarea>
+                                                            <div class="invalid-feedback">Spesifikasi harus diisi (min.
+                                                                10 karakter)</div>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='kebutuhan_qty' class='form-label'>Kebutuhan
                                                                 Qty</label>
                                                             <input type='number' class='form-control'
                                                                 name='kebutuhan_qty' id='kebutuhan_qty_update'
-                                                                value='<?php echo $row['kebutuhan_qty']; ?>' required>
+                                                                value='<?php echo $row['kebutuhan_qty']; ?>' required
+                                                                min="1">
+                                                            <div class="invalid-feedback">Qty harus lebih dari 0</div>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='harga_satuan' class='form-label'>Harga
                                                                 Satuan</label>
@@ -190,7 +210,9 @@ require('../layouts/header.php');
                                                                 id='harga_satuan_update'
                                                                 value='<?php echo number_format($row['harga_satuan'], 0, ',', '.'); ?>'
                                                                 required>
+                                                            <div class="invalid-feedback">Harga satuan harus diisi</div>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='total_harga' class='form-label'>Total
                                                                 Harga</label>
@@ -199,9 +221,11 @@ require('../layouts/header.php');
                                                                 value='<?php echo number_format($row['kebutuhan_qty'] * $row['harga_satuan'], 0, ',', '.'); ?>'
                                                                 readonly>
                                                         </div>
+
                                                         <div class='mb-3'>
                                                             <label for='status' class='form-label'>Status</label>
                                                             <select class='form-select' name='status' required>
+                                                                <option value="">Pilih Status</option>
                                                                 <option value='0'
                                                                     <?php echo ($row['status'] == 0 ? 'selected' : ''); ?>>
                                                                     Menunggu</option>
@@ -212,14 +236,20 @@ require('../layouts/header.php');
                                                                     <?php echo ($row['status'] == 2 ? 'selected' : ''); ?>>
                                                                     Tidak Disetujui</option>
                                                             </select>
+                                                            <div class="invalid-feedback">Silakan pilih status</div>
                                                         </div>
-                                                        <button type='submit' class='btn btn-primary'>Simpan</button>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit"
+                                                                class="btn btn-primary">Simpan</button>
+                                                        </div>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
                                     <!-- Modal Delete -->
                                     <div class='modal fade' id='modal-delete-<?php echo $row['id_permintaan']; ?>'
                                         tabindex='-1' aria-labelledby='modalDeleteLabel' aria-hidden='true'>
@@ -281,7 +311,7 @@ require('../layouts/header.php');
 
                     <!-- Modal Tambah Permintaan Barang -->
                     <div class="modal fade" id="tambahPermintaanModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">Tambah Permintaan Barang</h5>
@@ -289,10 +319,13 @@ require('../layouts/header.php');
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST" enctype="multipart/form-data">
+                                    <form id="formTambahPermintaan" method="POST" action="permintaanBarang.php"
+                                        class="needs-validation" novalidate>
+                                        <input type="hidden" name="tambahPermintaan" value="1">
                                         <div class="mb-3">
                                             <label class="form-label">Departemen</label>
                                             <select name="id_departemen" class="form-select" required>
+                                                <option value="">Pilih Departemen</option>
                                                 <?php
                             $dept_query = "SELECT * FROM departemen";
                             $dept_result = mysqli_query($conn, $dept_query);
@@ -301,30 +334,44 @@ require('../layouts/header.php');
                             }
                             ?>
                                             </select>
+                                            <div class="invalid-feedback">Silakan pilih departemen</div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Nama Barang</label>
-                                            <input type="text" name="nama_barang" class="form-control" required>
+                                            <input type="text" name="nama_barang" class="form-control" required
+                                                minlength="3" maxlength="100">
+                                            <div class="invalid-feedback">Nama barang harus diisi (3-100 karakter)</div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Tanggal</label>
-                                            <input type="date" name="tanggal" value="<?php echo date('Y-m-d'); ?>"
-                                                class="form-control" required>
+                                            <input type="date" name="tanggal" class="form-control" required>
+                                            <div class="invalid-feedback">Tanggal harus diisi</div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Spesifikasi</label>
-                                            <textarea name="spesifikasi" class="form-control" required></textarea>
+                                            <textarea name="spesifikasi" class="form-control" required minlength="10"
+                                                maxlength="500"></textarea>
+                                            <div class="invalid-feedback">Spesifikasi harus diisi (min. 10 karakter)
+                                            </div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Kebutuhan Qty</label>
                                             <input type="number" name="kebutuhan_qty" id="kebutuhan_qty"
-                                                class="form-control" required>
+                                                class="form-control" required min="1">
+                                            <div class="invalid-feedback">Qty harus lebih dari 0</div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Harga Satuan</label>
                                             <input type="text" name="harga_satuan" id="harga_satuan"
                                                 class="form-control" required>
+                                            <div class="invalid-feedback">Harga satuan harus diisi</div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label class="form-label">Total Harga</label>
                                             <input type="text" id="total_harga" class="form-control" readonly>
@@ -336,19 +383,18 @@ require('../layouts/header.php');
                                                 <option value="1">Disetujui</option>
                                                 <option value="2">Tidak Disetujui</option>
                                             </select>
+                                            <div class="invalid-feedback">Silakan pilih status</div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="submit" name="tambahPermintaan"
-                                                class="btn btn-primary">Tambah</button>
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
             <!-- Footer -->
@@ -377,7 +423,7 @@ require('../layouts/assetsFooter.php')
 
 
 <script>
-// Function to format number to currency
+// Fungsi format rupiah
 function formatRupiah(angka, prefix) {
     var number_string = angka.replace(/[^,\d]/g, '').toString(),
         split = number_string.split(','),
@@ -394,46 +440,88 @@ function formatRupiah(angka, prefix) {
     return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
 }
 
-// Function to calculate and display total price
-function calculateTotal(qtyId, priceId, totalId) {
-    var qty = document.getElementById(qtyId).value;
-    var price = document.getElementById(priceId).value.replace(/[^0-9]/g, '');
-    var total = qty * price;
-    document.getElementById(totalId).value = formatRupiah(total.toString(), 'Rp. ');
+// Hitung total harga
+function hitungTotal() {
+    var qty = document.getElementById('kebutuhan_qty').value || 0;
+    var harga = document.getElementById('harga_satuan').value.replace(/[^\d]/g, '') || 0;
+    var total = qty * harga;
+    document.getElementById('total_harga').value = formatRupiah(total.toString(), 'Rp. ');
 }
 
-// Event listeners for add modal
-document.getElementById('kebutuhan_qty').addEventListener('input', function() {
-    calculateTotal('kebutuhan_qty', 'harga_satuan', 'total_harga');
-});
-
+// Event listener untuk format harga dan hitung total
 document.getElementById('harga_satuan').addEventListener('input', function(e) {
     this.value = formatRupiah(this.value, 'Rp. ');
-    calculateTotal('kebutuhan_qty', 'harga_satuan', 'total_harga');
+    hitungTotal();
 });
 
-// Event listeners for update modal
-document.getElementById('kebutuhan_qty_update').addEventListener('input', function() {
-    calculateTotal('kebutuhan_qty_update', 'harga_satuan_update', 'total_harga_update');
-});
+document.getElementById('kebutuhan_qty').addEventListener('input', hitungTotal);
 
-document.getElementById('harga_satuan_update').addEventListener('input', function(e) {
-    this.value = formatRupiah(this.value, 'Rp. ');
-    calculateTotal('kebutuhan_qty_update', 'harga_satuan_update', 'total_harga_update');
-});
+// Form validation
+document.getElementById('formTambahPermintaan').addEventListener('submit', function(event) {
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    } else {
+        // Strip format rupiah sebelum submit
+        let hargaSatuan = this.querySelector('[name="harga_satuan"]');
+        hargaSatuan.value = hargaSatuan.value.replace(/[^\d]/g, '');
+    }
+    this.classList.add('was-validated');
+    return true;
+}, false);
 
-// Function to strip formatting from price input
-function stripFormatting(value) {
-    return value.replace(/[^\d]/g, '');
+// Fungsi untuk menangani perhitungan total di modal edit
+function hitungTotalUpdate(modalId) {
+    var qty = document.querySelector(`#modal-update-${modalId} [name="kebutuhan_qty"]`).value || 0;
+    var harga = document.querySelector(`#modal-update-${modalId} [name="harga_satuan"]`).value.replace(/[^\d]/g, '') ||
+        0;
+    var total = qty * harga;
+    document.querySelector(`#modal-update-${modalId} #total_harga_update`).value = formatRupiah(total.toString(),
+        'Rp. ');
 }
 
-// Add event listeners for form submission
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        let hargaSatuanInput = this.querySelector('[name="harga_satuan"]');
-        if (hargaSatuanInput) {
-            hargaSatuanInput.value = stripFormatting(hargaSatuanInput.value);
+// Event listener untuk format harga dan hitung total di modal edit
+document.addEventListener('input', function(e) {
+    if (e.target && e.target.matches('[name="harga_satuan"]')) {
+        // Format rupiah untuk input harga satuan
+        e.target.value = formatRupiah(e.target.value, 'Rp. ');
+
+        // Cari modal parent
+        const modalParent = e.target.closest('.modal');
+        if (modalParent) {
+            const modalId = modalParent.id.replace('modal-update-', '');
+            hitungTotalUpdate(modalId);
         }
-    });
+    }
+
+    if (e.target && e.target.matches('[name="kebutuhan_qty"]')) {
+        // Cari modal parent
+        const modalParent = e.target.closest('.modal');
+        if (modalParent) {
+            const modalId = modalParent.id.replace('modal-update-', '');
+            hitungTotalUpdate(modalId);
+        }
+    }
+});
+
+// Event listener untuk form edit sebelum submit
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.matches('form')) {
+        const hargaSatuanInput = e.target.querySelector('[name="harga_satuan"]');
+        if (hargaSatuanInput) {
+            // Strip format rupiah sebelum submit
+            hargaSatuanInput.value = hargaSatuanInput.value.replace(/[^\d]/g, '');
+        }
+    }
+});
+
+
+
+// Reset form ketika modal ditutup
+document.getElementById('tambahPermintaanModal').addEventListener('hidden.bs.modal', function() {
+    let form = document.getElementById('formTambahPermintaan');
+    form.reset();
+    form.classList.remove('was-validated');
+    document.getElementById('total_harga').value = '';
 });
 </script>

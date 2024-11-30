@@ -1,4 +1,5 @@
 <?php
+
 // Pengaturan untuk pagination
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5; // Default ke 5
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -14,6 +15,30 @@ $totalQuery = "SELECT COUNT(*) as total FROM user WHERE nama LIKE '%$search%'";
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalPages = ceil($totalRow['total'] / $limit);
+
+// Fungsi untuk validasi gambar
+function validasiFoto($file)
+{
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    $maxSize = 2097152;
+
+    // Cek apakah ada file yang diupload
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return "Tidak ada file yang diupload.";
+    }
+
+    // Cek ukuran file
+    if ($file['size'] > $maxSize) {
+        return "Ukuran file foto tidak boleh lebih dari 2MB.";
+    }
+
+    // Cek tipe file
+    if (!in_array($file['type'], $allowedTypes)) {
+        return "Tipe file tidak valid. Harus berupa JPG, JPEG, atau PNG.";
+    }
+
+    return true; // Validasi berhasil
+}
 
 // Proses penambahan user
 if (isset($_POST['tambahUser'])) {
@@ -32,16 +57,17 @@ if (isset($_POST['tambahUser'])) {
     } else {
         $uploadDir = '../upload/user/';
         $foto = $_FILES['foto'];
-        $fotoName = basename($foto['name']);
-        $fotoTmp = $foto['tmp_name'];
-        $fotoSize = $foto['size']; // Ambil ukuran foto
-        $fotoPath = $uploadDir . $fotoName;
 
-        // Check file size
-        if ($fotoSize > 5242880) { // Ukuran lebih dari 5MB
-            $error_message = "File size exceeds 5MB. Data tidak bisa dikirim.";
+        // Validasi gambar
+        $validationResult = validasiFoto($foto);
+        if ($validationResult !== true) {
+            $_SESSION['error_message'] = $validationResult;
         } else {
-            // Move the uploaded file
+            $fotoName = basename($foto['name']);
+            $fotoTmp = $foto['tmp_name'];
+            $fotoPath = $uploadDir . $fotoName;
+
+            // Pindahkan file yang diupload
             if (move_uploaded_file($fotoTmp, $fotoPath)) {
                 $query = "INSERT INTO user (nama, username, password, email, jabatan, foto, hak_akses)
                           VALUES ('$nama', '$username', '$password', '$email', '$jabatan', '$fotoName', '$hak_akses')";
@@ -62,6 +88,7 @@ if (isset($_POST['tambahUser'])) {
 // Proses pengeditan user
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_user = $_POST['id_user'];
+    $nama = $_POST['nama'];
     $username = $_POST['username'];
     $email = $_POST['email'];
     $jabatan = $_POST['jabatan'];
@@ -69,26 +96,27 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $password = !empty($_POST['password']) ? md5($_POST['password']) : null;
 
     // Mulai query update
-    $query = "UPDATE user SET username = '$username', email = '$email', jabatan = '$jabatan'";
-
+    $query = "UPDATE user SET nama = '$nama', username = '$username', email = '$email', jabatan = '$jabatan', hak_akses = '$hak_akses'";
     // Tambahkan password jika ada
     if ($password) {
         $query .= ", password = '$password'";
     }
 
     // Proses upload foto jika ada
+    $fotoUploaded = false; // Flag untuk menandakan apakah foto berhasil diupload
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
         $uploadDir = '../upload/user/';
         $foto = $_FILES['foto'];
-        $fotoName = basename($foto['name']);
-        $fotoSize = $foto['size']; 
-        $fotoTmp = $foto['tmp_name'];
-        $fotoPath = $uploadDir . $fotoName;
 
-        // Cek ukuran file
-        if ($fotoSize > 5242880) { // Ukuran lebih dari 5MB
-            $error_message = "File size exceeds 5MB. Data tidak bisa dikirim.";
+        // Validasi gambar
+        $validationResult = validasiFoto($foto);
+        if ($validationResult !== true) {
+            $_SESSION['error_message'] = $validationResult;
         } else {
+            $fotoName = basename($foto['name']);
+            $fotoTmp = $foto['tmp_name'];
+            $fotoPath = $uploadDir . $fotoName;
+
             // Ambil nama foto lama dari database
             $queryOld = "SELECT foto FROM user WHERE id_user='$id_user'";
             $resultOld = mysqli_query($conn, $queryOld);
@@ -105,6 +133,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
             // Pindahkan file foto baru
             if (move_uploaded_file($fotoTmp, $fotoPath)) {
                 $query .= ", foto = '$fotoName'";
+                $fotoUploaded = true; // Set flag true jika foto berhasil diupload
             } else {
                 $_SESSION['error_message'] = "Gagal mengupload foto baru.";
             }
@@ -113,15 +142,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 
     // Akhiri query dengan kondisi WHERE
     $query .= " WHERE id_user = '$id_user'";
-    if (!mysqli_query($conn, $query)) {
-        $_SESSION['error_message'] = "Gagal mengubah user: " . mysqli_error($conn);
-    } else {
-        $_SESSION['success_message'] = "User berhasil diubah!";
+
+    // Eksekusi query hanya jika tidak ada kesalahan
+    if (empty($_SESSION['error_message'])) {
+        if (!mysqli_query($conn, $query)) {
+            $_SESSION['error_message'] = "Gagal mengubah user: " . mysqli_error($conn);
+        } else {
+            $_SESSION['success_message'] = "User berhasil diubah!";
+        }
     }
 
     header("Location: manajemen-user.php");
     exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
 }
+
 
 // Proses penghapusan user
 if (isset($_GET['delete'])) {

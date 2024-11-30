@@ -52,7 +52,7 @@
 <script src="../lib/assets/js/main.js"></script>
 
 <!-- Page JS -->
-<script src="../lib/assets/js/dashboards-analytics.js"></script>
+<!-- <script src="../lib/assets/js/dashboards-analytics.js"></script>
 <script src="../lib/assets/js/app-access-roles.js"></script>
 <script src="../lib/assets/js/modal-add-role.js"></script>
-<script src="../lib/assets/js/tables-datatables-extensions.js"></script>
+<script src="../lib/assets/js/tables-datatables-extensions.js"></script> -->

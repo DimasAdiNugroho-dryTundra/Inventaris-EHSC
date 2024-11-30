@@ -45,6 +45,7 @@ function getDetailInventaris($kode)
                   ELSE i.nama_barang 
               END as nama_barang,
               i.jumlah_awal,
+              i.jumlah_akhir,
               i.satuan
               FROM inventaris i
               JOIN departemen d ON i.id_departemen = d.id_departemen
@@ -73,21 +74,24 @@ function getDataKontrol($id_inventaris)
 
     $cawu_queries = [
         "SELECT tahun_kontrol, SUM(jumlah_baik) AS jumlah_baik, SUM(jumlah_rusak) AS total_rusak, 
-                SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang
-         FROM kontrol_barang_cawu_satu
-         WHERE id_inventaris = '$id_inventaris'
+                SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang, i.satuan
+         FROM kontrol_barang_cawu_satu k
+         JOIN inventaris i ON k.id_inventaris = i.id_inventaris
+         WHERE k.id_inventaris = '$id_inventaris'
          GROUP BY tahun_kontrol",
 
         "SELECT tahun_kontrol, SUM(jumlah_baik) AS jumlah_baik, SUM(jumlah_rusak) AS total_rusak, 
-                SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang
-         FROM kontrol_barang_cawu_dua
-         WHERE id_inventaris = '$id_inventaris'
+                SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang, i.satuan
+         FROM kontrol_barang_cawu_dua k
+         JOIN inventaris i ON k.id_inventaris = i.id_inventaris
+         WHERE k.id_inventaris = '$id_inventaris'
          GROUP BY tahun_kontrol",
 
         "SELECT tahun_kontrol, SUM(jumlah_baik) AS jumlah_baik, SUM(jumlah_rusak) AS total_rusak, 
-                SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang
-         FROM kontrol_barang_cawu_tiga
-         WHERE id_inventaris = '$id_inventaris'
+                SUM(jumlah_pindah) AS total_pindah, SUM(jumlah_hilang) AS total_hilang, i.satuan
+         FROM kontrol_barang_cawu_tiga k
+         JOIN inventaris i ON k.id_inventaris = i.id_inventaris
+         WHERE k.id_inventaris = '$id_inventaris'
          GROUP BY tahun_kontrol"
     ];
 
@@ -273,6 +277,10 @@ function onScanSuccess(decodedText, decodedResult) {
                     <th>Jumlah Awal</th>
                     <td>: <span id="jumlahAwal">Memuat...</span></td>
                 </tr>
+                <tr>
+                    <th>Jumlah Akhir</th>
+                    <td>: <span id="jumlahAkhir">Memuat...</span></td>
+                </tr>
             </table>
         </div>
     `;
@@ -292,7 +300,9 @@ function onScanSuccess(decodedText, decodedResult) {
                 document.getElementById('departemen').textContent = data.data.nama_departemen;
                 document.getElementById('kategori').textContent = data.data.nama_kategori;
                 document.getElementById('jumlahAwal').textContent =
-                    `${data.data.jumlah_awal} ${data.data.satuan || 'unit'}`;
+                    `${data.data.jumlah_awal} ${data.data.satuan}`;
+                document.getElementById('jumlahAkhir').textContent =
+                    `${data.data.jumlah_akhir} ${data.data.satuan}`;
 
                 // Fetch and display control data
                 fetch(`scanQRcode.php?action=getDataKontrol&kode=${encodeURIComponent(decodedText)}`)
@@ -350,30 +360,30 @@ function updateTabelKontrolData(controlData) {
                 const tr = document.createElement('tr');
                 tr.classList.add('text-center');
 
-                const yearTd = document.createElement('td');
-                yearTd.textContent = row.tahun_kontrol;
+                const tahunTd = document.createElement('td');
+                tahunTd.textContent = row.tahun_kontrol;
 
-                const goodTd = document.createElement('td');
-                goodTd.classList.add('text-success');
-                goodTd.textContent = `${row.jumlah_baik} unit`;
+                const baikTd = document.createElement('td');
+                baikTd.classList.add('text-success');
+                baikTd.textContent = `${row.jumlah_baik} ${row.satuan}`;
 
-                const damagedTd = document.createElement('td');
-                damagedTd.classList.add('text-danger');
-                damagedTd.textContent = `${row.total_rusak} unit`;
+                const rusakTd = document.createElement('td');
+                rusakTd.classList.add('text-danger');
+                rusakTd.textContent = `${row.total_rusak} ${row.satuan}`;
 
-                const lostTd = document.createElement('td');
-                lostTd.classList.add('text-warning');
-                lostTd.textContent = `${row.total_hilang} unit`;
+                const hilangTd = document.createElement('td');
+                hilangTd.classList.add('text-warning');
+                hilangTd.textContent = `${row.total_hilang} ${row.satuan}`;
 
-                const movedTd = document.createElement('td');
-                movedTd.classList.add('text-info');
-                movedTd.textContent = `${row.total_pindah} unit`;
+                const pindahTd = document.createElement('td');
+                pindahTd.classList.add('text-info');
+                pindahTd.textContent = `${row.total_pindah} ${row.satuan}`;
 
-                tr.appendChild(yearTd);
-                tr.appendChild(goodTd);
-                tr.appendChild(damagedTd);
-                tr.appendChild(lostTd);
-                tr.appendChild(movedTd);
+                tr.appendChild(tahunTd);
+                tr.appendChild(baikTd);
+                tr.appendChild(rusakTd);
+                tr.appendChild(hilangTd);
+                tr.appendChild(pindahTd);
 
                 if (index === 0) {
                     cawu1Table.appendChild(tr);

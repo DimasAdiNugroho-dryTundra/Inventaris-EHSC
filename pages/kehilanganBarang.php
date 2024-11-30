@@ -117,6 +117,8 @@ require('../layouts/header.php');
                                                 data-bs-target="#modal-update-<?php echo $row['id_kehilangan_barang']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_kehilangan_barang']; ?>">Delete</button>
+                                            <a href="../report/printLaporanKehilanganBarang.php?id=<?php echo $row['id_kehilangan_barang']; ?>"
+                                                class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
                                     </tr>
                                     <?php
@@ -144,7 +146,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <form method="post" enctype="multipart/form-data" class="needs-validation"
                                             novalidate>
                                             <input type="hidden" name="action" value="update">
-                                            <input type="hidden" name="id_Kehilangan_barang"
+                                            <input type="hidden" name="id_kehilangan_barang"
                                                 value="<?php echo $row['id_kehilangan_barang']; ?>">
                                             <div class="mb-3">
                                                 <label class="form-label">Kode Inventaris</label>
@@ -158,9 +160,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Kehilangan</label>
-                                                <input type="date" class="form-control bg-light"
-                                                    name="tanggal_kehilangan"
-                                                    value="<?php echo $row['tanggal_kehilangan']; ?>" readonly>
+                                                <input type="date" class="form-control" name="tanggal_kehilangan"
+                                                    value="<?php echo $row['tanggal_kehilangan']; ?>" required>
+                                                <div class="invalid-feedback">Kolom tanggal kehilangan wajib diisi!
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Cawu</label>
@@ -169,9 +172,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Jumlah Kehilangan</label>
-                                                <input type="number" class="form-control bg-light"
-                                                    name="jumlah_kehilangan"
-                                                    value="<?php echo $row['jumlah_kehilangan']; ?>" readonly>
+                                                <input type="number" class="form-control" name="jumlah_kehilangan"
+                                                    value="<?php echo $row['jumlah_kehilangan']; ?>" required>
+                                                <div class="invalid-feedback">Kolom jumlah kehilangan wajib diisi!</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
@@ -236,10 +239,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                             $barang = getKehilanganBarang($conn);
                             while ($row = mysqli_fetch_assoc($barang)) {
                                 echo "<option value='{$row['id_inventaris']}' 
-                                            data-tanggal='{$row['tanggal_kontrol']}'
-                                            data-cawu='{$row['cawu']}'
-                                            data-jumlah='{$row['jumlah_hilang']}'
-                                            data-tahun='" . date('Y', strtotime($row['tanggal_kontrol'])) . "'>
+                                        data-tanggal='{$row['tanggal_kontrol']}'
+                                        data-cawu='{$row['cawu']}'
+                                        data-jumlah='{$row['jumlah_hilang']}'
+                                        data-tahun='" . date('Y', strtotime($row['tanggal_kontrol'])) . "'>
                                         {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['cawu']}  - " . date('Y', strtotime($row['tanggal_kontrol'])) . " - {$row['jumlah_hilang']} hilang
                                     </option>";
                             }
@@ -264,8 +267,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <label class="form-label">Jumlah Kehilangan</label>
                                                 <input type="number" class="form-control bg-light"
                                                     name="jumlah_kehilangan" id="jumlah_kehilangan" required readonly>
-                                                <div class="invalid-feedback">Kolom jumlah Kehilangan wajib diisi!
-                                                </div>
+                                                <div class="invalid-feedback">Kolom jumlah kehilangan wajib diisi!</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
@@ -283,6 +285,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </div>
                             </div>
                         </div>
+
                         <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mt-4">
                             <ul class="pagination pagination-rounded justify-content-center">
@@ -326,6 +329,21 @@ function fillKehilanganData(selectElement) {
     document.getElementById('cawu').value = selectedOption.dataset.cawu;
     document.getElementById('jumlah_kehilangan').value = selectedOption.dataset.jumlah;
 }
+
+(function() {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
 </script>
 
 

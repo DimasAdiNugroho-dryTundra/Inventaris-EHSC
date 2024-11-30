@@ -52,6 +52,29 @@ function getBarangRusak($conn) {
 }
 
 
+// Fungsi untuk validasi foto
+function validasiFoto($file) {
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']; // Tipe file yang diperbolehkan
+    $maxSize = 2097152;
+
+    // Cek apakah ada kesalahan saat upload
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return "Tidak ada file yang diupload.";
+    }
+
+    // Cek ukuran file
+    if ($file['size'] > $maxSize) {
+        return "Ukuran file tidak boleh lebih dari 2MB.";
+    }
+
+    // Cek tipe file
+    if (!in_array($file['type'], $allowedTypes)) {
+        return "Tipe file tidak valid. Harus berupa JPG, JPEG, atau PNG.";
+    }
+
+    return true; // Validasi berhasil
+}
+
 // Proses penambahan kerusakan barang
 if (isset($_POST['tambahKerusakan'])) {
     $id_inventaris = $_POST['id_inventaris'];
@@ -59,31 +82,37 @@ if (isset($_POST['tambahKerusakan'])) {
     $cawu = $_POST['cawu'];
     $jumlah_kerusakan = $_POST['jumlah_kerusakan'];
     $keterangan = $_POST['keterangan'];
-    
+
     // Upload foto
     $foto = $_FILES['foto_kerusakan'];
     $fotoName = '';
-    
-    if ($foto['error'] == 0) {
-        $uploadDir = '../upload/kerusakan/';
-        $fotoName = time() . '_' . basename($foto['name']);
-        
-        if (!move_uploaded_file($foto['tmp_name'], $uploadDir . $fotoName)) {
-            $_SESSION['error_message'] = "Gagal mengupload foto.";
-            header("Location: kerusakanBarang.php");
-            exit();
-        }
+
+    // Validasi foto
+    $validationResult = validasiFoto($foto);
+    if ($validationResult !== true) {
+        $_SESSION['error_message'] = $validationResult;
+        header("Location: kerusakanBarang.php");
+        exit();
     }
-    
+
+    $uploadDir = '../upload/kerusakan/';
+    $fotoName = time() . '_' . basename($foto['name']);
+
+    if (!move_uploaded_file($foto['tmp_name'], $uploadDir . $fotoName)) {
+        $_SESSION['error_message'] = "Gagal mengupload foto.";
+        header("Location: kerusakanBarang.php");
+        exit();
+    }
+
     $query = "INSERT INTO kerusakan_barang (id_inventaris, tanggal_kerusakan, cawu, jumlah_kerusakan, foto_kerusakan, keterangan)
               VALUES ('$id_inventaris', '$tanggal_kerusakan', '$cawu', '$jumlah_kerusakan', '$fotoName', '$keterangan')";
-    
+
     if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Data kerusakan barang berhasil ditambahkan!";
     } else {
         $_SESSION['error_message'] = "Gagal menambahkan data kerusakan barang: " . mysqli_error($conn);
     }
-    
+
     header("Location: kerusakanBarang.php");
     exit();
 }
@@ -113,6 +142,15 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         // Jika ada foto baru
         if (isset($_FILES['foto_kerusakan']) && $_FILES['foto_kerusakan']['error'] == 0) {
             $foto = $_FILES['foto_kerusakan'];
+
+            // Validasi foto baru
+            $validationResult = validasiFoto($foto);
+            if ($validationResult !== true) {
+                $_SESSION['error_message'] = $validationResult;
+                header("Location: kerusakanBarang.php");
+                exit();
+            }
+
             $uploadDir = '../upload/kerusakan/';
             $fotoName = time() . '_' . basename($foto['name']);
 
@@ -133,42 +171,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $_SESSION['error_message'] = "Gagal memperbarui data kerusakan barang: " . mysqli_error($conn);
     }
 
-    header("Location: kerusakanBarang.php");
-    exit();
-}
-if (isset($_POST['action']) && $_POST['action'] == 'update') {
-    $id_kerusakan_barang = $_POST['id_kerusakan_barang'];
-    $tanggal_kerusakan = $_POST['tanggal_kerusakan'];
-    $cawu = $_POST['cawu'];
-    $jumlah_kerusakan = $_POST['jumlah_kerusakan'];
-    $keterangan = $_POST['keterangan'];
-    
-    $query = "UPDATE kerusakan_barang SET 
-              tanggal_kerusakan = '$tanggal_kerusakan',
-              cawu = '$cawu',
-              jumlah_kerusakan = '$jumlah_kerusakan',
-              keterangan = '$keterangan'
-              WHERE id_kerusakan_barang = $id_kerusakan_barang";
-    
-    if (mysqli_query($conn, $query)) {
-        // Jika ada foto baru
-        if (isset($_FILES['foto_kerusakan']) && $_FILES['foto_kerusakan']['error'] == 0) {
-            $foto = $_FILES['foto_kerusakan'];
-            $uploadDir = '../upload/kerusakan/';
-            $fotoName = time() . '_' . basename($foto['name']);
-            
-            if (move_uploaded_file($foto['tmp_name'], $uploadDir . $fotoName)) {
-                // Update foto di database
-                $queryFoto = "UPDATE kerusakan_barang SET foto_kerusakan = '$fotoName' WHERE id_kerusakan_barang = $id_kerusakan_barang";
-                mysqli_query($conn, $queryFoto);
-            }
-        }
-        
-        $_SESSION['success_message'] = "Data kerusakan barang berhasil diperbarui!";
-    } else {
-        $_SESSION['error_message'] = "Gagal memperbarui data kerusakan barang: " . mysqli_error($conn);
-    }
-    
     header("Location: kerusakanBarang.php");
     exit();
 }

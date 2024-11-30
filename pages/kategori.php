@@ -118,6 +118,115 @@ require('../layouts/header.php');
                             </table>
                         </div>
 
+                        <!-- Modal Edit -->
+                        <?php
+mysqli_data_seek($result, 0);
+while ($row = mysqli_fetch_assoc($result)) { 
+?>
+                        <div class="modal fade" id="modal-update-<?php echo $row['id_kategori']; ?>" tabindex="-1"
+                            aria-labelledby="modalUpdateLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="modalUpdateLabel">Edit Kategori</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="kategori.php" class="needs-validation" novalidate>
+                                            <input type="hidden" name="action" value="update">
+                                            <input type="hidden" name="id_kategori"
+                                                value="<?php echo $row['id_kategori']; ?>">
+                                            <div class="mb-3">
+                                                <label class="form-label">Kode Kategori</label>
+                                                <input type="text" class="form-control" name="kode_kategori"
+                                                    value="<?php echo $row['kode_kategori']; ?>" required
+                                                    data-original-value="<?php echo $row['kode_kategori']; ?>">
+                                                <div class="invalid-feedback">
+                                                    Kolom kode kategori wajib diisi!
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nama Kategori</label>
+                                                <input type="text" class="form-control" name="nama_kategori"
+                                                    value="<?php echo $row['nama_kategori']; ?>" required
+                                                    data-original-value="<?php echo $row['nama_kategori']; ?>">
+                                                <div class="invalid-feedback">
+                                                    Kolom nama kategori wajib diisi!
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Delete -->
+                        <div class="modal fade" id="modal-delete-<?php echo $row['id_kategori']; ?>" tabindex="-1"
+                            aria-labelledby="modalDeleteLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalDeleteLabel">Konfirmasi Hapus</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Apakah Anda yakin ingin menghapus kategori <?php echo $row['nama_kategori']; ?>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Batal</button>
+                                        <a href="kategori.php?delete=<?php echo $row['id_kategori']; ?>"
+                                            class="btn btn-danger">Hapus</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+
+                        <!-- Modal Tambah -->
+                        <div class="modal fade" id="tambahKategoriModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Tambah Kategori</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="kategori.php" class="needs-validation" novalidate>
+                                            <div class="mb-3">
+                                                <label class="form-label">Kode Kategori</label>
+                                                <input type="text" name="kode_kategori" class="form-control" required>
+                                                <div class="invalid-feedback">
+                                                    Kolom kode kategori wajib diisi!
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nama Kategori</label>
+                                                <input type="text" name="nama_kategori" class="form-control" required>
+                                                <div class="invalid-feedback">
+                                                    Kolom nama kategori wajib diisi!
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" name="tambahKategori"
+                                                    class="btn btn-primary">Tambah</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mt-4">
                             <ul class="pagination pagination-rounded justify-content-center">
@@ -158,213 +267,27 @@ require('../layouts/header.php');
     <div class="drag-target"></div>
 </div>
 
-<!-- Modal Tambah -->
-<div class="modal fade" id="tambahKategoriModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Kategori</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="kategori.php" class="needs-validation" novalidate>
-                    <div class="mb-3">
-                        <label class="form-label">Kode Kategori</label>
-                        <input type="text" name="kode_kategori" class="form-control" required>
-                        <div class="invalid-feedback">
-                            Kolom kode kategori wajib diisi!
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nama Kategori</label>
-                        <input type="text" name="nama_kategori" class="form-control" required>
-                        <div class="invalid-feedback">
-                            Kolom nama kategori wajib diisi!
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" name="tambahKategori" class="btn btn-primary">Tambah</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Edit -->
-<?php
-mysqli_data_seek($result, 0);
-while ($row = mysqli_fetch_assoc($result)) { 
-?>
-<div class="modal fade" id="modal-update-<?php echo $row['id_kategori']; ?>" tabindex="-1"
-    aria-labelledby="modalUpdateLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="modalUpdateLabel">Edit Kategori</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="kategori.php" class="needs-validation" novalidate>
-                    <input type="hidden" name="action" value="update">
-                    <input type="hidden" name="id_kategori" value="<?php echo $row['id_kategori']; ?>">
-                    <div class="mb-3">
-                        <label class="form-label">Kode Kategori</label>
-                        <input type="text" class="form-control" name="kode_kategori"
-                            value="<?php echo $row['kode_kategori']; ?>" required
-                            data-original-value="<?php echo $row['kode_kategori']; ?>">
-                        <div class="invalid-feedback">
-                            Kolom kode kategori wajib diisi!
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nama Kategori</label>
-                        <input type="text" class="form-control" name="nama_kategori"
-                            value="<?php echo $row['nama_kategori']; ?>" required
-                            data-original-value="<?php echo $row['nama_kategori']; ?>">
-                        <div class="invalid-feedback">
-                            Kolom nama kategori wajib diisi!
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Delete -->
-<div class="modal fade" id="modal-delete-<?php echo $row['id_kategori']; ?>" tabindex="-1"
-    aria-labelledby="modalDeleteLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalDeleteLabel">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Apakah Anda yakin ingin menghapus kategori <?php echo $row['nama_kategori']; ?>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <a href="kategori.php?delete=<?php echo $row['id_kategori']; ?>" class="btn btn-danger">Hapus</a>
-            </div>
-        </div>
-    </div>
-</div>
-<?php 
-} 
-?>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Validasi untuk form tambah data
     const tambahForm = document.querySelector("#tambahKategoriModal form");
     if (tambahForm) {
         tambahForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            // Reset semua validasi sebelumnya
-            this.querySelectorAll('.is-invalid').forEach(element => {
-                element.classList.remove('is-invalid');
-            });
-
-            let isValid = true;
-            const inputs = this.querySelectorAll('input[required]');
-
-            // Cek setiap input required
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-                }
-            });
-
-            // Jika semua valid, submit form
-            if (isValid) {
-                this.submit();
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
             }
+            this.classList.add('was-validated');
         });
     }
 
-    // Validasi untuk form edit data
     document.querySelectorAll("[id^='modal-update-']").forEach(modal => {
         const form = modal.querySelector('form');
-        const inputs = form.querySelectorAll('input:not([type="hidden"])');
-        const submitBtn = form.querySelector('button[type="submit"]');
-
-        // Handle form submission
         form.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            // Reset semua validasi sebelumnya
-            inputs.forEach(input => {
-                input.classList.remove('is-invalid');
-                // Hapus pesan error yang ada
-                const nextElement = input.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
-                    nextElement.remove();
-                }
-            });
-
-            let isValid = true;
-            let hasChanges = false;
-
-            // Validasi input kosong dan cek perubahan
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-
-                    // Tambah pesan error untuk input kosong
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'invalid-feedback';
-                    errorDiv.textContent =
-                        `Kolom ${input.previousElementSibling.textContent.toLowerCase()} wajib diisi!`;
-                    input.parentNode.appendChild(errorDiv);
-                }
-
-                // Cek apakah ada perubahan
-                if (input.value !== input.getAttribute('data-original-value')) {
-                    hasChanges = true;
-                }
-            });
-
-            // Jika tidak ada perubahan, tambahkan pesan error
-            if (!hasChanges && isValid) {
-                inputs.forEach(input => {
-                    input.classList.add('is-invalid');
-                });
-
-                // Tambah pesan error untuk tidak ada perubahan
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'invalid-feedback';
-                errorDiv.textContent = 'Belum ada perubahan data yang dilakukan!';
-                inputs[inputs.length - 1].parentNode.appendChild(errorDiv);
-                return;
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
             }
-
-            // Jika semua valid dan ada perubahan, submit form
-            if (isValid && hasChanges) {
-                this.submit();
-            }
-        });
-
-        // Reset form saat modal ditutup
-        modal.addEventListener('hidden.bs.modal', function() {
-            inputs.forEach(input => {
-                input.value = input.getAttribute('data-original-value');
-                input.classList.remove('is-invalid');
-                // Hapus pesan error yang ada
-                const nextElement = input.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
-                    nextElement.remove();
-                }
-            });
+            this.classList.add('was-validated');
         });
     });
 });

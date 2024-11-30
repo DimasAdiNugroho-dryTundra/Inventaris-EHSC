@@ -58,6 +58,14 @@ require('../layouts/header.php');
                         </h4>
 
                         <div class="row p-3">
+                            <div class="col-12 d-flex justify-content-start align-items-center">
+                                <a href="scanQRcode.php" class="btn btn-primary me-2">
+                                    <i class="ti ti-qrcode"></i> Scan QR Code
+                                </a>
+                            </div>
+                        </div>
+                        <h4 class="card-header">Barang Inventaris Tersedia</h4>
+                        <div class="row p-3">
                             <div class="col-md-6">
                                 <form method="POST" class="d-flex">
                                     <input type="text" class="form-control me-2" name="search"
@@ -69,38 +77,36 @@ require('../layouts/header.php');
                                 <form class="d-flex justify-content-end align-items-center">
                                     <label for="limit" class="label me-2">Tampilkan:</label>
                                     <select id="limit" class="select2 form-select" onchange="location = this.value;">
-                                        <option value="permintaan_barang.php?limit=5"
+                                        <option value="inventaris.php?limit=5"
                                             <?php if ($limit == 5) echo 'selected'; ?>>5</option>
-                                        <option value="permintaan_barang.php?limit=10"
+                                        <option value="inventaris.php?limit=10"
                                             <?php if ($limit == 10) echo 'selected'; ?>>10</option>
-                                        <option value="permintaan_barang.php?limit=20"
+                                        <option value="inventaris.php?limit=20"
                                             <?php if ($limit == 20) echo 'selected'; ?>>20</option>
                                     </select>
                                 </form>
                             </div>
                         </div>
-
                         <div class="row p-3">
-                            <div class="col-12 d-flex align-content-center">
-                                <a href="scanQRcode.php" class="btn btn-primary">
-                                    <i class="ti ti-qrcode"></i> Scan QR Code
+                            <div class="col-12 d-flex justify-content-start align-items-center">
+                                <a href="../report/printLaporanInventarisTersedia.php" class="btn btn-success">
+                                    <i class="ti ti-printer"></i> Cetak Laporan
                                 </a>
                             </div>
                         </div>
-                        <h4 class="card-header">Barang Inventaris Tersedia</h4>
                         <div class="table-responsive text-nowrap">
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Kode Inventaris</th>
-                                        <th>Departemen</th>
-                                        <th>Kategori</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah Awal</th>
-                                        <th>Jumlah Akhir</th>
-                                        <th>Satuan</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center align-middle">No</th>
+                                        <th class="text-center align-middle">Kode Inventaris</th>
+                                        <th class="text-center align-middle">Departemen</th>
+                                        <th class="text-center align-middle">Kategori</th>
+                                        <th class="text-center align-middle">Nama Barang</th>
+                                        <th class="text-center align-middle">Jumlah Awal</th>
+                                        <th class="text-center align-middle">Jumlah Akhir</th>
+                                        <th class="text-center align-middle">Satuan</th>
+                                        <th class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,15 +115,15 @@ require('../layouts/header.php');
                                     while ($row = mysqli_fetch_assoc($result)) {
                                     ?>
                                     <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $row['kode_inventaris']; ?></td>
-                                        <td><?php echo $row['nama_departemen']; ?></td>
-                                        <td><?php echo $row['nama_kategori']; ?></td>
-                                        <td><?php echo $row['nama_barang']; ?></td>
-                                        <td><?php echo $row['jumlah_awal']; ?></td>
-                                        <td><?php echo $row['jumlah_akhir']; ?></td>
-                                        <td><?php echo $row['satuan']; ?></td>
-                                        <td>
+                                        <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['kode_inventaris']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_kategori']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['jumlah_awal']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['jumlah_akhir']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['satuan']; ?></td>
+                                        <td class="text-center align-middle">
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_inventaris']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
@@ -272,23 +278,82 @@ require('../layouts/header.php');
                                     <?php } ?>
                                 </tbody>
                             </table>
+                            <!-- Pagination untuk Barang Inventaris Tersedia -->
+                            <nav aria-label="Page navigation" class="mt-4">
+                                <ul class="pagination pagination-rounded justify-content-center">
+                                    <?php if ($page > 1) { ?>
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                            href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>"
+                                            aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <?php } ?>
+                                    <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+                                    <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                                        <a class="page-link"
+                                            href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>"><?php echo $i; ?></a>
+                                    </li>
+                                    <?php } ?>
+                                    <?php if ($page < $totalPages) { ?>
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                            href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>"
+                                            aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <?php } ?>
+                                </ul>
+                            </nav>
                         </div>
 
                         <!-- Tabel untuk menampilkan barang dengan jumlah akhir 0 -->
                         <h4 class="card-header">Barang Inventaris Tidak Tersedia</h4>
+                        <div class="row p-3">
+                            <div class="col-md-6">
+                                <form method="POST" class="d-flex">
+                                    <input type="text" class="form-control me-2" name="search_zero"
+                                        placeholder="Cari nama barang..." value="<?php echo $search_zero; ?>">
+                                    <button class="btn btn-outline-secondary" type="submit">Cari</button>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form class="d-flex justify-content-end align-items-center">
+                                    <label for="limit_zero" class="label me-2">Tampilkan:</label>
+                                    <select id="limit_zero" class="select2 form-select"
+                                        onchange="location = this.value;">
+                                        <option value="inventaris.php?limit_zero=5"
+                                            <?php if ($limit_zero == 5) echo 'selected'; ?>>5</option>
+                                        <option value="inventaris.php?limit_zero=10"
+                                            <?php if ($limit_zero == 10) echo 'selected'; ?>>10</option>
+                                        <option value="inventaris.php?limit_zero=20"
+                                            <?php if ($limit_zero == 20) echo 'selected'; ?>>20</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row p-3">
+                            <div class="col-12 d-flex justify-content-start align-items-center">
+                                <a href="../report/printLaporanInventarisTidakTersedia.php" class="btn btn-success">
+                                    <i class="ti ti-printer"></i> Cetak Laporan
+                                </a>
+                            </div>
+                        </div>
                         <div class="table-responsive text-nowrap">
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Kode Inventaris</th>
-                                        <th>Departemen</th>
-                                        <th>Kategori</th>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah Awal</th>
-                                        <th>Jumlah Akhir</th>
-                                        <th>Satuan</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center align-middle">No</th>
+                                        <th class="text-center align-middle">Kode Inventaris</th>
+                                        <th class="text-center align-middle">Departemen</th>
+                                        <th class="text-center align-middle">Kategori</th>
+                                        <th class="text-center align-middle">Nama Barang</th>
+                                        <th class="text-center align-middle">Jumlah Awal</th>
+                                        <th class="text-center align-middle">Jumlah Akhir</th>
+                                        <th class="text-center align-middle">Satuan</th>
+                                        <th class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -297,15 +362,21 @@ require('../layouts/header.php');
             while ($row_zero = mysqli_fetch_assoc($result_zero)) {
             ?>
                                     <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $row_zero['kode_inventaris']; ?></td>
-                                        <td><?php echo $row_zero['nama_departemen']; ?></td>
-                                        <td><?php echo $row_zero['nama_kategori']; ?></td>
-                                        <td><?php echo $row_zero['nama_barang']; ?></td>
-                                        <td><?php echo $row_zero['jumlah_awal']; ?></td>
-                                        <td><?php echo $row_zero['jumlah_akhir']; ?></td>
-                                        <td><?php echo $row_zero['satuan']; ?></td>
-                                        <td>
+                                        <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['kode_inventaris']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['nama_departemen']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['nama_kategori']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['nama_barang']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['jumlah_awal']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['jumlah_akhir']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row_zero['satuan']; ?></td>
+                                        <td class="text-center align-middle">
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-zero-<?php echo $row_zero['id_inventaris']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
@@ -466,29 +537,28 @@ require('../layouts/header.php');
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Pagination -->
+                        <!-- Pagination untuk Barang Inventaris Tidak Tersedia -->
                         <nav aria-label="Page navigation" class="mt-4">
                             <ul class="pagination pagination-rounded justify-content-center">
-                                <?php if ($page > 1) { ?>
+                                <?php if ($page_zero > 1) { ?>
                                 <li class="page-item">
                                     <a class="page-link"
-                                        href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>"
+                                        href="?page_zero=<?php echo $page_zero - 1; ?>&limit_zero=<?php echo $limit_zero; ?>"
                                         aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                                 <?php } ?>
-                                <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                                <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                                <?php for ($i = 1; $i <= $totalPages_zero; $i++) { ?>
+                                <li class="page-item <?php if ($i == $page_zero) echo 'active'; ?>">
                                     <a class="page-link"
-                                        href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>"><?php echo $i; ?></a>
+                                        href="?page_zero=<?php echo $i; ?>&limit_zero=<?php echo $limit_zero; ?>"><?php echo $i; ?></a>
                                 </li>
                                 <?php } ?>
-                                <?php if ($page < $totalPages) { ?>
+                                <?php if ($page_zero < $totalPages_zero) { ?>
                                 <li class="page-item">
                                     <a class="page-link"
-                                        href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>"
+                                        href="?page_zero=<?php echo $page_zero + 1; ?>&limit_zero=<?php echo $limit_zero; ?>"
                                         aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
@@ -508,7 +578,7 @@ require('../layouts/header.php');
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST">
+                                    <form method="POST" onsubmit="return validateForm()">
                                         <input type="hidden" name="action" value="create">
                                         <div class="mb-3">
                                             <label class="form-label">Jenis Input</label>
@@ -525,20 +595,21 @@ require('../layouts/header.php');
                                                 <label class="form-label">Penerimaan Barang</label>
                                                 <select name="id_penerimaan" class="form-select" id="id_penerimaan"
                                                     onchange="updateDepartemen()">
+                                                    <option value="">Pilih Penerimaan Barang</option>
                                                     <?php
-                                                    $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, d.nama_departemen, d.id_departemen 
-                                                                        FROM penerimaan_barang pb 
-                                                                        JOIN permintaan_barang pmb ON pb.id_permintaan = pmb.id_permintaan
-                                                                        JOIN departemen d ON pmb.id_departemen = d.id_departemen
-                                                                        WHERE pb.id_penerimaan NOT IN (SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)";
-                                                    $penerimaan_result = mysqli_query($conn, $penerimaan_query);
-                                                    while ($penerimaan = mysqli_fetch_assoc($penerimaan_result)) {
-                                                        echo "<option value='" . $penerimaan['id_penerimaan'] . "' 
-                                                            data-departemen='" . $penerimaan['id_departemen'] . "'>" 
-                                                            . $penerimaan['nama_barang'] . " - " 
-                                                            . $penerimaan['nama_departemen'] . "</option>";
-                                                    }
-                                                    ?>
+        $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, d.nama_departemen, d.id_departemen 
+                             FROM penerimaan_barang pb 
+                             JOIN permintaan_barang pmb ON pb.id_permintaan = pmb.id_permintaan
+                             JOIN departemen d ON pmb.id_departemen = d.id_departemen
+                             WHERE pb.id_penerimaan NOT IN (SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)";
+        $penerimaan_result = mysqli_query($conn, $penerimaan_query);
+        while ($penerimaan = mysqli_fetch_assoc($penerimaan_result)) {
+            echo "<option value='" . $penerimaan['id_penerimaan'] . "' 
+                  data-departemen='" . $penerimaan['id_departemen'] . "'>" 
+                  . $penerimaan['nama_barang'] . " - " 
+                  . $penerimaan['nama_departemen'] . "</option>";
+        }
+        ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -549,33 +620,29 @@ require('../layouts/header.php');
                                                 <label class="form-label">Nama Barang</label>
                                                 <input type="text" name="nama_barang" class="form-control">
                                             </div>
-
                                             <div class="mb-3">
                                                 <label class="form-label">Jumlah Awal</label>
                                                 <input type="number" name="jumlah_awal" class="form-control">
                                             </div>
-
                                             <div class="mb-3">
                                                 <label class="form-label">Satuan</label>
                                                 <input type="text" name="satuan" class="form-control">
                                             </div>
-
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Perolehan</label>
                                                 <input type="date" name="tanggal_perolehan" class="form-control">
                                             </div>
-
                                             <div class="mb-3">
                                                 <label class="form-label">Departemen</label>
                                                 <select name="id_departemen" class="form-select">
                                                     <?php
-                                                    $dept_query = "SELECT * FROM departemen";
-                                                    $dept_result = mysqli_query($conn, $dept_query);
-                                                    while ($dept = mysqli_fetch_assoc($dept_result)) {
-                                                        echo "<option value='" . $dept['id_departemen'] . "'>" 
-                                                            . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-                                                    }
-                                                    ?>
+                                $dept_query = "SELECT * FROM departemen";
+                                $dept_result = mysqli_query($conn, $dept_query);
+                                while ($dept = mysqli_fetch_assoc($dept_result)) {
+                                    echo "<option value='" . $dept['id_departemen'] . "'>" 
+                                         . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
+                                }
+                                ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -584,13 +651,13 @@ require('../layouts/header.php');
                                             <label class="form-label">Kategori</label>
                                             <select name="id_kategori" class="form-select" required>
                                                 <?php
-                                                $kat_query = "SELECT * FROM kategori";
-                                                $kat_result = mysqli_query($conn, $kat_query);
-                                                while ($kat = mysqli_fetch_assoc($kat_result)) {
-                                                    echo "<option value='" . $kat['id_kategori'] . "'>" 
-                                                        . $kat['nama_kategori'] . "</option>";
-                                                }
-                                                ?>
+                            $kat_query = "SELECT * FROM kategori";
+                            $kat_result = mysqli_query($conn, $kat_query);
+                            while ($kat = mysqli_fetch_assoc($kat_result)) {
+                                echo "<option value='" . $kat['id_kategori'] . "'>" 
+                                     . $kat['nama_kategori'] . "</option>";
+                            }
+                            ?>
                                             </select>
                                         </div>
 
@@ -617,10 +684,10 @@ require('../layouts/header.php');
     </div>
 
     <script>
-    function toggleInputForm(id) {
-        var jenisInput = document.getElementById('jenis_input-' + id).value;
-        var formPenerimaan = document.getElementById('form_penerimaan-' + id);
-        var formManual = document.getElementById('form_manual-' + id);
+    function toggleInputForm() {
+        var jenisInput = document.getElementById('jenis_input').value;
+        var formPenerimaan = document.getElementById('form_penerimaan');
+        var formManual = document.getElementById('form_manual');
 
         if (jenisInput === 'penerimaan') {
             formPenerimaan.style.display = 'block';
@@ -631,22 +698,26 @@ require('../layouts/header.php');
         }
     }
 
-    function updateDepartemen(id) {
-        var penerimaan = document.getElementById('id_penerimaan-' + id);
-        var selectedOption = penerimaan.options[penerimaan.selectedIndex];
-        var departemenId = selectedOption.getAttribute('data-departemen');
-        document.querySelector('select[name="id_departemen"]').value = departemenId;
-    }
-
     // Initialize the form state
     document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi untuk semua form yang ada
-        var forms = document.querySelectorAll('[id^="jenis_input-"]');
-        forms.forEach(function(form) {
-            var id = form.id.split('-')[1];
-            toggleInputForm(id);
-        });
+        toggleInputForm(); // Call the function on page load to set the initial state
     });
+
+    document.getElementById('formEdit').onsubmit = function(event) {
+        var namaBarang = document.getElementById('nama_barang').value;
+        var departemen = document.getElementById('id_departemen').value;
+        var kategori = document.getElementById('id_kategori').value;
+        var tanggalPerolehan = document.getElementById('tanggal_perolehan').value;
+        var jumlahAwal = document.getElementById('jumlah_awal').value;
+
+        if (namaBarang === '' || departemen === '' || kategori === '' || tanggalPerolehan === '' || jumlahAwal ===
+            '') {
+            alert("Semua kolom harus diisi!");
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    };
     </script>
 
     <?php require('../layouts/assetsFooter.php'); ?>

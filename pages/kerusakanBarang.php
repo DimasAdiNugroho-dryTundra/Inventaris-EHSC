@@ -115,7 +115,7 @@ require('../layouts/header.php');
                                         <td class="text-center align-middle">
                                             <?php if ($row['foto_kerusakan']) { ?>
                                             <img src="../upload/kerusakan/<?php echo $row['foto_kerusakan']; ?>"
-                                                alt="Foto Kerusakan" width="100">
+                                                width="100">
                                             <?php } else { ?>
                                             <span>Tidak ada foto</span>
                                             <?php } ?>
@@ -126,6 +126,8 @@ require('../layouts/header.php');
                                                 data-bs-target="#modal-update-<?php echo $row['id_kerusakan_barang']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_kerusakan_barang']; ?>">Delete</button>
+                                            <a href="../report/printLaporanKerusakanBarang.php?id=<?php echo $row['id_kerusakan_barang']; ?>"
+                                                class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
                                     </tr>
                                     <?php
@@ -167,9 +169,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Kerusakan</label>
-                                                <input type="date" class="form-control bg-light"
-                                                    name="tanggal_kerusakan"
-                                                    value="<?php echo $row['tanggal_kerusakan']; ?>" readonly>
+                                                <input type="date" class="form-control" name="tanggal_kerusakan"
+                                                    value="<?php echo $row['tanggal_kerusakan']; ?>" required>
+                                                <div class="invalid-feedback">Kolom tanggal kerusakan wajib diisi!</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Cawu</label>
@@ -178,25 +180,22 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Jumlah Kerusakan</label>
-                                                <input type="number" class="form-control bg-light"
-                                                    name="jumlah_kerusakan"
-                                                    value="<?php echo $row['jumlah_kerusakan']; ?>" readonly>
+                                                <input type="number" class="form-control" name="jumlah_kerusakan"
+                                                    value="<?php echo $row['jumlah_kerusakan']; ?>" required>
+                                                <div class="invalid-feedback">Kolom jumlah kerusakan wajib diisi!</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Foto Kerusakan</label>
                                                 <input type="file" class="form-control" name="foto_kerusakan"
                                                     accept="image/*">
-                                                <div class="invalid-feedback">
-                                                    Silakan upload foto kerusakan jika ada!
+                                                <div class="invalid-feedback">Silakan upload foto kerusakan jika ada!
                                                 </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
                                                 <textarea class="form-control" name="keterangan"
                                                     required><?php echo $row['keterangan']; ?></textarea>
-                                                <div class="invalid-feedback">
-                                                    Kolom keterangan wajib diisi!
-                                                </div>
+                                                <div class="invalid-feedback">Kolom keterangan wajib diisi!</div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" class="btn btn-primary">Simpan</button>
@@ -362,6 +361,21 @@ function fillKerusakanData(selectElement) {
     document.getElementById('cawu').value = selectedOption.dataset.cawu;
     document.getElementById('jumlah_kerusakan').value = selectedOption.dataset.jumlah;
 }
+
+(function() {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
 </script>
 
 <?php require('../layouts/assetsFooter.php'); ?>

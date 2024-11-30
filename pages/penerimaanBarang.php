@@ -70,11 +70,11 @@ require('../layouts/header.php');
                                 <form class="d-flex justify-content-end align-items-center">
                                     <label for="limit" class="label me-2">Tampilkan:</label>
                                     <select id="limit" class="select2 form-select" onchange="location = this.value;">
-                                        <option value="permintaan_barang.php?limit=5"
+                                        <option value="permintaanBarang.php?limit=5"
                                             <?php if ($limit == 5) echo 'selected'; ?>>5</option>
-                                        <option value="permintaan_barang.php?limit=10"
+                                        <option value="permintaanBarang.php?limit=10"
                                             <?php if ($limit == 10) echo 'selected'; ?>>10</option>
-                                        <option value="permintaan_barang.php?limit=20"
+                                        <option value="permintaanBarang.php?limit=20"
                                             <?php if ($limit == 20) echo 'selected'; ?>>20</option>
                                     </select>
                                 </form>
@@ -85,14 +85,14 @@ require('../layouts/header.php');
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Departemen</th>
-                                        <th>Nama Barang</th>
-                                        <th>Tanggal Terima</th>
-                                        <th>Jumlah</th>
-                                        <th>Satuan</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center align-middle">No</th>
+                                        <th class="text-center align-middle">Departemen</th>
+                                        <th class="text-center align-middle">Nama Barang</th>
+                                        <th class="text-center align-middle">Tanggal Terima</th>
+                                        <th class="text-center align-middle">Jumlah</th>
+                                        <th class="text-center align-middle">Satuan</th>
+                                        <th class="text-center align-middle">Status</th>
+                                        <th class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,14 +101,14 @@ require('../layouts/header.php');
                                     while ($row = mysqli_fetch_assoc($result)) {
                                     ?>
                                     <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $row['nama_departemen']; ?></td>
-                                        <td><?php echo $row['nama_barang']; ?></td>
-                                        <td><?php echo $row['tanggal_terima']; ?></td>
-                                        <td><?php echo $row['jumlah']; ?></td>
-                                        <td><?php echo $row['satuan']; ?></td>
-                                        <td><?php echo $row['status']; ?></td>
-                                        <td>
+                                        <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['tanggal_terima']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['jumlah']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['satuan']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['status']; ?></td>
+                                        <td class="text-center align-middle">
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_penerimaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
@@ -122,7 +122,7 @@ require('../layouts/header.php');
                         <!-- Modal Update -->
                         <div class="modal fade" id="modal-update-<?php echo $row['id_penerimaan']; ?>" tabindex="-1"
                             aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Edit Penerimaan Barang</h5>
@@ -165,7 +165,11 @@ require('../layouts/header.php');
                                                         Ditolak</option>
                                                 </select>
                                             </div>
-                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -175,7 +179,7 @@ require('../layouts/header.php');
                         <!-- Modal Delete -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_penerimaan']; ?>" tabindex="-1"
                             aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Konfirmasi Hapus</h5>
@@ -232,7 +236,7 @@ require('../layouts/header.php');
 
                     <!-- Modal Tambah Penerimaan -->
                     <div class="modal fade" id="tambahPenerimaanModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">Tambah Penerimaan Barang</h5>
@@ -282,10 +286,10 @@ require('../layouts/header.php');
                                             </select>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="submit" name="tambahPenerimaan"
-                                                class="btn btn-primary">Tambah</button>
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" name="tambahPenerimaan"
+                                                class="btn btn-primary">Tambah</button>
                                         </div>
                                     </form>
                                 </div>

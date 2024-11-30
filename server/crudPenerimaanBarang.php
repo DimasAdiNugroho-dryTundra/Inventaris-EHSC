@@ -90,34 +90,55 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 // Fungsi untuk menghapus penerimaan dan data terkait
 function deletePenerimaan($conn, $id_penerimaan)
 {
-    mysqli_begin_transaction($conn);
+    // Dapatkan id_permintaan terkait
+    $query = "SELECT id_permintaan FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
+    $result = mysqli_query($conn, $query);
+    $penerimaan = mysqli_fetch_assoc($result);
 
-    try {
-        // 1. Hapus inventaris terkait
-        $query = "SELECT id_inventaris FROM inventaris WHERE id_penerimaan = '$id_penerimaan'";
+    if ($penerimaan) {
+        $id_permintaan = $penerimaan['id_permintaan'];
+
+        // Dapatkan id_inventaris terkait
+        $query = "SELECT id_inventaris FROM inventaris WHERE id_penerimaan = $id_penerimaan";
         $result = mysqli_query($conn, $query);
+        $inventaris = mysqli_fetch_assoc($result);
 
-        while ($row = mysqli_fetch_assoc($result)) {
-            deleteInventaris($conn, $row['id_inventaris']);
+        if ($inventaris) {
+            $id_inventaris = $inventaris['id_inventaris'];
+
+            // Hapus dari tabel yang terkait
+            $tables = [
+                'kontrol_barang_cawu_satu',
+                'kontrol_barang_cawu_dua',
+                'kontrol_barang_cawu_tiga',
+                'kerusakan_barang',
+                'kehilangan_barang',
+                'perpindahan_barang'
+            ];
+
+            foreach ($tables as $table) {
+                $query = "DELETE FROM $table WHERE id_inventaris = $id_inventaris";
+                mysqli_query($conn, $query);
+            }
+
+            // Hapus dari tabel inventaris
+            $query = "DELETE FROM inventaris WHERE id_inventaris = $id_inventaris";
+            mysqli_query($conn, $query);
         }
 
-        // 2. Hapus penerimaan
-        $query = "DELETE FROM penerimaan_barang WHERE id_penerimaan = '$id_penerimaan'";
+        // Hapus dari tabel penerimaan_barang
+        $query = "DELETE FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
         mysqli_query($conn, $query);
-
-        mysqli_commit($conn);
-        return true;
-    } catch (Exception $e) {
-        mysqli_rollback($conn);
-        return false;
     }
+
+    return true; // atau return mysqli_affected_rows($conn) untuk melihat jumlah baris yang terpengaruh
 }
 
 // Proses penghapusan penerimaan barang
 if (isset($_GET['delete'])) {
     $id_penerimaan = $_GET['delete'];
     if (deletePenerimaan($conn, $id_penerimaan)) {
-        $_SESSION['success_message'] = "Penerimaan barang berhasil dihapus!";
+        $_SESSION['success_message'] = "Penerimaan barang berhasil dihapus beserta data terkait!";
     } else {
         $_SESSION['error_message'] = "Gagal menghapus penerimaan barang";
     }

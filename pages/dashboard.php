@@ -1,7 +1,37 @@
 <?php
 require('../server/sessionHandler.php');
 require('../layouts/header.php');
+
+// Ambil data pengguna berdasarkan session
+$queryUser = "SELECT * FROM user WHERE id_user = '$id_user'";
+$resultUser = mysqli_query($conn, $queryUser);
+$user = mysqli_fetch_assoc($resultUser);
+
+// Query untuk menghitung jumlah inventaris yang tersedia
+$queryInventarisTersedia = "SELECT COUNT(*) as total_inventaris FROM inventaris WHERE jumlah_akhir > 0";
+$resultInventarisTersedia = mysqli_query($conn, $queryInventarisTersedia);
+$rowInventarisTersedia = mysqli_fetch_assoc($resultInventarisTersedia);
+$totalInventarisTersedia = $rowInventarisTersedia['total_inventaris'];
+
+// Query untuk menghitung jumlah kerusakan barang
+$queryKerusakan = "SELECT COUNT(*) as total_kerusakan FROM kerusakan_barang";
+$resultKerusakan = mysqli_query($conn, $queryKerusakan);
+$rowKerusakan = mysqli_fetch_assoc($resultKerusakan);
+$totalKerusakan = $rowKerusakan['total_kerusakan'];
+
+// Query untuk menghitung jumlah perpindahan barang
+$queryPerpindahan = "SELECT COUNT(*) as total_perpindahan FROM perpindahan_barang";
+$resultPerpindahan = mysqli_query($conn, $queryPerpindahan);
+$rowPerpindahan = mysqli_fetch_assoc($resultPerpindahan);
+$totalPerpindahan = $rowPerpindahan['total_perpindahan'];
+
+// Query untuk menghitung jumlah kehilangan barang
+$queryKehilangan = "SELECT COUNT(*) as total_kehilangan FROM kehilangan_barang";
+$resultKehilangan = mysqli_query($conn, $queryKehilangan);
+$rowKehilangan = mysqli_fetch_assoc($resultKehilangan);
+$totalKehilangan = $rowKehilangan['total_kehilangan'];
 ?>
+
 
 <body>
     <!-- Layout wrapper -->
@@ -26,67 +56,32 @@ require('../layouts/header.php');
                     <!-- Content -->
 
                     <div class="container-xxl flex-grow-1 container-p-y">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <h1>halo</h1>
-                                <p>Jabatan: <?php echo $_SESSION['jabatan']; ?></p>
-                            </div>
-                        </div>
                         <div class="row row-cols-1 row-cols-md-3 g-6 mb-12">
                             <div class="col-lg-3 col-sm-6">
                                 <div class="card h-100">
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div class="card-title mb-0">
-                                            <h5 class="mb-1 me-2">86%</h5>
-                                            <p class="mb-0">CPU Usage</p>
-                                        </div>
-                                        <div class="card-icon">
-                                            <span class="badge bg-label-primary rounded p-2">
-                                                <i class="ti ti-cpu ti-26px"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-sm-6">
-                                <div class="card h-100">
-                                    <div class="card-body d-flex justify-content-between align-items-center">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-1 me-2">1.24gb</h5>
-                                            <p class="mb-0">Memory Usage</p>
+                                            <h5 class="mb-1"><?php echo $totalInventarisTersedia; ?></h5>
+                                            <p class="mb-0">Inventaris Tersedia</p>
                                         </div>
                                         <div class="card-icon">
                                             <span class="badge bg-label-success rounded p-2">
-                                                <i class="ti ti-server ti-26px"></i>
+                                                <i class="ti ti-box ti-26px"></i>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-lg-3 col-sm-6">
                                 <div class="card h-100">
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div class="card-title mb-0">
-                                            <h5 class="mb-1 me-2">0.2%</h5>
-                                            <p class="mb-0">Downtime Ratio</p>
+                                            <h5 class="mb-1"><?php echo $totalKerusakan; ?></h5>
+                                            <p class="mb-0">Kerusakan Barang</p>
                                         </div>
                                         <div class="card-icon">
                                             <span class="badge bg-label-danger rounded p-2">
-                                                <i class="ti ti-chart-pie-2 ti-26px"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-sm-6">
-                                <div class="card h-100">
-                                    <div class="card-body d-flex justify-content-between align-items-center">
-                                        <div class="card-title mb-0">
-                                            <h5 class="mb-1 me-2">128</h5>
-                                            <p class="mb-0">Issues Found</p>
-                                        </div>
-                                        <div class="card-icon">
-                                            <span class="badge bg-label-warning rounded p-2">
                                                 <i class="ti ti-alert-octagon ti-26px"></i>
                                             </span>
                                         </div>
@@ -94,129 +89,105 @@ require('../layouts/header.php');
                                 </div>
                             </div>
 
-                            <div class="col-xl-12 col-12">
-                                <div class="card">
-                                    <div class="card-header d-flex justify-content-between">
-                                        <div class="card-title m-0">
-                                            <h5 class="mb-1">Earning Reports</h5>
-                                            <p class="card-subtitle">Yearly Earnings Overview</p>
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="card h-100">
+                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                        <div class="card-title mb-0">
+                                            <h5 class="mb-1"><?php echo $totalPerpindahan; ?></h5>
+                                            <p class="mb-0">Perpindahan Barang</p>
                                         </div>
-                                        <div class="dropdown">
-                                            <button
-                                                class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1"
-                                                type="button" id="earningReportsTabsId" data-bs-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false">
-                                                <i class="ti ti-dots-vertical ti-md text-muted"></i>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-end"
-                                                aria-labelledby="earningReportsTabsId">
-                                                <a class="dropdown-item" href="javascript:void(0);">View More</a>
-                                                <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <ul class="nav nav-tabs widget-nav-tabs pb-8 gap-4 mx-1 d-flex flex-nowrap"
-                                            role="tablist">
-                                            <li class="nav-item">
-                                                <a href="javascript:void(0);"
-                                                    class="nav-link btn active d-flex flex-column align-items-center justify-content-center"
-                                                    role="tab" data-bs-toggle="tab" data-bs-target="#navs-orders-id"
-                                                    aria-controls="navs-orders-id" aria-selected="true">
-                                                    <div class="badge bg-label-secondary rounded p-2">
-                                                        <i class="ti ti-shopping-cart ti-md"></i>
-                                                    </div>
-                                                    <h6 class="tab-widget-title mb-0 mt-2">Orders</h6>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="javascript:void(0);"
-                                                    class="nav-link btn d-flex flex-column align-items-center justify-content-center"
-                                                    role="tab" data-bs-toggle="tab" data-bs-target="#navs-sales-id"
-                                                    aria-controls="navs-sales-id" aria-selected="false">
-                                                    <div class="badge bg-label-secondary rounded p-2">
-                                                        <i class="ti ti-chart-bar ti-md"></i>
-                                                    </div>
-                                                    <h6 class="tab-widget-title mb-0 mt-2">Sales</h6>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="javascript:void(0);"
-                                                    class="nav-link btn d-flex flex-column align-items-center justify-content-center"
-                                                    role="tab" data-bs-toggle="tab" data-bs-target="#navs-profit-id"
-                                                    aria-controls="navs-profit-id" aria-selected="false">
-                                                    <div class="badge bg-label-secondary rounded p-2">
-                                                        <i class="ti ti-currency-dollar ti-md"></i>
-                                                    </div>
-                                                    <h6 class="tab-widget-title mb-0 mt-2">Profit</h6>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="javascript:void(0);"
-                                                    class="nav-link btn d-flex flex-column align-items-center justify-content-center"
-                                                    role="tab" data-bs-toggle="tab" data-bs-target="#navs-income-id"
-                                                    aria-controls="navs-income-id" aria-selected="false">
-                                                    <div class="badge bg-label-secondary rounded p-2">
-                                                        <i class="ti ti-chart-pie-2 ti-md"></i>
-                                                    </div>
-                                                    <h6 class="tab-widget-title mb-0 mt-2">Income</h6>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="javascript:void(0);"
-                                                    class="nav-link btn d-flex align-items-center justify-content-center disabled"
-                                                    role="tab" data-bs-toggle="tab" aria-selected="false">
-                                                    <div class="badge bg-label-secondary rounded p-2"><i
-                                                            class="ti ti-plus ti-md"></i></div>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        <div class="tab-content p-0 ms-0 ms-sm-2">
-                                            <div class="tab-pane fade show active" id="navs-orders-id" role="tabpanel">
-                                                <div id="earningReportsTabsOrders"></div>
-                                            </div>
-                                            <div class="tab-pane fade" id="navs-sales-id" role="tabpanel">
-                                                <div id="earningReportsTabsSales"></div>
-                                            </div>
-                                            <div class="tab-pane fade" id="navs-profit-id" role="tabpanel">
-                                                <div id="earningReportsTabsProfit"></div>
-                                            </div>
-                                            <div class="tab-pane fade" id="navs-income-id" role="tabpanel">
-                                                <div id="earningReportsTabsIncome"></div>
-                                            </div>
+                                        <div class="card-icon">
+                                            <span class="badge bg-label-warning rounded p-2">
+                                                <i class="ti ti-arrows-exchange ti-26px"></i>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="card h-100">
+                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                        <div class="card-title mb-0">
+                                            <h5 class="mb-1"><?php echo $totalKehilangan; ?></h5>
+                                            <p class="mb-0">Kehilangan Barang</p>
+                                        </div>
+                                        <div class="card-icon">
+                                            <span class="badge bg-label-danger rounded p-2">
+                                                <i class="ti ti-alert-circle ti-26px"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Card -->
+                            <div class="col-lg-12">
+                                <div class="card mb-6">
+                                    <div class="card-body pt-12">
+                                        <div class="user-avatar-section">
+                                            <div class="d-flex align-items-center flex-column">
+                                                <img class="img-fluid rounded mb-4"
+                                                    src="../upload/user/<?php echo ($user['foto']); ?>" height="120"
+                                                    width="120" alt="User avatar" />
+                                                <div class="user-info text-center">
+                                                    <h5><?php echo ($user['nama']); ?></h5>
+                                                    <span
+                                                        class="badge bg-label-secondary"><?php echo ($user['jabatan']); ?></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h5 class="pb-4 border-bottom mb-4">Details</h5>
+                                        <div class="info-container">
+                                            <ul class="list-unstyled mb-6">
+                                                <li class="mb-2">
+                                                    <span class="h6">Username:</span>
+                                                    <span><?php echo ($user['username']); ?></span>
+                                                </li>
+                                                <li class="mb-2">
+                                                    <span class="h6">Email:</span>
+                                                    <span><?php echo ($user['email']); ?></span>
+                                                </li>
+                                                <li class="mb-2">
+                                                    <span class="h6">Status:</span>
+                                                    <span><?php echo $user['hak_akses'] == 0 ? 'Aktif' : 'Non Aktif'; ?></span>
+                                                </li>
+                                                <li class="mb-2">
+                                                    <span class="h6">Jabatan:</span>
+                                                    <span><?php echo ($user['jabatan']); ?></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        <!-- / Content -->
+
+                        <!-- Footer -->
+                        <?php
+                        require('../layouts/footer.php');
+                        ?>
+                        <!-- / Footer -->
+
+                        <div class="content-backdrop fade"></div>
                     </div>
-                    <!-- / Content -->
-
-                    <!-- Footer -->
-                    <?php
-                    require('../layouts/footer.php');
-                    ?>
-                    <!-- / Footer -->
-
-                    <div class="content-backdrop fade"></div>
+                    <!-- Content wrapper -->
                 </div>
-                <!-- Content wrapper -->
+                <!-- / Layout page -->
             </div>
-            <!-- / Layout page -->
+
+            <!-- Overlay -->
+            <div class="layout-overlay layout-menu-toggle"></div>
+
+            <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+            <div class="drag-target"></div>
         </div>
+        <!-- / Layout wrapper -->
 
-        <!-- Overlay -->
-        <div class="layout-overlay layout-menu-toggle"></div>
-
-        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
-        <div class="drag-target"></div>
-    </div>
-    <!-- / Layout wrapper -->
-
-    <?php
-    require('../layouts/assetsFooter.php')
-        ?>
+        <?php
+        require('../layouts/assetsFooter.php')
+            ?>
 </body>
 
 </html>

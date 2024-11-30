@@ -76,9 +76,9 @@ $totalPages = ceil($totalRows / $limit);
                                         <i class="ti ti-user"></i>
                                     </div>
                                     <h5 class="mb-0">Petugas: <?php echo $_SESSION['nama']; ?></h5>
-                                    <button onclick="window.history.back()" class="btn btn-secondary btn-sm ms-auto">
+                                    <a href="pilihCawuKontrolBarang.php" class="btn btn-secondary btn-sm ms-auto">
                                         <i class="ti ti-arrow-left"></i> Kembali
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                             <div class="row p-3">
@@ -210,15 +210,14 @@ $totalPages = ceil($totalRows / $limit);
                                                 </td>
                                             </tr>
 
-
                                             <!-- Modal Edit -->
                                             <div class="modal fade"
                                                 id="editModal<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
                                                 tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog">
+                                                <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Edit Kontrol Barang Cawu 3</h5>
+                                                            <h5 class="modal-title">Edit Kontrol Barang Cawu 1</h5>
                                                             <button type="button" class="btn-close"
                                                                 data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
@@ -231,6 +230,13 @@ $totalPages = ceil($totalRows / $limit);
                                                                     value="<?php echo $year; ?>">
 
                                                                 <div class="mb-3">
+                                                                    <label class="form-label">Nama Barang</label>
+                                                                    <input type="text" class="form-control bg-light"
+                                                                        value="<?php echo $row['nama_barang']; ?>"
+                                                                        readonly>
+                                                                </div>
+
+                                                                <div class="mb-3">
                                                                     <label class="form-label">Tanggal</label>
                                                                     <input type="date" name="tanggal"
                                                                         class="form-control"
@@ -239,35 +245,95 @@ $totalPages = ceil($totalRows / $limit);
                                                                 </div>
 
                                                                 <div class="mb-3">
-                                                                    <label class="form-label">Jumlah Baik</label>
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <label class="form-check-label">Baik</label>
+                                                                        <div class="form-check form-switch">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="switchBaikEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                onchange="toggleInputEdit(this, 'inputBaikEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>')"
+                                                                                <?php echo ($row['jumlah_baik'] > 0) ? 'checked' : ''; ?>>
+                                                                            <input type="hidden" name="status[baik]"
+                                                                                id="status_inputBaikEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                value="<?php echo ($row['jumlah_baik'] > 0) ? '1' : '0'; ?>">
+                                                                        </div>
+                                                                    </div>
                                                                     <input type="number" name="jumlah_baik"
-                                                                        class="form-control"
+                                                                        id="inputBaikEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                        class="form-control <?php echo ($row['jumlah_baik'] > 0) ? '' : 'bg-light'; ?>"
+                                                                        min="1"
                                                                         value="<?php echo $row['jumlah_baik']; ?>"
-                                                                        required>
+                                                                        <?php echo ($row['jumlah_baik'] > 0) ? '' : 'disabled'; ?>>
                                                                 </div>
 
                                                                 <div class="mb-3">
-                                                                    <label class="form-label">Jumlah Rusak</label>
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <label class="form-check-label">Rusak</label>
+                                                                        <div class="form-check form-switch">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="switchRusakEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                onchange="toggleInputEdit(this, 'inputRusakEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>')"
+                                                                                <?php echo ($row['jumlah_rusak'] > 0) ? 'checked' : ''; ?>>
+                                                                            <input type="hidden" name="status[rusak]"
+                                                                                id="status_inputRusakEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                value="<?php echo ($row['jumlah_rusak'] > 0) ? '1' : '0'; ?>">
+                                                                        </div>
+                                                                    </div>
                                                                     <input type="number" name="jumlah_rusak"
-                                                                        class="form-control"
+                                                                        id="inputRusakEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                        class="form-control <?php echo ($row['jumlah_rusak'] > 0) ? '' : 'bg-light'; ?>"
+                                                                        min="1"
                                                                         value="<?php echo $row['jumlah_rusak']; ?>"
-                                                                        required>
+                                                                        <?php echo ($row['jumlah_rusak'] > 0) ? '' : 'disabled'; ?>>
                                                                 </div>
 
                                                                 <div class="mb-3">
-                                                                    <label class="form-label">Jumlah Pindah</label>
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <label class="form-check-label">Pindah</label>
+                                                                        <div class="form-check form-switch">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="switchPindahEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                onchange="toggleInputEdit(this, 'inputPindahEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>')"
+                                                                                <?php echo ($row['jumlah_pindah'] > 0) ? 'checked' : ''; ?>>
+                                                                            <input type="hidden" name="status[pindah]"
+                                                                                id="status_inputPindahEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                value="<?php echo ($row['jumlah_pindah'] > 0) ? '1' : '0'; ?>">
+                                                                        </div>
+                                                                    </div>
                                                                     <input type="number" name="jumlah_pindah"
-                                                                        class="form-control"
+                                                                        id="inputPindahEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                        class="form-control <?php echo ($row['jumlah_pindah'] > 0) ? '' : 'bg-light'; ?>"
+                                                                        min="1"
                                                                         value="<?php echo $row['jumlah_pindah']; ?>"
-                                                                        required>
+                                                                        <?php echo ($row['jumlah_pindah'] > 0) ? '' : 'disabled'; ?>>
                                                                 </div>
 
                                                                 <div class="mb-3">
-                                                                    <label class="form-label">Jumlah Hilang</label>
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <label class="form-check-label">Hilang</label>
+                                                                        <div class="form-check form-switch">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="switchHilangEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                onchange="toggleInputEdit(this, 'inputHilangEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>')"
+                                                                                <?php echo ($row['jumlah_hilang'] > 0) ? 'checked' : ''; ?>>
+                                                                            <input type="hidden" name="status[hilang]"
+                                                                                id="status_inputHilangEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                                value="<?php echo ($row['jumlah_hilang'] > 0) ? '1' : '0'; ?>">
+                                                                        </div>
+                                                                    </div>
                                                                     <input type="number" name="jumlah_hilang"
-                                                                        class="form-control"
+                                                                        id="inputHilangEdit<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>"
+                                                                        class="form-control <?php echo ($row['jumlah_hilang'] > 0) ? '' : 'bg-light'; ?>"
+                                                                        min="1"
                                                                         value="<?php echo $row['jumlah_hilang']; ?>"
-                                                                        required>
+                                                                        <?php echo ($row['jumlah_hilang'] > 0) ? '' : 'disabled'; ?>>
                                                                 </div>
 
                                                                 <div class="d-flex justify-content-end gap-2">
@@ -300,7 +366,7 @@ $totalPages = ceil($totalRows / $limit);
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
                                                                 data-bs-dismiss="modal">Batal</button>
-                                                            <a href="kontrolBarangCawuSatu.php?delete=<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>&year=<?php echo $year; ?>"
+                                                            <a href="kontrolBarangCawutiga.php?delete=<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>&year=<?php echo $year; ?>"
                                                                 class="btn btn-danger">Hapus</a>
                                                         </div>
                                                     </div>
@@ -470,6 +536,21 @@ $totalPages = ceil($totalRows / $limit);
 
 <script>
 function toggleInput(checkbox, inputId) {
+    const input = document.getElementById(inputId);
+    const statusInput = document.getElementById('status_' + inputId);
+    if (checkbox.checked) {
+        input.disabled = false;
+        input.classList.remove('bg-light');
+        statusInput.value = '1'; // Set status menjadi aktif
+    } else {
+        input.disabled = true;
+        input.classList.add('bg-light');
+        input.value = ''; // Reset nilai input ketika dinonaktifkan
+        statusInput.value = '0'; // Set status menjadi non-aktif
+    }
+}
+
+function toggleInputEdit(checkbox, inputId) {
     const input = document.getElementById(inputId);
     const statusInput = document.getElementById('status_' + inputId);
     if (checkbox.checked) {
