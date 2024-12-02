@@ -133,18 +133,18 @@ require('../layouts/header.php');
                                         </td>
                                     </tr>
 
-                                    <!-- Modal Update -->
+                                    <!-- Modal Update untuk Barang Tersedia -->
                                     <div class="modal fade" id="modal-update-<?php echo $row['id_inventaris']; ?>"
                                         tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Edit Inventaris</h5>
+                                                    <h5 class="modal-title">Edit Data Inventaris</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST">
+                                                    <form method="POST" class="form-edit-inventaris">
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="id_inventaris"
                                                             value="<?php echo $row['id_inventaris']; ?>">
@@ -155,47 +155,6 @@ require('../layouts/header.php');
                                                                 value="<?php echo $row['kode_inventaris']; ?>" readonly>
                                                         </div>
 
-                                                        <?php if ($row['id_penerimaan'] === NULL): ?>
-                                                        <!-- Form untuk barang input manual - semua field bisa diedit -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Nama Barang</label>
-                                                            <input type="text" name="nama_barang" class="form-control"
-                                                                value="<?php echo $row['nama_barang']; ?>" required>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Jumlah Awal</label>
-                                                            <input type="number" name="jumlah_awal" class="form-control"
-                                                                value="<?php echo $row['jumlah_awal']; ?>" required>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Tanggal Perolehan</label>
-                                                            <input type="date" name="tanggal_perolehan"
-                                                                class="form-control"
-                                                                value="<?php echo $row['tanggal_perolehan']; ?>"
-                                                                required>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Departemen</label>
-                                                            <select name="id_departemen"
-                                                                class="form-select editDepartemenSelect" required>
-                                                                <?php
-                                                                $dept_query = "SELECT * FROM departemen ORDER BY 
-                                                                    CASE WHEN id_departemen = '{$row['id_departemen']}' THEN 0 ELSE 1 END, 
-                                                                    nama_departemen ASC";
-                                                                $dept_result = mysqli_query($conn, $dept_query);
-                                                                while ($dept = mysqli_fetch_assoc($dept_result)) {
-                                                                    $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
-                                                                    echo "<option value='" . $dept['id_departemen'] . "' " . $selected . ">" 
-                                                                        . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                        <?php else: ?>
-                                                        <!-- Form untuk barang dari penerimaan - readonly fields -->
                                                         <div class="mb-3">
                                                             <label class="form-label">Nama Barang</label>
                                                             <input type="text" class="form-control bg-light"
@@ -222,30 +181,38 @@ require('../layouts/header.php');
                                                             <input type="hidden" name="id_departemen"
                                                                 value="<?php echo $row['id_departemen']; ?>">
                                                         </div>
-                                                        <?php endif; ?>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Satuan</label>
+                                                            <input type="text" name="satuan"
+                                                                class="form-control bg-light"
+                                                                value="<?php echo $row['satuan']; ?>" readonly>
+                                                        </div>
 
                                                         <div class="mb-3">
                                                             <label class="form-label">Kategori</label>
                                                             <select name="id_kategori" class="form-select" required>
+                                                                <option value="">Pilih Kategori</option>
                                                                 <?php
-                                                                $kat_query = "SELECT * FROM kategori";
-                                                                $kat_result = mysqli_query($conn, $kat_query);
-                                                                while ($kat = mysqli_fetch_assoc($kat_result)) {
-                                                                    $selected = ($kat['id_kategori'] == $row['id_kategori']) ? 'selected' : '';
-                                                                    echo "<option value='" . $kat['id_kategori'] . "' $selected>" 
-                                                                        . $kat['nama_kategori'] . "</option>";
-                                                                }
-                                                                ?>
+                            $kat_query = "SELECT * FROM kategori ORDER BY 
+                                CASE WHEN id_kategori = '{$row['id_kategori']}' THEN 0 ELSE 1 END,
+                                nama_kategori ASC";
+                            $kat_result = mysqli_query($conn, $kat_query);
+                            while ($kat = mysqli_fetch_assoc($kat_result)) {
+                                $selected = ($kat['id_kategori'] == $row['id_kategori']) ? 'selected' : '';
+                                echo "<option value='" . $kat['id_kategori'] . "' $selected>" 
+                                     . $kat['nama_kategori'] . "</option>";
+                            }
+                            ?>
                                                             </select>
                                                         </div>
 
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Satuan</label>
-                                                            <input type="text" name="satuan" class="form-control"
-                                                                value="<?php echo $row['satuan']; ?>" required>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-primary">Simpan
+                                                                Perubahan</button>
                                                         </div>
-
-                                                        <button type="submit" class="btn btn-primary">Simpan</button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -385,22 +352,24 @@ require('../layouts/header.php');
                                                 class="btn btn-primary btn-sm">Detail</a>
                                         </td>
                                     </tr>
-                                    <!-- Modal Update untuk barang dengan jumlah akhir 0 -->
+
+                                    <!-- Modal Update untuk Barang Tidak Tersedia -->
                                     <div class="modal fade"
                                         id="modal-update-zero-<?php echo $row_zero['id_inventaris']; ?>" tabindex="-1"
                                         aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Edit Inventaris</h5>
+                                                    <h5 class="modal-title">Edit Data Inventaris</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form method="POST">
+                                                    <form method="POST" class="form-edit-inventaris">
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="id_inventaris"
                                                             value="<?php echo $row_zero['id_inventaris']; ?>">
+
                                                         <div class="mb-3">
                                                             <label class="form-label">Kode Inventaris</label>
                                                             <input type="text" class="form-control bg-light"
@@ -408,49 +377,6 @@ require('../layouts/header.php');
                                                                 readonly>
                                                         </div>
 
-                                                        <?php if ($row_zero['id_penerimaan'] === NULL): ?>
-                                                        <!-- Form untuk barang input manual - semua field bisa diedit -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Nama Barang</label>
-                                                            <input type="text" name="nama_barang" class="form-control"
-                                                                value="<?php echo $row_zero['nama_barang']; ?>"
-                                                                required>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Jumlah Awal</label>
-                                                            <input type="number" name="jumlah_awal" class="form-control"
-                                                                value="<?php echo $row_zero['jumlah_awal']; ?>"
-                                                                required>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Tanggal Perolehan</label>
-                                                            <input type="date" name="tanggal_perolehan"
-                                                                class="form-control"
-                                                                value="<?php echo $row_zero['tanggal_perolehan']; ?>"
-                                                                required>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Departemen</label>
-                                                            <select name="id_departemen"
-                                                                class="form-select editDepartemenSelect" required>
-                                                                <?php
-                                                                $dept_query = "SELECT * FROM departemen ORDER BY 
-                                                                    CASE WHEN id_departemen = '{$row_zero['id_departemen']}' THEN 0 ELSE 1 END, 
-                                                                    nama_departemen ASC";
-                                                                $dept_result = mysqli_query($conn, $dept_query);
-                                                                while ($dept = mysqli_fetch_assoc($dept_result)) {
-                                                                    $selected = ($dept['id_departemen'] == $row_zero['id_departemen']) ? 'selected' : '';
-                                                                    echo "<option value='" . $dept['id_departemen'] . "' " . $selected . ">" 
-                                                                        . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                        <?php else: ?>
-                                                        <!-- Form untuk barang dari penerimaan - readonly fields -->
                                                         <div class="mb-3">
                                                             <label class="form-label">Nama Barang</label>
                                                             <input type="text" class="form-control bg-light"
@@ -480,35 +406,44 @@ require('../layouts/header.php');
                                                             <input type="hidden" name="id_departemen"
                                                                 value="<?php echo $row_zero['id_departemen']; ?>">
                                                         </div>
-                                                        <?php endif; ?>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Satuan</label>
+                                                            <input type="text" name="satuan"
+                                                                class="form-control bg-light"
+                                                                value="<?php echo $row_zero['satuan']; ?>" readonly>
+                                                        </div>
 
                                                         <div class="mb-3">
                                                             <label class="form-label">Kategori</label>
                                                             <select name="id_kategori" class="form-select" required>
+                                                                <option value="">Pilih Kategori</option>
                                                                 <?php
-                                                                $kat_query = "SELECT * FROM kategori";
-                                                                $kat_result = mysqli_query($conn, $kat_query);
-                                                                while ($kat = mysqli_fetch_assoc($kat_result)) {
-                                                                    $selected = ($kat['id_kategori'] == $row_zero['id_kategori']) ? 'selected' : '';
-                                                                    echo "<option value='" . $kat['id_kategori'] . "' $selected>" 
-                                                                        . $kat['nama_kategori'] . "</option>";
-                                                                }
-                                                                ?>
+                            $kat_query = "SELECT * FROM kategori ORDER BY 
+                                CASE WHEN id_kategori = '{$row_zero['id_kategori']}' THEN 0 ELSE 1 END,
+                                nama_kategori ASC";
+                            $kat_result = mysqli_query($conn, $kat_query);
+                            while ($kat = mysqli_fetch_assoc($kat_result)) {
+                                $selected = ($kat['id_kategori'] == $row_zero['id_kategori']) ? 'selected' : '';
+                                echo "<option value='" . $kat['id_kategori'] . "' $selected>" 
+                                     . $kat['nama_kategori'] . "</option>";
+                            }
+                            ?>
                                                             </select>
                                                         </div>
 
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Satuan</label>
-                                                            <input type="text" name="satuan" class="form-control"
-                                                                value="<?php echo $row_zero['satuan']; ?>" required>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-primary">Simpan
+                                                                Perubahan</button>
                                                         </div>
-
-                                                        <button type="submit" class="btn btn-primary">Simpan</button>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
                                     <!-- Modal Delete untuk barang dengan jumlah akhir 0 -->
                                     <div class="modal fade"
                                         id="modal-delete-zero-<?php echo $row_zero_zero['id_inventaris']; ?>"
@@ -578,100 +513,80 @@ require('../layouts/header.php');
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST" onsubmit="return validateForm()">
+                                    <form method="POST" id="formTambahInventaris" onsubmit="return validasiForm()">
                                         <input type="hidden" name="action" value="create">
-                                        <div class="mb-3">
-                                            <label class="form-label">Jenis Input</label>
-                                            <select name="jenis_input" class="form-select" id="jenis_input"
-                                                onchange="toggleInputForm()">
-                                                <option value="penerimaan">Dari Penerimaan</option>
-                                                <option value="manual">Input Manual</option>
-                                            </select>
-                                        </div>
-
-                                        <!-- Form untuk input dari penerimaan -->
-                                        <div id="form_penerimaan">
-                                            <div class="mb-3">
-                                                <label class="form-label">Penerimaan Barang</label>
-                                                <select name="id_penerimaan" class="form-select" id="id_penerimaan"
-                                                    onchange="updateDepartemen()">
-                                                    <option value="">Pilih Penerimaan Barang</option>
-                                                    <?php
-        $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, d.nama_departemen, d.id_departemen 
-                             FROM penerimaan_barang pb 
-                             JOIN permintaan_barang pmb ON pb.id_permintaan = pmb.id_permintaan
-                             JOIN departemen d ON pmb.id_departemen = d.id_departemen
-                             WHERE pb.id_penerimaan NOT IN (SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)";
-        $penerimaan_result = mysqli_query($conn, $penerimaan_query);
-        while ($penerimaan = mysqli_fetch_assoc($penerimaan_result)) {
-            echo "<option value='" . $penerimaan['id_penerimaan'] . "' 
-                  data-departemen='" . $penerimaan['id_departemen'] . "'>" 
-                  . $penerimaan['nama_barang'] . " - " 
-                  . $penerimaan['nama_departemen'] . "</option>";
-        }
-        ?>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- Form untuk input manual -->
-                                        <div id="form_manual" style="display: none;">
-                                            <div class="mb-3">
-                                                <label class="form-label">Nama Barang</label>
-                                                <input type="text" name="nama_barang" class="form-control">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Jumlah Awal</label>
-                                                <input type="number" name="jumlah_awal" class="form-control">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Satuan</label>
-                                                <input type="text" name="satuan" class="form-control">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Tanggal Perolehan</label>
-                                                <input type="date" name="tanggal_perolehan" class="form-control">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Departemen</label>
-                                                <select name="id_departemen" class="form-select">
-                                                    <?php
-                                $dept_query = "SELECT * FROM departemen";
-                                $dept_result = mysqli_query($conn, $dept_query);
-                                while ($dept = mysqli_fetch_assoc($dept_result)) {
-                                    echo "<option value='" . $dept['id_departemen'] . "'>" 
-                                         . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-                                }
-                                ?>
-                                                </select>
-                                            </div>
-                                        </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">Kategori</label>
-                                            <select name="id_kategori" class="form-select" required>
+                                            <label class="form-label">Penerimaan Barang</label>
+                                            <select name="id_penerimaan" class="form-select" id="id_penerimaan" required
+                                                onchange="updateKolom()">
+                                                <option value="">Pilih Penerimaan Barang</option>
                                                 <?php
-                            $kat_query = "SELECT * FROM kategori";
-                            $kat_result = mysqli_query($conn, $kat_query);
-                            while ($kat = mysqli_fetch_assoc($kat_result)) {
-                                echo "<option value='" . $kat['id_kategori'] . "'>" 
-                                     . $kat['nama_kategori'] . "</option>";
+                            $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, pb.tanggal_terima, d.nama_departemen, pb.jumlah, pb.satuan 
+                                                 FROM penerimaan_barang pb
+                                                 JOIN departemen d ON pb.id_departemen = d.id_departemen 
+                                                 WHERE pb.id_penerimaan NOT IN (SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)";
+                            $penerimaan_result = mysqli_query($conn, $penerimaan_query);
+                            while ($penerimaan = mysqli_fetch_assoc($penerimaan_result)) {
+                                echo "<option value='" . $penerimaan['id_penerimaan'] . "' data-nama='" . $penerimaan['nama_barang'] . "' data-tanggal='" . $penerimaan['tanggal_terima'] . "' data-departemen='" . $penerimaan['nama_departemen'] . "' data-jumlah='" . $penerimaan['jumlah'] . "' data-satuan='" . $penerimaan['satuan'] . "'>" . $penerimaan['nama_barang'] . "</option>";
                             }
                             ?>
                                             </select>
                                         </div>
 
+                                        <div class="mb-3">
+                                            <label class="form-label">Nama Barang</label>
+                                            <input type="text" class="form-control bg-light" id="nama_barang" readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Tanggal Perolehan</label>
+                                            <input type="date" class="form-control bg-light" id="tanggal_perolehan"
+                                                readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Departemen</label>
+                                            <input type="text" class="form-control bg-light" id="departemen" readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Jumlah Awal</label>
+                                            <input type="number" name="jumlah_awal" class="form-control bg-light"
+                                                id="jumlah_awal" readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Satuan</label>
+                                            <input type="text" class="form-control bg-light" id="satuan" readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Kategori</label>
+                                            <select name="id_kategori" class="form-select" required>
+                                                <option value="">Pilih Kategori</option>
+                                                <?php
+                            $kat_query = "SELECT * FROM kategori";
+                            $kat_result = mysqli_query($conn, $kat_query);
+                            while ($kat = mysqli_fetch_assoc($kat_result)) {
+                                echo "<option value='" . $kat['id_kategori'] . "'>" . $kat['nama_kategori'] . "</option>";
+                            }
+                            ?>
+                                            </select>
+                                            <div class="invalid-feedback">Silakan pilih kategori</div>
+                                        </div>
+
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" name="tambahInventaris"
-                                                class="btn btn-primary">Simpan</button>
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <!-- Footer -->
                 <?php require('../layouts/footer.php'); ?>
@@ -684,40 +599,96 @@ require('../layouts/header.php');
     </div>
 
     <script>
-    function toggleInputForm() {
-        var jenisInput = document.getElementById('jenis_input').value;
-        var formPenerimaan = document.getElementById('form_penerimaan');
-        var formManual = document.getElementById('form_manual');
+    function updateKolom() {
+        const select = document.getElementById('id_penerimaan');
+        const selectedOption = select.options[select.selectedIndex];
 
-        if (jenisInput === 'penerimaan') {
-            formPenerimaan.style.display = 'block';
-            formManual.style.display = 'none';
-        } else {
-            formPenerimaan.style.display = 'none';
-            formManual.style.display = 'block';
+        document.getElementById('nama_barang').value = selectedOption.getAttribute('data-nama') || '';
+        document.getElementById('tanggal_perolehan').value = selectedOption.getAttribute('data-tanggal') || '';
+        document.getElementById('departemen').value = selectedOption.getAttribute('data-departemen') || '';
+        document.getElementById('jumlah_awal').value = selectedOption.getAttribute('data-jumlah') || '';
+        document.getElementById('satuan').value = selectedOption.getAttribute('data-satuan') || '';
+    }
+
+    // Fungsi untuk mendapatkan pesan validasi
+    function getPesanValidasi(labelText, jenisInput) {
+        labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
+
+        const pesanKhusus = {
+            'penerimaan barang': 'Mohon pilih penerimaan barang',
+            'kategori': 'Mohon pilih kategori',
+            'jumlah awal': 'Mohon masukkan jumlah awal'
+        };
+
+        return pesanKhusus[labelText] ||
+            (jenisInput === 'select' ? `Mohon pilih ${labelText}` : `Mohon masukkan ${labelText}`);
+    }
+
+    // Fungsi untuk menghapus pesan error
+    function hapusPesanError(element) {
+        element.addEventListener('input', function() {
+            this.setCustomValidity('');
+        });
+    }
+
+    // Fungsi untuk menerapkan validasi
+    function terapkanValidasi() {
+        const elemenWajib = document.querySelectorAll('input[required], select[required]');
+
+        elemenWajib.forEach(elemen => {
+            // Atur pesan error kustom
+            elemen.oninvalid = function(e) {
+                if (e.target.validity.valueMissing) {
+                    const labelElemen = elemen.previousElementSibling;
+                    const labelTeks = labelElemen ? labelElemen.textContent : '';
+                    const jenisInput = elemen.tagName.toLowerCase();
+
+                    e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+                }
+            };
+
+            // Hapus pesan error saat mulai diisi
+            hapusPesanError(elemen);
+        });
+    }
+
+    // Fungsi untuk validasi form manual
+    function validasiFormManual() {
+        const formManual = document.querySelectorAll('.form-tambah-inventaris, .form-edit-inventaris');
+        if (formManual) {
+            formManual.forEach(form => {
+                const inputs = form.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (input.hasAttribute('required')) {
+                        hapusPesanError(input);
+                    }
+                });
+            });
         }
     }
 
-    // Initialize the form state
-    document.addEventListener('DOMContentLoaded', function() {
-        toggleInputForm(); // Call the function on page load to set the initial state
+    // Event listener saat modal tambah dibuka
+    document.getElementById('tambahInventarisModal').addEventListener('show.bs.modal', function() {
+        // Reset form saat modal dibuka
+        const form = this.querySelector('form');
+        if (form) form.reset();
+
+        // Terapkan validasi
+        setTimeout(terapkanValidasi, 100);
     });
 
-    document.getElementById('formEdit').onsubmit = function(event) {
-        var namaBarang = document.getElementById('nama_barang').value;
-        var departemen = document.getElementById('id_departemen').value;
-        var kategori = document.getElementById('id_kategori').value;
-        var tanggalPerolehan = document.getElementById('tanggal_perolehan').value;
-        var jumlahAwal = document.getElementById('jumlah_awal').value;
+    // Event listener saat modal update dibuka
+    document.querySelectorAll('[id^="modal-update-"], [id^="modal-update-zero-"]').forEach(modal => {
+        modal.addEventListener('show.bs.modal', function() {
+            setTimeout(terapkanValidasi, 100);
+        });
+    });
 
-        if (namaBarang === '' || departemen === '' || kategori === '' || tanggalPerolehan === '' || jumlahAwal ===
-            '') {
-            alert("Semua kolom harus diisi!");
-            event.preventDefault();
-            return false;
-        }
-        return true;
-    };
+    // Event listener saat dokumen dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        terapkanValidasi();
+        validasiFormManual();
+    });
     </script>
 
     <?php require('../layouts/assetsFooter.php'); ?>

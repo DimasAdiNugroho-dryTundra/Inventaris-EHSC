@@ -6,10 +6,10 @@ $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Query untuk barang inventaris tersedia
-$query = "SELECT i.*, d.nama_departemen, k.nama_kategori 
-          FROM inventaris i 
-          JOIN departemen d ON i.id_departemen = d.id_departemen 
-          JOIN kategori k ON i.id_kategori = k.id_kategori 
+$query = "SELECT i.*, d.nama_departemen, k.nama_kategori
+          FROM inventaris i
+          JOIN departemen d ON i.id_departemen = d.id_departemen  
+          JOIN kategori k ON i.id_kategori = k.id_kategori
           WHERE i.jumlah_akhir > 0";
 
 if (!empty($search)) {
@@ -18,6 +18,8 @@ if (!empty($search)) {
                      OR d.nama_departemen LIKE '%$search%' 
                      OR k.nama_kategori LIKE '%$search%')";
 }
+
+$query .= " ORDER BY i.id_inventaris DESC";
 
 // Hitung total data untuk pagination
 $total_records_query = mysqli_query($conn, $query);
@@ -28,6 +30,7 @@ $totalPages = ceil($total_records / $limit);
 $query .= " LIMIT $offset, $limit";
 $result = mysqli_query($conn, $query);
 
+
 // Handling Pencarian dan Pagination untuk Barang Tidak Tersedia
 $search_zero = isset($_POST['search_zero']) ? $_POST['search_zero'] : '';
 $limit_zero = isset($_GET['limit_zero']) ? (int) $_GET['limit_zero'] : 5;
@@ -35,10 +38,10 @@ $page_zero = isset($_GET['page_zero']) ? (int) $_GET['page_zero'] : 1;
 $offset_zero = ($page_zero - 1) * $limit_zero;
 
 // Query untuk barang inventaris tidak tersedia
-$query_zero = "SELECT i.*, d.nama_departemen, k.nama_kategori 
-               FROM inventaris i 
-               JOIN departemen d ON i.id_departemen = d.id_departemen 
-               JOIN kategori k ON i.id_kategori = k.id_kategori 
+$query_zero = "SELECT i.*, d.nama_departemen, k.nama_kategori
+               FROM inventaris i
+               JOIN departemen d ON i.id_departemen = d.id_departemen
+               JOIN kategori k ON i.id_kategori = k.id_kategori  
                WHERE i.jumlah_akhir = 0";
 
 if (!empty($search_zero)) {
@@ -47,6 +50,8 @@ if (!empty($search_zero)) {
                          OR d.nama_departemen LIKE '%$search_zero%' 
                          OR k.nama_kategori LIKE '%$search_zero%')";
 }
+
+$query_zero .= " ORDER BY i.id_inventaris DESC";
 
 // Hitung total data untuk pagination
 $total_records_zero_query = mysqli_query($conn, $query_zero);
@@ -75,69 +80,18 @@ function generateKodeInventaris($conn, $departemen_kode, $kategori_kode)
 
 // Handling Create
 if (isset($_POST['action']) && $_POST['action'] == 'create') {
-    $jenis_input = $_POST['jenis_input'];
+    // Validasi input dari penerimaan
+    if (!empty($_POST['id_penerimaan'])) {
+        $id_penerimaan = $_POST['id_penerimaan'];
+        $id_kategori = $_POST['id_kategori'];
 
-    if ($jenis_input == 'penerimaan') {
-        // Validasi input dari penerimaan
-        if (!empty($_POST['id_penerimaan'])) {
-            $id_penerimaan = $_POST['id_penerimaan'];
-            $id_kategori = $_POST['id_kategori'];
+        // Ambil data penerimaan
+        $query_penerimaan = "SELECT * FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
+        $result_penerimaan = mysqli_query($conn, $query_penerimaan);
 
-            // Ambil data penerimaan
-            $query_penerimaan = "SELECT pb.*, pmb.id_departemen 
-                                 FROM penerimaan_barang pb 
-                                 JOIN permintaan_barang pmb ON pb.id_permintaan = pmb.id_permintaan 
-                                 WHERE pb.id_penerimaan = $id_penerimaan";
-            $result_penerimaan = mysqli_query($conn, $query_penerimaan);
+        if ($penerimaan = mysqli_fetch_assoc($result_penerimaan)) {
+            $id_departemen = $penerimaan['id_departemen'];
 
-            if ($penerimaan = mysqli_fetch_assoc($result_penerimaan)) {
-                $id_departemen = $penerimaan['id_departemen'];
-
-                // Ambil kode departemen dan kategori
-                $query_dept = "SELECT kode_departemen FROM departemen WHERE id_departemen = $id_departemen";
-                $query_kat = "SELECT kode_kategori FROM kategori WHERE id_kategori = $id_kategori";
-
-                $result_dept = mysqli_query($conn, $query_dept);
-                $dept = mysqli_fetch_assoc($result_dept);
-
-                $result_kat = mysqli_query($conn, $query_kat);
-                $kat = mysqli_fetch_assoc($result_kat);
-
-                if ($dept && $kat) {
-                    $kode_inventaris = generateKodeInventaris($conn, $dept['kode_departemen'], $kat['kode_kategori']);
-
-                    // Query untuk insert
-                    $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, id_penerimaan, 
-                             id_departemen, id_kategori, tanggal_perolehan, jumlah_awal, 
-                             jumlah_akhir, satuan) 
-                             VALUES ('$kode_inventaris', '{$penerimaan['nama_barang']}', $id_penerimaan, 
-                             $id_departemen, $id_kategori, '{$penerimaan['tanggal_terima']}', 
-                             {$penerimaan['jumlah']}, {$penerimaan['jumlah']}, '{$penerimaan['satuan']}')";
-
-                    if (mysqli_query($conn, $query)) {
-                        $_SESSION['success_message'] = "Data inventaris berhasil ditambahkan!";
-                    } else {
-                        $_SESSION['error_message'] = "Data inventaris gagal ditambahkan!";
-                    }
-                } else {
-                    $_SESSION['error_message'] = "Silahkan pilih penerimaan barang!";
-                }
-            } else {
-                $_SESSION['error_message'] = "Data penerimaan tidak ditemukan!";
-            }
-        } else {
-            $_SESSION['error_message'] = "Silakan pilih penerimaan barang!";
-        }
-    } else {
-        // Input manual
-        $nama_barang = !empty($_POST['nama_barang']) ? $_POST['nama_barang'] : '';
-        $id_departemen = !empty($_POST['id_departemen']) ? $_POST['id_departemen'] : '';
-        $id_kategori = !empty($_POST['id_kategori']) ? $_POST['id_kategori'] : '';
-        $tanggal_perolehan = !empty($_POST['tanggal_perolehan']) ? $_POST['tanggal_perolehan'] : NULL;
-        $jumlah_awal = !empty($_POST['jumlah_awal']) ? $_POST['jumlah_awal'] : 0;
-        $satuan = !empty($_POST['satuan']) ? $_POST['satuan'] : '';
-
-        if ($nama_barang && $id_departemen && $id_kategori && $tanggal_perolehan) {
             // Ambil kode departemen dan kategori
             $query_dept = "SELECT kode_departemen FROM departemen WHERE id_departemen = $id_departemen";
             $query_kat = "SELECT kode_kategori FROM kategori WHERE id_kategori = $id_kategori";
@@ -152,23 +106,26 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
                 $kode_inventaris = generateKodeInventaris($conn, $dept['kode_departemen'], $kat['kode_kategori']);
 
                 // Query untuk insert
-                $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, id_departemen, 
-                         id_kategori, tanggal_perolehan, jumlah_awal, jumlah_akhir, satuan) 
-                         VALUES ('$kode_inventaris', '$nama_barang', $id_departemen, 
-                         $id_kategori, '$tanggal_perolehan', $jumlah_awal, 
-                         $jumlah_awal, '$satuan')";
+                $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, id_penerimaan,
+                         id_departemen, id_kategori, tanggal_perolehan, jumlah_awal,
+                         jumlah_akhir, satuan)
+                         VALUES ('$kode_inventaris', '{$penerimaan['nama_barang']}', $id_penerimaan,
+                         $id_departemen, $id_kategori, '{$penerimaan['tanggal_terima']}',
+                         {$penerimaan['jumlah']}, {$penerimaan['jumlah']}, '{$penerimaan['satuan']}')";
 
                 if (mysqli_query($conn, $query)) {
                     $_SESSION['success_message'] = "Data inventaris berhasil ditambahkan!";
                 } else {
-                    $_SESSION['error_message'] = "Data Inventaris gagal ditambahkan!";
+                    $_SESSION['error_message'] = "Data inventaris gagal ditambahkan!";
                 }
             } else {
-                $_SESSION['error_message'] = "Data departemen atau kategori tidak ditemukan!";
+                $_SESSION['error_message'] = "Silahkan pilih penerimaan barang!";
             }
         } else {
-            $_SESSION['error_message'] = "Semua kolom harus diisi!";
+            $_SESSION['error_message'] = "Data penerimaan tidak ditemukan!";
         }
+    } else {
+        $_SESSION['error_message'] = "Silakan pilih penerimaan barang!";
     }
 
     header("Location: inventaris.php");
@@ -181,45 +138,39 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kategori = $_POST['id_kategori'];
     $satuan = $_POST['satuan'];
 
-    // Cek apakah barang dari penerimaan atau input manual
-    $check_query = "SELECT id_penerimaan FROM inventaris WHERE id_inventaris = $id_inventaris";
-    $check_result = mysqli_query($conn, $check_query);
-    $inventaris = mysqli_fetch_assoc($check_result);
+    // Ambil data inventaris
+    $query_inventaris = "SELECT * FROM inventaris WHERE id_inventaris = $id_inventaris";
+    $result_inventaris = mysqli_query($conn, $query_inventaris);
+    $inventaris = mysqli_fetch_assoc($result_inventaris);
 
-    if ($inventaris['id_penerimaan'] === NULL) {
-        // Untuk barang input manual
-        $nama_barang = $_POST['nama_barang'];
-        $id_departemen = $_POST['id_departemen'];
-        $tanggal_perolehan = $_POST['tanggal_perolehan'];
-        $jumlah_awal = $_POST['jumlah_awal'];
+    // Ambil kode departemen dan kategori
+    $query_dept = "SELECT kode_departemen FROM departemen WHERE id_departemen = {$inventaris['id_departemen']}";
+    $query_kat = "SELECT kode_kategori FROM kategori WHERE id_kategori = $id_kategori";
 
-        // Validasi input
-        if ($nama_barang && $id_departemen && $id_kategori && $tanggal_perolehan && $jumlah_awal) {
-            $query = "UPDATE inventaris SET 
-                      nama_barang = '$nama_barang',
-                      id_departemen = $id_departemen,
-                      id_kategori = $id_kategori,
-                      tanggal_perolehan = '$tanggal_perolehan',
-                      jumlah_awal = $jumlah_awal,
-                      satuan = '$satuan'
-                      WHERE id_inventaris = $id_inventaris";
-        } else {
-            $_SESSION['error_message'] = "Semua kolom harus diisi!";
-            header("Location: inventaris.php");
-            exit();
-        }
-    } else {
-        // Untuk barang dari penerimaan
-        $query = "UPDATE inventaris SET 
+    $result_dept = mysqli_query($conn, $query_dept);
+    $dept = mysqli_fetch_assoc($result_dept);
+
+    $result_kat = mysqli_query($conn, $query_kat);
+    $kat = mysqli_fetch_assoc($result_kat);
+
+    if ($dept && $kat) {
+        // Generate kode inventaris baru
+        $kode_inventaris_baru = generateKodeInventaris($conn, $dept['kode_departemen'], $kat['kode_kategori']);
+
+        // Query untuk update
+        $query = "UPDATE inventaris SET
+                  kode_inventaris = '$kode_inventaris_baru',
                   id_kategori = $id_kategori,
                   satuan = '$satuan'
                   WHERE id_inventaris = $id_inventaris";
-    }
 
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['success_message'] = "Data inventaris berhasil diupdate!";
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['success_message'] = "Data inventaris berhasil diupdate!";
+        } else {
+            $_SESSION['error_message'] = "Error: " . mysqli_error($conn);
+        }
     } else {
-        $_SESSION['error_message'] = "Error: " . mysqli_error($conn);
+        $_SESSION['error_message'] = "Data departemen atau kategori tidak ditemukan!";
     }
 
     header("Location: inventaris.php");
