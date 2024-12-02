@@ -131,6 +131,7 @@ require('../layouts/header.php');
                                                 class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
                                     </tr>
+                                    <!-- modal edit -->
                                     <div class='modal fade' id='modal-update-<?php echo $row['id_permintaan']; ?>'
                                         tabindex='-1' aria-labelledby='modalUpdateLabel' aria-hidden='true'>
                                         <div class='modal-dialog modal-lg modal-dialog-centered' role='document'>
@@ -142,8 +143,7 @@ require('../layouts/header.php');
                                                         aria-label='Close'></button>
                                                 </div>
                                                 <div class='modal-body'>
-                                                    <form method='POST' enctype='multipart/form-data'
-                                                        class="needs-validation" novalidate>
+                                                    <form method='POST' enctype='multipart/form-data'>
                                                         <input type='hidden' name='action' value='update'>
                                                         <input type='hidden' name='id_permintaan'
                                                             value='<?php echo $row['id_permintaan']; ?>'>
@@ -161,17 +161,13 @@ require('../layouts/header.php');
         }
         ?>
                                                             </select>
-                                                            <div class="invalid-feedback">Silakan pilih departemen</div>
                                                         </div>
 
                                                         <div class='mb-3'>
                                                             <label for='nama_barang' class='form-label'>Nama
                                                                 Barang</label>
                                                             <input type='text' class='form-control' name='nama_barang'
-                                                                value='<?php echo $row['nama_barang']; ?>' required
-                                                                minlength="3" maxlength="100">
-                                                            <div class="invalid-feedback">Nama barang harus diisi (3-100
-                                                                karakter)</div>
+                                                                value='<?php echo $row['nama_barang']; ?>' required>
                                                         </div>
 
                                                         <div class='mb-3'>
@@ -180,17 +176,13 @@ require('../layouts/header.php');
                                                             <input type='date' class='form-control' name='tanggal'
                                                                 value='<?php echo date('Y-m-d', strtotime($row['tanggal_permintaan'])); ?>'
                                                                 required>
-                                                            <div class="invalid-feedback">Tanggal harus diisi</div>
                                                         </div>
 
                                                         <div class='mb-3'>
                                                             <label for='spesifikasi'
                                                                 class='form-label'>Spesifikasi</label>
-                                                            <textarea class='form-control' name='spesifikasi' required
-                                                                minlength="10"
-                                                                maxlength="500"><?php echo $row['spesifikasi']; ?></textarea>
-                                                            <div class="invalid-feedback">Spesifikasi harus diisi (min.
-                                                                10 karakter)</div>
+                                                            <textarea class='form-control' name='spesifikasi'
+                                                                required><?php echo $row['spesifikasi']; ?></textarea>
                                                         </div>
 
                                                         <div class='mb-3'>
@@ -198,9 +190,7 @@ require('../layouts/header.php');
                                                                 Qty</label>
                                                             <input type='number' class='form-control'
                                                                 name='kebutuhan_qty' id='kebutuhan_qty_update'
-                                                                value='<?php echo $row['kebutuhan_qty']; ?>' required
-                                                                min="1">
-                                                            <div class="invalid-feedback">Qty harus lebih dari 0</div>
+                                                                value='<?php echo $row['kebutuhan_qty']; ?>' required>
                                                         </div>
 
                                                         <div class='mb-3'>
@@ -210,13 +200,12 @@ require('../layouts/header.php');
                                                                 id='harga_satuan_update'
                                                                 value='<?php echo number_format($row['harga_satuan'], 0, ',', '.'); ?>'
                                                                 required>
-                                                            <div class="invalid-feedback">Harga satuan harus diisi</div>
                                                         </div>
 
                                                         <div class='mb-3'>
                                                             <label for='total_harga' class='form-label'>Total
                                                                 Harga</label>
-                                                            <input type='text' class='form-control'
+                                                            <input type='text' class='form-control bg-light'
                                                                 id='total_harga_update'
                                                                 value='<?php echo number_format($row['kebutuhan_qty'] * $row['harga_satuan'], 0, ',', '.'); ?>'
                                                                 readonly>
@@ -236,7 +225,6 @@ require('../layouts/header.php');
                                                                     <?php echo ($row['status'] == 2 ? 'selected' : ''); ?>>
                                                                     Tidak Disetujui</option>
                                                             </select>
-                                                            <div class="invalid-feedback">Silakan pilih status</div>
                                                         </div>
 
                                                         <div class="modal-footer">
@@ -319,8 +307,7 @@ require('../layouts/header.php');
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form id="formTambahPermintaan" method="POST" action="permintaanBarang.php"
-                                        class="needs-validation" novalidate>
+                                    <form id="formTambahPermintaan" method="POST" action="permintaanBarang.php">
                                         <input type="hidden" name="tambahPermintaan" value="1">
                                         <div class="mb-3">
                                             <label class="form-label">Departemen</label>
@@ -334,47 +321,38 @@ require('../layouts/header.php');
                             }
                             ?>
                                             </select>
-                                            <div class="invalid-feedback">Silakan pilih departemen</div>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Nama Barang</label>
-                                            <input type="text" name="nama_barang" class="form-control" required
-                                                minlength="3" maxlength="100">
-                                            <div class="invalid-feedback">Nama barang harus diisi (3-100 karakter)</div>
+                                            <input type="text" name="nama_barang" class="form-control" required>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Tanggal</label>
                                             <input type="date" name="tanggal" class="form-control" required>
-                                            <div class="invalid-feedback">Tanggal harus diisi</div>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Spesifikasi</label>
-                                            <textarea name="spesifikasi" class="form-control" required minlength="10"
-                                                maxlength="500"></textarea>
-                                            <div class="invalid-feedback">Spesifikasi harus diisi (min. 10 karakter)
-                                            </div>
+                                            <textarea name="spesifikasi" class="form-control" required></textarea>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Kebutuhan Qty</label>
                                             <input type="number" name="kebutuhan_qty" id="kebutuhan_qty"
-                                                class="form-control" required min="1">
-                                            <div class="invalid-feedback">Qty harus lebih dari 0</div>
+                                                class="form-control" required>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Harga Satuan</label>
                                             <input type="text" name="harga_satuan" id="harga_satuan"
                                                 class="form-control" required>
-                                            <div class="invalid-feedback">Harga satuan harus diisi</div>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Total Harga</label>
-                                            <input type="text" id="total_harga" class="form-control" readonly>
+                                            <input type="text" id="total_harga" class="form-control bg-light" readonly>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Status</label>
@@ -383,7 +361,6 @@ require('../layouts/header.php');
                                                 <option value="1">Disetujui</option>
                                                 <option value="2">Tidak Disetujui</option>
                                             </select>
-                                            <div class="invalid-feedback">Silakan pilih status</div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
@@ -423,6 +400,52 @@ require('../layouts/assetsFooter.php')
 
 
 <script>
+// Fungsi untuk mendapatkan pesan validasi
+function getPesanValidasi(labelText, jenisInput) {
+    labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
+
+    const pesanKhusus = {
+        'departemen': 'Kolom departemen wajib diisi!',
+        'nama barang': 'Kolom nama barang wajib diisi!',
+        'tanggal': 'Kolom tanggal wajib diisi!',
+        'spesifikasi': 'Kolom spesifikasi wajib diisi!',
+        'kebutuhan qty': 'Kolom kebutuhan qty wajib diisi!',
+        'harga satuan': 'Kolom harga satuan wajib diisi!',
+        'status': 'Kolom status wajib diisi!'
+    };
+
+    return pesanKhusus[labelText] ||
+        (jenisInput === 'select' ? `Mohon pilih ${labelText}` : `Mohon masukkan ${labelText}`);
+}
+
+// Fungsi untuk menghapus pesan error
+function hapusPesanError(element) {
+    element.addEventListener('input', function() {
+        this.setCustomValidity('');
+    });
+}
+
+// Fungsi untuk menerapkan validasi
+function terapkanValidasi() {
+    const elemenWajib = document.querySelectorAll('input[required], select[required], textarea[required]');
+
+    elemenWajib.forEach(elemen => {
+        // Atur pesan error kustom
+        elemen.oninvalid = function(e) {
+            if (e.target.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+
+                e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            }
+        };
+
+        // Hapus pesan error saat mulai diisi
+        hapusPesanError(elemen);
+    });
+}
+
 // Fungsi format rupiah
 function formatRupiah(angka, prefix) {
     var number_string = angka.replace(/[^,\d]/g, '').toString(),
@@ -440,7 +463,7 @@ function formatRupiah(angka, prefix) {
     return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
 }
 
-// Hitung total harga
+// Hitung total harga untuk modal tambah
 function hitungTotal() {
     var qty = document.getElementById('kebutuhan_qty').value || 0;
     var harga = document.getElementById('harga_satuan').value.replace(/[^\d]/g, '') || 0;
@@ -448,7 +471,7 @@ function hitungTotal() {
     document.getElementById('total_harga').value = formatRupiah(total.toString(), 'Rp. ');
 }
 
-// Event listener untuk format harga dan hitung total
+// Event listener untuk format harga dan hitung total di modal tambah
 document.getElementById('harga_satuan').addEventListener('input', function(e) {
     this.value = formatRupiah(this.value, 'Rp. ');
     hitungTotal();
@@ -456,8 +479,21 @@ document.getElementById('harga_satuan').addEventListener('input', function(e) {
 
 document.getElementById('kebutuhan_qty').addEventListener('input', hitungTotal);
 
-// Form validation
+// Validasi form tambah
 document.getElementById('formTambahPermintaan').addEventListener('submit', function(event) {
+    const elemenWajib = this.querySelectorAll('input[required], select[required], textarea[required]');
+
+    elemenWajib.forEach(elemen => {
+        if (elemen.validity.valueMissing) {
+            const labelElemen = elemen.previousElementSibling;
+            const labelTeks = labelElemen ? labelElemen.textContent : '';
+            const jenisInput = elemen.tagName.toLowerCase();
+            elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+        } else {
+            elemen.setCustomValidity('');
+        }
+    });
+
     if (!this.checkValidity()) {
         event.preventDefault();
         event.stopPropagation();
@@ -466,11 +502,9 @@ document.getElementById('formTambahPermintaan').addEventListener('submit', funct
         let hargaSatuan = this.querySelector('[name="harga_satuan"]');
         hargaSatuan.value = hargaSatuan.value.replace(/[^\d]/g, '');
     }
-    this.classList.add('was-validated');
-    return true;
 }, false);
 
-// Fungsi untuk menangani perhitungan total di modal edit
+// Hitung total harga untuk modal edit
 function hitungTotalUpdate(modalId) {
     var qty = document.querySelector(`#modal-update-${modalId} [name="kebutuhan_qty"]`).value || 0;
     var harga = document.querySelector(`#modal-update-${modalId} [name="harga_satuan"]`).value.replace(/[^\d]/g, '') ||
@@ -504,24 +538,56 @@ document.addEventListener('input', function(e) {
     }
 });
 
-// Event listener untuk form edit sebelum submit
+// Validasi form edit
 document.addEventListener('submit', function(e) {
     if (e.target && e.target.matches('form')) {
+        const elemenWajib = e.target.querySelectorAll('input[required], select[required], textarea[required]');
+
+        elemenWajib.forEach(elemen => {
+            if (elemen.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+                elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            } else {
+                elemen.setCustomValidity('');
+            }
+        });
+
         const hargaSatuanInput = e.target.querySelector('[name="harga_satuan"]');
         if (hargaSatuanInput) {
             // Strip format rupiah sebelum submit
             hargaSatuanInput.value = hargaSatuanInput.value.replace(/[^\d]/g, '');
         }
+
+        if (!e.target.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
     }
 });
 
+// Event listener saat modal tambah dibuka
+document.getElementById('tambahPermintaanModal').addEventListener('show.bs.modal', function() {
+    // Reset form saat modal dibuka
+    const form = this.querySelector('form');
+    if (form) form.reset();
 
+    // Terapkan validasi
+    setTimeout(terapkanValidasi, 100);
+});
 
-// Reset form ketika modal ditutup
+// Event listener saat modal edit dibuka
+document.querySelectorAll('[id^="modal-update-"]').forEach(modal => {
+    modal.addEventListener('show.bs.modal', function() {
+        setTimeout(terapkanValidasi, 100);
+    });
+});
+
+// Reset form ketika modal tambah ditutup
 document.getElementById('tambahPermintaanModal').addEventListener('hidden.bs.modal', function() {
     let form = document.getElementById('formTambahPermintaan');
     form.reset();
-    form.classList.remove('was-validated');
     document.getElementById('total_harga').value = '';
 });
 </script>

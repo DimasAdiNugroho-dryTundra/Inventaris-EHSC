@@ -392,6 +392,7 @@ require('../layouts/header.php');
                                         <div class="mb-3">
                                             <label class="form-label">Status</label>
                                             <select name="status" class="form-select" required>
+                                                <option value="">Pilih status</option>
                                                 <option value="Diterima">Diterima</option>
                                                 <option value="Ditolak">Ditolak</option>
                                             </select>
@@ -485,14 +486,14 @@ function setSelectedValues() {
 
 // Fungsi untuk mendapatkan pesan validasi
 function getPesanValidasi(labelText, jenisInput) {
-    labelText = labelText.replace(/[:\\s]+$/, '').toLowerCase();
+    labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
 
     const pesanKhusus = {
         'jenis input': 'Mohon pilih jenis input data',
         'permintaan barang': 'Mohon pilih data permintaan barang',
         'nama barang': 'Mohon masukkan nama barang',
-        'departemen': 'Mohon pilih departemen',
-        'jumlah': 'Mohon masukkan jumlah barang',
+        'departemen': 'Kolom departemen wajib diisi!',
+        'jumlah': 'Kolom jumlah barang wajib diisi!',
         'satuan': 'Mohon masukkan satuan barang',
         'tanggal terima': 'Mohon masukkan tanggal terima',
         'status': 'Mohon pilih status barang'
@@ -534,9 +535,21 @@ function terapkanValidasi() {
 function validasiFormManual() {
     const formManual = document.getElementById('form_manual');
     if (formManual) {
-        const inputs = formManual.querySelectorAll('input, select');
+        const inputs = formManual.querySelectorAll('input[required], select[required]');
         inputs.forEach(input => {
             if (input.hasAttribute('required')) {
+                // Atur pesan error kustom
+                input.oninvalid = function(e) {
+                    if (e.target.validity.valueMissing) {
+                        const labelElemen = input.previousElementSibling;
+                        const labelTeks = labelElemen ? labelElemen.textContent : '';
+                        const jenisInput = input.tagName.toLowerCase();
+
+                        e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+                    }
+                };
+
+                // Hapus pesan error saat mulai diisi
                 hapusPesanError(input);
             }
         });

@@ -592,4 +592,225 @@ function toggleInputEdit(checkbox, inputId) {
         statusInput.value = '0'; // Set status menjadi non-aktif
     }
 }
+
+// Fungsi untuk mendapatkan pesan validasi
+function getPesanValidasi(labelText, jenisInput) {
+    labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
+
+    const pesanKhusus = {
+        'inventaris': 'Kolom inventaris wajib diisi!',
+        'tanggal': 'Kolom tanggal wajib diisi!',
+        'baik': 'Kolom jumlah barang baik wajib diisi!',
+        'rusak': 'Kolom jumlah barang rusak wajib diisi!',
+        'pindah': 'Kolom jumlah barang pindah wajib diisi!',
+        'hilang': 'Kolom jumlah barang hilang wajib diisi!'
+    };
+
+    return pesanKhusus[labelText] ||
+        (jenisInput === 'select' ? `Mohon pilih ${labelText}` : `Mohon masukkan ${labelText}`);
+}
+
+// Fungsi untuk menghapus pesan error
+function hapusPesanError(element) {
+    element.addEventListener('input', function() {
+        this.setCustomValidity('');
+    });
+}
+
+// Fungsi untuk menerapkan validasi
+function terapkanValidasi() {
+    const elemenWajib = document.querySelectorAll('input[required], select[required], textarea[required]');
+
+    elemenWajib.forEach(elemen => {
+        // Atur pesan error kustom
+        elemen.oninvalid = function(e) {
+            if (e.target.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+
+                e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            }
+        };
+
+        // Hapus pesan error saat mulai diisi
+        hapusPesanError(elemen);
+    });
+}
+
+// Fungsi untuk validasi form manual
+function validasiFormManual() {
+    const formManual = document.querySelectorAll('.needs-validation');
+    if (formManual) {
+        formManual.forEach(form => {
+            const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+            inputs.forEach(input => {
+                if (input.hasAttribute('required')) {
+                    // Atur pesan error kustom
+                    input.oninvalid = function(e) {
+                        if (e.target.validity.valueMissing) {
+                            const labelElemen = input.previousElementSibling;
+                            const labelTeks = labelElemen ? labelElemen.textContent : '';
+                            const jenisInput = input.tagName.toLowerCase();
+
+                            e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+                        }
+                    };
+
+                    // Hapus pesan error saat mulai diisi
+                    hapusPesanError(input);
+                }
+            });
+        });
+    }
+}
+
+// Validasi form tambah kontrol
+document.getElementById('tambahKontrolForm').addEventListener('submit', function(event) {
+    const statusBaik = document.getElementById('status_inputBaik').value;
+    const statusRusak = document.getElementById('status_inputRusak').value;
+    const statusPindah = document.getElementById('status_inputPindah').value;
+    const statusHilang = document.getElementById('status_inputHilang').value;
+
+    let valid = true;
+
+    if (statusBaik === '0' && statusRusak === '0' && statusPindah === '0' && statusHilang === '0') {
+        valid = false;
+        alert('Minimal pilih satu status kondisi barang!');
+    }
+
+    if (statusBaik === '1' && !document.getElementById('inputBaik').value) {
+        valid = false;
+        document.getElementById('inputBaik').setCustomValidity(getPesanValidasi('baik', 'input'));
+    }
+
+    if (statusRusak === '1' && !document.getElementById('inputRusak').value) {
+        valid = false;
+        document.getElementById('inputRusak').setCustomValidity(getPesanValidasi('rusak', 'input'));
+    }
+
+    if (statusPindah === '1' && !document.getElementById('inputPindah').value) {
+        valid = false;
+        document.getElementById('inputPindah').setCustomValidity(getPesanValidasi('pindah', 'input'));
+    }
+
+    if (statusHilang === '1' && !document.getElementById('inputHilang').value) {
+        valid = false;
+        document.getElementById('inputHilang').setCustomValidity(getPesanValidasi('hilang', 'input'));
+    }
+
+    if (!valid) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    const elemenWajib = this.querySelectorAll('input[required], select[required], textarea[required]');
+
+    elemenWajib.forEach(elemen => {
+        if (elemen.validity.valueMissing) {
+            const labelElemen = elemen.previousElementSibling;
+            const labelTeks = labelElemen ? labelElemen.textContent : '';
+            const jenisInput = elemen.tagName.toLowerCase();
+            elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+        } else {
+            elemen.setCustomValidity('');
+        }
+    });
+
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}, false);
+
+// Validasi form edit kontrol
+document.querySelectorAll('[id^="editModal"]').forEach(modal => {
+    modal.querySelector('form').addEventListener('submit', function(event) {
+        const modalId = modal.id.replace('editModal', '');
+
+        const statusBaikEdit = document.getElementById(`status_inputBaikEdit${modalId}`).value;
+        const statusRusakEdit = document.getElementById(`status_inputRusakEdit${modalId}`).value;
+        const statusPindahEdit = document.getElementById(`status_inputPindahEdit${modalId}`).value;
+        const statusHilangEdit = document.getElementById(`status_inputHilangEdit${modalId}`).value;
+
+        let valid = true;
+
+        if (statusBaikEdit === '0' && statusRusakEdit === '0' && statusPindahEdit === '0' &&
+            statusHilangEdit === '0') {
+            valid = false;
+            alert('Minimal pilih satu status kondisi barang!');
+        }
+
+        if (statusBaikEdit === '1' && !document.getElementById(`inputBaikEdit${modalId}`).value) {
+            valid = false;
+            document.getElementById(`inputBaikEdit${modalId}`).setCustomValidity(getPesanValidasi(
+                'baik', 'input'));
+        }
+
+        if (statusRusakEdit === '1' && !document.getElementById(`inputRusakEdit${modalId}`).value) {
+            valid = false;
+            document.getElementById(`inputRusakEdit${modalId}`).setCustomValidity(getPesanValidasi(
+                'rusak', 'input'));
+        }
+
+        if (statusPindahEdit === '1' && !document.getElementById(`inputPindahEdit${modalId}`).value) {
+            valid = false;
+            document.getElementById(`inputPindahEdit${modalId}`).setCustomValidity(getPesanValidasi(
+                'pindah', 'input'));
+        }
+
+        if (statusHilangEdit === '1' && !document.getElementById(`inputHilangEdit${modalId}`).value) {
+            valid = false;
+            document.getElementById(`inputHilangEdit${modalId}`).setCustomValidity(getPesanValidasi(
+                'hilang', 'input'));
+        }
+
+        if (!valid) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const elemenWajib = this.querySelectorAll(
+            'input[required], select[required], textarea[required]');
+
+        elemenWajib.forEach(elemen => {
+            if (elemen.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+                elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            } else {
+                elemen.setCustomValidity('');
+            }
+        });
+
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+});
+
+// Event listener saat modal tambah dibuka
+document.getElementById('tambahKontrolModal').addEventListener('show.bs.modal', function() {
+    // Reset form saat modal dibuka
+    const form = this.querySelector('form');
+    if (form) form.reset();
+
+    // Terapkan validasi
+    setTimeout(terapkanValidasi, 100);
+});
+
+// Event listener saat modal edit dibuka
+document.querySelectorAll('[id^="editModal"]').forEach(modal => {
+    modal.addEventListener('show.bs.modal', function() {
+        setTimeout(terapkanValidasi, 100);
+    });
+});
+
+// Event listener saat dokumen dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    terapkanValidasi();
+    validasiFormManual();
+});
 </script>

@@ -16,26 +16,26 @@ require('layouts/headerLogin.php');
                     <p class="mb-6">Silahkan Masuk</p>
 
                     <?php if (isset($error_message) && !empty($error_message)): ?>
-                    <div class="alert alert-solid-danger d-flex align-items-center" role="alert">
-                        <span class="alert-icon rounded">
-                            <i class="ti ti-ban"></i>
-                        </span>
-                        <?php echo $error_message; ?>
-                    </div>
+                        <div class="alert alert-solid-danger d-flex align-items-center" role="alert">
+                            <span class="alert-icon rounded">
+                                <i class="ti ti-ban"></i>
+                            </span>
+                            <?php echo $error_message; ?>
+                        </div>
                     <?php endif; ?>
 
-                    <form id="formAuthentication" class="mb-4" method="post">
+                    <form id="formAuthentication" class="mb-4" method="POST">
                         <div class="mb-6">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" class="form-control" id="username" name="username"
-                                placeholder="Masukan username anda" autofocus />
+                                placeholder="Masukan username anda" autofocus required />
                         </div>
                         <div class="mb-6 form-password-toggle">
                             <label class="form-label" for="password">Password</label>
                             <div class="input-group input-group-merge">
                                 <input type="password" id="password" class="form-control" name="password"
                                     placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                    aria-describedby="password" />
+                                    aria-describedby="password" required />
                                 <span class="input-group-text cursor-pointer toggle-password">
                                     <i class="ti ti-eye-off"></i>
                                 </span>
@@ -54,22 +54,88 @@ require('layouts/headerLogin.php');
 
 <script src="../../assets/vendor/libs/jquery/jquery.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleButton = document.querySelector('.toggle-password');
-    const passwordInput = document.querySelector('#password');
-    const icon = toggleButton.querySelector('i');
-    toggleButton.addEventListener('click', function() {
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('ti-eye-off');
-            icon.classList.add('ti-eye');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('ti-eye');
-            icon.classList.add('ti-eye-off');
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleButton = document.querySelector('.toggle-password');
+        const passwordInput = document.querySelector('#password');
+        const icon = toggleButton.querySelector('i');
+        toggleButton.addEventListener('click', function () {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('ti-eye-off');
+                icon.classList.add('ti-eye');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('ti-eye');
+                icon.classList.add('ti-eye-off');
+            }
+        });
     });
-});
+
+    // Fungsi untuk mendapatkan pesan validasi
+    function getPesanValidasi(labelText, jenisInput) {
+        labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
+
+        const pesanKhusus = {
+            'username': 'Kolom username wajib diisi!',
+            'password': 'Kolom password wajib diisi!'
+        };
+
+        return pesanKhusus[labelText] || `Mohon masukkan ${labelText}`;
+    }
+
+    // Fungsi untuk menghapus pesan error
+    function hapusPesanError(element) {
+        element.addEventListener('input', function () {
+            this.setCustomValidity('');
+        });
+    }
+
+    // Fungsi untuk menerapkan validasi
+    function terapkanValidasi() {
+        const elemenWajib = document.querySelectorAll('input[required]');
+
+        elemenWajib.forEach(elemen => {
+            // Atur pesan error kustom
+            elemen.oninvalid = function (e) {
+                if (e.target.validity.valueMissing) {
+                    const labelElemen = elemen.previousElementSibling;
+                    const labelTeks = labelElemen ? labelElemen.textContent : '';
+                    const jenisInput = elemen.tagName.toLowerCase();
+
+                    e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+                }
+            };
+
+            // Hapus pesan error saat mulai diisi
+            hapusPesanError(elemen);
+        });
+    }
+
+    // Event listener untuk validasi saat form login disubmit
+    document.getElementById('formAuthentication').addEventListener('submit', function (event) {
+        const elemenWajib = this.querySelectorAll('input[required]');
+
+        elemenWajib.forEach(elemen => {
+            if (elemen.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+                elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            } else {
+                elemen.setCustomValidity('');
+            }
+        });
+
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, false);
+
+    // Terapkan validasi saat dokumen dimuat
+    document.addEventListener('DOMContentLoaded', function () {
+        terapkanValidasi();
+    });
 </script>
 
 <!-- Core JSJS -->

@@ -131,38 +131,19 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="post" action="departemen.php" enctype="multipart/form-data"
-                                            class="needs-validation" novalidate>
+                                        <form method="post" action="departemen.php" enctype="multipart/form-data">
                                             <input type="hidden" name="action" value="update">
                                             <input type="hidden" name="id_departemen"
                                                 value="<?php echo $row['id_departemen']; ?>">
                                             <div class="mb-3">
                                                 <label class="form-label">Kode Departemen</label>
-                                                <input type="text" class="form-control check-changes"
-                                                    name="kode_departemen"
-                                                    id="kode_departemen_edit_<?php echo $row['id_departemen']; ?>"
-                                                    value="<?php echo $row['kode_departemen']; ?>"
-                                                    data-original-value="<?php echo $row['kode_departemen']; ?>"
-                                                    required>
-                                                <div class="invalid-feedback">
-                                                    Kolom kode departemen wajib diisi!
-                                                </div>
+                                                <input type="text" class="form-control" name="kode_departemen"
+                                                    value="<?php echo $row['kode_departemen']; ?>" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Departemen</label>
-                                                <input type="text" class="form-control check-changes"
-                                                    name="nama_departemen"
-                                                    id="nama_departemen_edit_<?php echo $row['id_departemen']; ?>"
-                                                    value="<?php echo $row['nama_departemen']; ?>"
-                                                    data-original-value="<?php echo $row['nama_departemen']; ?>"
-                                                    required>
-                                                <div class="invalid-feedback">
-                                                    Kolom nama departemen wajib diisi!
-                                                </div>
-                                                <div class="text-danger no-changes-message"
-                                                    style="display: none; margin-top: 0.5rem; font-size: 0.875em;">
-                                                    Belum ada perubahan data yang dilakukan!
-                                                </div>
+                                                <input type="text" class="form-control" name="nama_departemen""
+                                                    value=" <?php echo $row['nama_departemen']; ?>" required>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" class="btn btn-primary"
@@ -175,6 +156,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- Modal Delete -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_departemen']; ?>" tabindex="-1"
@@ -211,25 +193,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="POST" action="departemen.php" enctype="multipart/form-data"
-                                            class="needs-validation" novalidate>
+                                        <form method="POST" action="departemen.php" enctype="multipart/form-data">
                                             <div class="mb-3">
                                                 <label class="form-label">Kode Departemen</label>
-                                                <input type="text" name="kode_departemen" class="form-control" required
-                                                    data-bs-toggle="tooltip" data-bs-placement="right"
-                                                    title="Silakan masukkan kode departemen">
-                                                <div class="invalid-feedback">
-                                                    Kolom kode departemen wajib diisi!
-                                                </div>
+                                                <input type="text" name="kode_departemen" class="form-control" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Departemen</label>
-                                                <input type="text" name="nama_departemen" class="form-control" required
-                                                    data-bs-toggle="tooltip" data-bs-placement="right"
-                                                    title="Silakan masukkan nama departemen">
-                                                <div class="invalid-feedback">
-                                                    Kolom nama departemen wajib diisi!
-                                                </div>
+                                                <input type="text" name="nama_departemen" class="form-control" required>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" name="tambahDepartemen"
@@ -242,6 +213,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mt-4">
@@ -292,112 +264,83 @@ while ($row = mysqli_fetch_assoc($result)) {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Validasi untuk form tambah data
-    const tambahForm = document.querySelector("#tambahDepartemenModal form");
-    if (tambahForm) {
-        tambahForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+// Fungsi untuk mendapatkan pesan validasi
+function getPesanValidasi(labelText, jenisInput) {
+    labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
 
-            // Reset semua validasi sebelumnya
-            this.querySelectorAll('.is-invalid').forEach(element => {
-                element.classList.remove('is-invalid');
-            });
+    const pesanKhusus = {
+        'kode departemen': 'Kolom kode departemen wajib diisi!',
+        'nama departemen': 'Kolom nama departemen wajib diisi!'
+    };
 
-            let isValid = true;
-            const inputs = this.querySelectorAll('input[required]');
+    return pesanKhusus[labelText] ||
+        (jenisInput === 'select' ? `Mohon pilih ${labelText}` : `Mohon masukkan ${labelText}`);
+}
 
-            // Cek setiap input required
+// Fungsi untuk menghapus pesan error
+function hapusPesanError(element) {
+    element.addEventListener('input', function() {
+        this.setCustomValidity('');
+    });
+}
+
+// Fungsi untuk menerapkan validasi
+function terapkanValidasi() {
+    const elemenWajib = document.querySelectorAll('input[required], select[required]');
+
+    elemenWajib.forEach(elemen => {
+        // Atur pesan error kustom
+        elemen.oninvalid = function(e) {
+            if (e.target.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+
+                e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            }
+        };
+
+        // Hapus pesan error saat mulai diisi
+        hapusPesanError(elemen);
+    });
+}
+
+// Fungsi untuk validasi form manual
+function validasiFormManual() {
+    const formManual = document.querySelectorAll('.needs-validation');
+    if (formManual) {
+        formManual.forEach(form => {
+            const inputs = form.querySelectorAll('input, select');
             inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
+                if (input.hasAttribute('required')) {
+                    hapusPesanError(input);
                 }
             });
-
-            // Jika semua valid, submit form
-            if (isValid) {
-                this.submit();
-            }
         });
     }
+}
 
-    // Validasi untuk form edit data
-    document.querySelectorAll("[id^='modal-update-']").forEach(modal => {
-        const form = modal.querySelector('form');
-        const inputs = form.querySelectorAll('input:not([type="hidden"])');
-        const submitBtn = form.querySelector('button[type="submit"]');
+// Event listener saat modal tambah dibuka
+document.getElementById('tambahDepartemenModal').addEventListener('show.bs.modal', function() {
+    // Reset form saat modal dibuka
+    const form = this.querySelector('form');
+    if (form) form.reset();
 
-        // Handle form submission
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
+    // Terapkan validasi
+    setTimeout(terapkanValidasi, 100);
+});
 
-            // Reset semua validasi sebelumnya
-            inputs.forEach(input => {
-                input.classList.remove('is-invalid');
-                // Hapus pesan error yang ada
-                const nextElement = input.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
-                    nextElement.remove();
-                }
-            });
-
-            let isValid = true;
-            let hasChanges = false;
-
-            // Validasi input kosong dan cek perubahan
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-
-                    // Tambah pesan error untuk input kosong
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'invalid-feedback';
-                    errorDiv.textContent =
-                        `Kolom ${input.previousElementSibling.textContent.toLowerCase()} wajib diisi!`;
-                    input.parentNode.appendChild(errorDiv);
-                }
-
-                // Cek apakah ada perubahan
-                if (input.value !== input.getAttribute('data-original-value')) {
-                    hasChanges = true;
-                }
-            });
-
-            // Jika tidak ada perubahan, tambahkan pesan error
-            if (!hasChanges && isValid) {
-                inputs.forEach(input => {
-                    input.classList.add('is-invalid');
-                });
-
-                // Tambah pesan error untuk tidak ada perubahan
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'invalid-feedback';
-                errorDiv.textContent = 'Belum ada perubahan data yang dilakukan!';
-                inputs[inputs.length - 1].parentNode.appendChild(errorDiv);
-                return;
-            }
-
-            // Jika semua valid dan ada perubahan, submit form
-            if (isValid && hasChanges) {
-                this.submit();
-            }
-        });
-
-        // Reset form saat modal ditutup
-        modal.addEventListener('hidden.bs.modal', function() {
-            inputs.forEach(input => {
-                input.value = input.getAttribute('data-original-value');
-                input.classList.remove('is-invalid');
-                // Hapus pesan error yang ada
-                const nextElement = input.nextElementSibling;
-                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
-                    nextElement.remove();
-                }
-            });
-        });
+// Event listener saat modal update dibuka
+document.querySelectorAll('[id^="modal-update-"]').forEach(modal => {
+    modal.addEventListener('show.bs.modal', function() {
+        setTimeout(terapkanValidasi, 100);
     });
+});
+
+// Event listener saat dokumen dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    terapkanValidasi();
+    validasiFormManual();
 });
 </script>
 <!-- / Layout wrapper -->

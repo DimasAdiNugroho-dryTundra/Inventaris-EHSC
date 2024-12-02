@@ -133,27 +133,19 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="POST" action="kategori.php" class="needs-validation" novalidate>
+                                        <form method="POST" action="kategori.php">
                                             <input type="hidden" name="action" value="update">
                                             <input type="hidden" name="id_kategori"
                                                 value="<?php echo $row['id_kategori']; ?>">
                                             <div class="mb-3">
                                                 <label class="form-label">Kode Kategori</label>
                                                 <input type="text" class="form-control" name="kode_kategori"
-                                                    value="<?php echo $row['kode_kategori']; ?>" required
-                                                    data-original-value="<?php echo $row['kode_kategori']; ?>">
-                                                <div class="invalid-feedback">
-                                                    Kolom kode kategori wajib diisi!
-                                                </div>
+                                                    value="<?php echo $row['kode_kategori']; ?>" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Kategori</label>
                                                 <input type="text" class="form-control" name="nama_kategori"
-                                                    value="<?php echo $row['nama_kategori']; ?>" required
-                                                    data-original-value="<?php echo $row['nama_kategori']; ?>">
-                                                <div class="invalid-feedback">
-                                                    Kolom nama kategori wajib diisi!
-                                                </div>
+                                                    value="<?php echo $row['nama_kategori']; ?>" required>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" class="btn btn-primary">Simpan</button>
@@ -200,20 +192,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="POST" action="kategori.php" class="needs-validation" novalidate>
+                                        <form method="POST" action="kategori.php">
                                             <div class="mb-3">
                                                 <label class="form-label">Kode Kategori</label>
                                                 <input type="text" name="kode_kategori" class="form-control" required>
-                                                <div class="invalid-feedback">
-                                                    Kolom kode kategori wajib diisi!
-                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Kategori</label>
                                                 <input type="text" name="nama_kategori" class="form-control" required>
-                                                <div class="invalid-feedback">
-                                                    Kolom nama kategori wajib diisi!
-                                                </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" name="tambahKategori"
@@ -268,28 +254,83 @@ while ($row = mysqli_fetch_assoc($result)) {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tambahForm = document.querySelector("#tambahKategoriModal form");
-    if (tambahForm) {
-        tambahForm.addEventListener('submit', function(event) {
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
+// Fungsi untuk mendapatkan pesan validasi
+function getPesanValidasi(labelText, jenisInput) {
+    labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
+
+    const pesanKhusus = {
+        'kode kategori': 'Kolom kode kategori wajib diisi!',
+        'nama kategori': 'Kolom nama kategori wajib diisi!'
+    };
+
+    return pesanKhusus[labelText] ||
+        (jenisInput === 'select' ? `Mohon pilih ${labelText}` : `Mohon masukkan ${labelText}`);
+}
+
+// Fungsi untuk menghapus pesan error
+function hapusPesanError(element) {
+    element.addEventListener('input', function() {
+        this.setCustomValidity('');
+    });
+}
+
+// Fungsi untuk menerapkan validasi
+function terapkanValidasi() {
+    const elemenWajib = document.querySelectorAll('input[required], select[required]');
+
+    elemenWajib.forEach(elemen => {
+        // Atur pesan error kustom
+        elemen.oninvalid = function(e) {
+            if (e.target.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+
+                e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
             }
-            this.classList.add('was-validated');
+        };
+
+        // Hapus pesan error saat mulai diisi
+        hapusPesanError(elemen);
+    });
+}
+
+// Fungsi untuk validasi form manual
+function validasiFormManual() {
+    const formManual = document.querySelectorAll('.needs-validation');
+    if (formManual) {
+        formManual.forEach(form => {
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.hasAttribute('required')) {
+                    hapusPesanError(input);
+                }
+            });
         });
     }
+}
 
-    document.querySelectorAll("[id^='modal-update-']").forEach(modal => {
-        const form = modal.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            this.classList.add('was-validated');
-        });
+// Event listener saat modal tambah dibuka
+document.getElementById('tambahKategoriModal').addEventListener('show.bs.modal', function() {
+    // Reset form saat modal dibuka
+    const form = this.querySelector('form');
+    if (form) form.reset();
+
+    // Terapkan validasi
+    setTimeout(terapkanValidasi, 100);
+});
+
+// Event listener saat modal update dibuka
+document.querySelectorAll('[id^="modal-update-"]').forEach(modal => {
+    modal.addEventListener('show.bs.modal', function() {
+        setTimeout(terapkanValidasi, 100);
     });
+});
+
+// Event listener saat dokumen dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    terapkanValidasi();
+    validasiFormManual();
 });
 </script>
 

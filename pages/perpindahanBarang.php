@@ -143,8 +143,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="post" enctype="multipart/form-data" class="needs-validation"
-                                            novalidate>
+                                        <form method="post" enctype="multipart/form-data">
                                             <input type="hidden" name="action" value="update">
                                             <input type="hidden" name="id_perpindahan_barang"
                                                 value="<?php echo $row['id_perpindahan_barang']; ?>">
@@ -179,7 +178,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <label class="form-label">Keterangan</label>
                                                 <textarea class="form-control" name="keterangan"
                                                     required><?php echo $row['keterangan']; ?></textarea>
-                                                <div class="invalid-feedback">Kolom keterangan wajib diisi!</div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" class="btn btn-primary">Simpan</button>
@@ -227,8 +225,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="POST" enctype="multipart/form-data" class="needs-validation"
-                                            novalidate>
+                                        <form method="POST" enctype="multipart/form-data">
                                             <div class="mb-3">
                                                 <label class="form-label">Barang</label>
                                                 <select name="id_inventaris" class="form-select" required
@@ -247,33 +244,26 @@ while ($row = mysqli_fetch_assoc($result)) {
                             }
                             ?>
                                                 </select>
-                                                <div class="invalid-feedback">Silakan pilih barang!</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Perpindahan</label>
                                                 <input type="date" class="form-control bg-light"
                                                     name="tanggal_perpindahan" id="tanggal_perpindahan" required
                                                     readonly>
-                                                <div class="invalid-feedback">Kolom tanggal perpindahan wajib diisi!
-                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Cawu</label>
                                                 <input type="text" class="form-control bg-light" name="cawu" id="cawu"
                                                     required readonly>
-                                                <div class="invalid-feedback">Kolom cawu wajib diisi!</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Jumlah Perpindahan</label>
                                                 <input type="number" class="form-control bg-light"
                                                     name="jumlah_perpindahan" id="jumlah_perpindahan" required readonly>
-                                                <div class="invalid-feedback">Kolom jumlah perpindahan wajib diisi!
-                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
                                                 <textarea class="form-control" name="keterangan" required></textarea>
-                                                <div class="invalid-feedback">Kolom keterangan wajib diisi!</div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="submit" name="tambahPerpindahan"
@@ -286,6 +276,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </div>
                             </div>
                         </div>
+
                         <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mt-4">
                             <ul class="pagination pagination-rounded justify-content-center">
@@ -329,6 +320,97 @@ function fillPerpindahanData(selectElement) {
     document.getElementById('cawu').value = selectedOption.dataset.cawu;
     document.getElementById('jumlah_perpindahan').value = selectedOption.dataset.jumlah;
 }
+
+// Fungsi untuk mendapatkan pesan validasi
+function getPesanValidasi(labelText, jenisInput) {
+    labelText = labelText.replace(/[:\s]+$/, '').toLowerCase();
+
+    const pesanKhusus = {
+        'barang': 'Silahkan pilih data barang yang pindah!',
+        'keterangan': 'Kolom keterangan wajib diisi!'
+    };
+
+    return pesanKhusus[labelText] ||
+        (jenisInput === 'select' ? `Mohon pilih ${labelText}` : `Mohon masukkan ${labelText}`);
+}
+
+// Fungsi untuk menghapus pesan error
+function hapusPesanError(element) {
+    element.addEventListener('input', function() {
+        this.setCustomValidity('');
+    });
+}
+
+// Fungsi untuk menerapkan validasi
+function terapkanValidasi() {
+    const elemenWajib = document.querySelectorAll('input[required], select[required], textarea[required]');
+
+    elemenWajib.forEach(elemen => {
+        // Atur pesan error kustom
+        elemen.oninvalid = function(e) {
+            if (e.target.validity.valueMissing) {
+                const labelElemen = elemen.previousElementSibling;
+                const labelTeks = labelElemen ? labelElemen.textContent : '';
+                const jenisInput = elemen.tagName.toLowerCase();
+
+                e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            }
+        };
+
+        // Hapus pesan error saat mulai diisi
+        hapusPesanError(elemen);
+    });
+}
+
+// Fungsi untuk validasi form manual
+function validasiFormManual() {
+    const formManual = document.querySelectorAll('.needs-validation');
+    if (formManual) {
+        formManual.forEach(form => {
+            const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+            inputs.forEach(input => {
+                if (input.hasAttribute('required')) {
+                    // Atur pesan error kustom
+                    input.oninvalid = function(e) {
+                        if (e.target.validity.valueMissing) {
+                            const labelElemen = input.previousElementSibling;
+                            const labelTeks = labelElemen ? labelElemen.textContent : '';
+                            const jenisInput = input.tagName.toLowerCase();
+
+                            e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+                        }
+                    };
+
+                    // Hapus pesan error saat mulai diisi
+                    hapusPesanError(input);
+                }
+            });
+        });
+    }
+}
+
+// Event listener saat modal tambah dibuka
+document.getElementById('tambahPerpindahanModal').addEventListener('show.bs.modal', function() {
+    // Reset form saat modal dibuka
+    const form = this.querySelector('form');
+    if (form) form.reset();
+
+    // Terapkan validasi
+    setTimeout(terapkanValidasi, 100);
+});
+
+// Event listener saat modal edit dibuka
+document.querySelectorAll('[id^="modal-update-"]').forEach(modal => {
+    modal.addEventListener('show.bs.modal', function() {
+        setTimeout(terapkanValidasi, 100);
+    });
+});
+
+// Event listener saat dokumen dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    terapkanValidasi();
+    validasiFormManual();
+});
 </script>
 
 
