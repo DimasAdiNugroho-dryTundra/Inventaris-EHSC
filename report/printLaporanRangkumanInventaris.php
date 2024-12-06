@@ -5,8 +5,10 @@ require_once('../server/configDB.php');
 require('../lib/TCPDF/tcpdf.php');
 
 // Extend TCPDF with custom header
-class MYPDF extends TCPDF {
-    public function Header() {
+class MYPDF extends TCPDF
+{
+    public function Header()
+    {
         $this->SetFont('helvetica', 'B', 12);
         $this->Cell(0, 15, 'Laporan Inventaris', 0, false, 'C', 0, '', 0, false, 'M', 'M');
         $this->Ln(5);
@@ -14,15 +16,14 @@ class MYPDF extends TCPDF {
         $this->Cell(0, 15, 'Tahun: ' . $_POST['year'], 0, false, 'C', 0, '', 0, false, 'M', 'M');
         $this->Ln(10);
     }
-    
-    public function Footer() {
+
+    public function Footer()
+    {
         $this->SetY(-15);
         $this->SetFont('helvetica', 'I', 8);
-        $this->Cell(0, 10, 'Halaman '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        $this->Cell(0, 10, 'Halaman ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }
-
-$selectedYear = isset($_POST['year']) ? intval($_POST['year']) : date('Y');
 
 $selectedYear = isset($_POST['year']) ? intval($_POST['year']) : date('Y');
 
@@ -65,87 +66,158 @@ $query = " SELECT
 
 $result = mysqli_query($conn, $query);
 
+// Create new PDF document
 $pdf = new MYPDF('L', 'mm', 'A4', true, 'UTF-8', false);
-
-// Set document information
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('Admin');
 $pdf->SetTitle('Laporan Inventaris ' . $selectedYear);
-
-// Set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
-
-// Set margins
 $pdf->SetMargins(10, 30, 10);
 $pdf->SetHeaderMargin(5);
 $pdf->SetFooterMargin(10);
-
-// Set auto page breaks
 $pdf->SetAutoPageBreak(TRUE, 25);
-
-// Add a page
 $pdf->AddPage('L', 'A4');
 
-// Set font
-$pdf->SetFont('helvetica', '', 8);
+$html = '
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    th, td {
+        border: 1px solid #000;
+        padding: 4px;
+        font-size: 8pt;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .cawu1 {
+        background-color: #E8FFE8;
+    }
+    .cawu2 {
+        background-color: #E8F8FF;
+    }
+    .cawu3 {
+        background-color: #FFF8E8;
+    }
+    .header-main th {
+        font-weight: bold;
+        background-color: #f5f5f5;
+    }
+    .header-sub th {
+        font-weight: bold;
+    }
+</style>
 
-// Header tabel
-$header = array('No', 'Nama Barang', 'Kode', 'Jml Awal', 'Satuan', 
-                'B1', 'R1', 'P1', 'H1',
-                'B2', 'R2', 'P2', 'H2',
-                'B3', 'R3', 'P3', 'H3', 'Jml Akhir');
+<table cellpadding="2">
+    <thead>
+        <tr class="header-main">
+            <th rowspan="3">No</th>
+            <th rowspan="3">Nama Barang</th>
+            <th rowspan="3">Kode Barang</th>
+            <th rowspan="3">Jumlah Awal</th>
+            <th rowspan="3">Satuan</th>
+            <th colspan="12">Kondisi Barang</th>
+            <th rowspan="3">Jumlah Akhir</th>
+        </tr>
+        <tr class="header-main">
+            <th colspan="4" class="cawu1">Cawu 1</th>
+            <th colspan="4" class="cawu2">Cawu 2</th>
+            <th colspan="4" class="cawu3">Cawu 3</th>
+        </tr>
+        <tr class="header-sub">
+            <th class="cawu1">B</th>
+            <th class="cawu1">R</th>
+            <th class="cawu1">P</th>
+            <th class="cawu1">H</th>
+            <th class="cawu2">B</th>
+            <th class="cawu2">R</th>
+            <th class="cawu2">P</th>
+            <th class="cawu2">H</th>
+            <th class="cawu3">B</th>
+            <th class="cawu3">R</th>
+            <th class="cawu3">P</th>
+            <th class="cawu3">H</th>
+        </tr>
+    </thead>
+    <tbody>';
 
-// Column widths
-$w = array(10, 40, 25, 15, 15, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 20);
-
-// Header
-for($i = 0; $i < count($header); $i++) {
-    $pdf->Cell($w[$i], 7, $header[$i], 1, 0, 'C');
-}
-$pdf->Ln();
-
-// Data
+// Generate table content
 if (mysqli_num_rows($result) > 0) {
     $no = 1;
-    while($row = mysqli_fetch_assoc($result)) {
+    while ($row = mysqli_fetch_assoc($result)) {
         $jumlah_akhir = $row['jumlah_baik_cawu_tiga'];
-        
-        $pdf->Cell($w[0], 6, $no++, 1, 0, 'C');
-        $pdf->Cell($w[1], 6, $row['nama_barang'], 1);
-        $pdf->Cell($w[2], 6, $row['kode_inventaris'], 1, 0, 'C');
-        $pdf->Cell($w[3], 6, $row['jumlah_awal'], 1, 0, 'C');
-        $pdf->Cell($w[4], 6, $row['satuan'], 1, 0, 'C');
-        $pdf->Cell($w[5], 6, $row['jumlah_baik_cawu_satu'], 1, 0, 'C');
-        $pdf->Cell($w[6], 6, $row['jumlah_rusak_cawu_satu'], 1, 0, 'C');
-        $pdf->Cell($w[7], 6, $row['jumlah_pindah_cawu_satu'], 1, 0, 'C');
-        $pdf->Cell($w[8], 6, $row['jumlah_hilang_cawu_satu'], 1, 0, 'C');
-        $pdf->Cell($w[9], 6, $row['jumlah_baik_cawu_dua'], 1, 0, 'C');
-        $pdf->Cell($w[10], 6, $row['jumlah_rusak_cawu_dua'], 1, 0, 'C');
-        $pdf->Cell($w[11], 6, $row['jumlah_pindah_cawu_dua'], 1, 0, 'C');
-        $pdf->Cell($w[12], 6, $row['jumlah_hilang_cawu_dua'], 1, 0, 'C');
-        $pdf->Cell($w[13], 6, $row['jumlah_baik_cawu_tiga'], 1, 0, 'C');
-        $pdf->Cell($w[14], 6, $row['jumlah_rusak_cawu_tiga'], 1, 0, 'C');
-        $pdf->Cell($w[15], 6, $row['jumlah_pindah_cawu_tiga'], 1, 0, 'C');
-        $pdf->Cell($w[16], 6, $row['jumlah_hilang_cawu_tiga'], 1, 0, 'C');
-        $pdf->Cell($w[17], 6, $jumlah_akhir, 1, 0, 'C');
-        $pdf->Ln();
+        $html .= '
+        <tr>
+            <td style="text-align: center;">' . $no++ . '</td>
+            <td style="text-align: left;">' . $row['nama_barang'] . '</td>
+            <td style="text-align: center;">' . $row['kode_inventaris'] . '</td>
+            <td style="text-align: center;">' . $row['jumlah_awal'] . '</td>
+            <td style="text-align: center;">' . $row['satuan'] . '</td>
+            
+            <!-- Cawu 1 -->
+            <td class="cawu1">' . $row['jumlah_baik_cawu_satu'] . '</td>
+            <td class="cawu1">' . $row['jumlah_rusak_cawu_satu'] . '</td>
+            <td class="cawu1">' . $row['jumlah_pindah_cawu_satu'] . '</td>
+            <td class="cawu1">' . $row['jumlah_hilang_cawu_satu'] . '</td>
+            
+            <!-- Cawu 2 -->
+            <td class="cawu2">' . $row['jumlah_baik_cawu_dua'] . '</td>
+            <td class="cawu2">' . $row['jumlah_rusak_cawu_dua'] . '</td>
+            <td class="cawu2">' . $row['jumlah_pindah_cawu_dua'] . '</td>
+            <td class="cawu2">' . $row['jumlah_hilang_cawu_dua'] . '</td>
+            
+            <!-- Cawu 3 -->
+            <td class="cawu3">' . $row['jumlah_baik_cawu_tiga'] . '</td>
+            <td class="cawu3">' . $row['jumlah_rusak_cawu_tiga'] . '</td>
+            <td class="cawu3">' . $row['jumlah_pindah_cawu_tiga'] . '</td>
+            <td class="cawu3">' . $row['jumlah_hilang_cawu_tiga'] . '</td>
+            
+            <td style="text-align: center;">' . $jumlah_akhir . '</td>
+        </tr>';
     }
 } else {
-    $pdf->Cell(array_sum($w), 6, 'Tidak ada data yang dikontrol untuk tahun ' . $selectedYear, 1, 0, 'C');
+    $html .= '<tr><td colspan="18" style="text-align: center;">Tidak ada data yang dikontrol untuk tahun ' . $selectedYear . '</td></tr>';
 }
 
-// Tambahkan keterangan
-$pdf->Ln(10);
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 6, 'Keterangan:', 0, 1);
-$pdf->Cell(0, 6, 'B = Baik', 0, 1);
-$pdf->Cell(0, 6, 'R = Rusak', 0, 1);
-$pdf->Cell(0, 6, 'P = Pindah', 0, 1);
-$pdf->Cell(0, 6, 'H = Hilang', 0, 1);
+$html .= '
+    </tbody>
+</table>
 
-ob_end_clean();
+<!-- Keterangan dan Tanda Tangan -->
+<table style="width: 100%; border: none; margin-top: 20px;">
+    <tr>
+        <td style="width: 60%; border: none;">
+            <p style="font-size: 10pt;"><strong>Keterangan:</strong></p>
+            <table style="width: auto; border: none;">
+                <tr>
+                    <td style="border: none; text-align: left; padding: 2px; font-size: 10pt;">B = Baik</td>
+                </tr>
+                <tr>
+                    <td style="border: none; text-align: left; padding: 2px; font-size: 10pt;">R = Rusak</td>
+                </tr>
+                <tr>
+                    <td style="border: none; text-align: left; padding: 2px; font-size: 10pt;">P = Pindah</td>
+                </tr>
+                <tr>
+                    <td style="border: none; text-align: left; padding: 2px; font-size: 10pt;">H = Hilang</td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 40%; border: none; text-align: center;">
+            <p style="font-size: 10pt;">Bandung, ' . date('d F Y') . '</p>
+            <p style="font-size: 10pt;">Petugas Inventaris</p>
+            <br><br><br>
+            <p style="font-size: 10pt;">(_____________________)</p>
+            <p style="font-size: 10pt;">NIP. </p>
+        </td>
+    </tr>
+</table>';
 
-// Output PDF
-$pdf->Output('laporan_inventaris_' . $selectedYear . '.pdf', 'I');
-exit();
+// Output the HTML content
+$pdf->writeHTML($html, true, false, true, false, '');
+
+// Close and output PDF document
+$pdf->Output('Laporan_Inventaris_' . $selectedYear . '.pdf', 'I');
+
 ?>
