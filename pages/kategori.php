@@ -89,10 +89,10 @@ require('../layouts/header.php');
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Kode Kategori</th>
-                                        <th>Nama Kategori</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center align-middle">No</th>
+                                        <th class="text-center align-middle">Kode Kategori</th>
+                                        <th class="text-center align-middle">Nama Kategori</th>
+                                        <th class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,10 +101,10 @@ require('../layouts/header.php');
                                     while ($row = mysqli_fetch_assoc($result)) { 
                                     ?>
                                     <tr>
-                                        <td><?php echo $no++; ?></td>
-                                        <td><?php echo $row['kode_kategori']; ?></td>
-                                        <td><?php echo $row['nama_kategori']; ?></td>
-                                        <td>
+                                        <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['kode_kategori']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_kategori']; ?></td>
+                                        <td class="text-center align-middle">
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_kategori']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"

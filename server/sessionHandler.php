@@ -18,6 +18,8 @@ if ($user['hak_akses'] == 0) {
     exit();
 }
 
+$jabatan = isset($_SESSION['jabatan']) ? $_SESSION['jabatan'] : '';
+
 $year = isset($_POST['year']) ? intval($_POST['year']) : date('Y');
-$_SESSION['selected_year'] = $year; 
+$_SESSION['selected_year'] = $year;
 ?>

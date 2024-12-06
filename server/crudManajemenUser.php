@@ -81,7 +81,7 @@ if (isset($_POST['tambahUser'])) {
             }
         }
     }
-    header("Location: manajemen-user.php");
+    header("Location: manajemenUser.php");
     exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
 }
 
@@ -152,7 +152,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         }
     }
 
-    header("Location: manajemen-user.php");
+    header("Location: manajemenUser.php");
     exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
 }
 
@@ -182,7 +182,7 @@ if (isset($_GET['delete'])) {
         $_SESSION['error_message'] = "Gagal menghapus user: " . mysqli_error($conn);
     }
 
-    header("Location: manajemen-user.php");
+    header("Location: manajemenUser.php");
     exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
 }
 ?>

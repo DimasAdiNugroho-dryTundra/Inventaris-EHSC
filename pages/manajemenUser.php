@@ -78,11 +78,11 @@ require('../layouts/header.php');
                                         <label for="limit" class="label me-2">Tampilkan:</label>
                                         <select id="limit" class="select2 form-select"
                                             onchange="location = this.value;">
-                                            <option value="manajemen-user.php?limit=5"
+                                            <option value="manajemenUser.php?limit=5"
                                                 <?php if ($limit == 5) echo 'selected'; ?>>5</option>
-                                            <option value="manajemen-user.php?limit=10"
+                                            <option value="manajemenUser.php?limit=10"
                                                 <?php if ($limit == 10) echo 'selected'; ?>>10</option>
-                                            <option value="manajemen-user.php?limit=20"
+                                            <option value="manajemenUser.php?limit=20"
                                                 <?php if ($limit == 20) echo 'selected'; ?>>20</option>
                                         </select>
                                     </form>
@@ -93,14 +93,14 @@ require('../layouts/header.php');
                                 <table class="table table-hover table-sm">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>No</th>
-                                            <th>Nama</th>
-                                            <th>Username</th>
-                                            <th>Email</th>
-                                            <th>Jabatan</th>
-                                            <th>Hak Akses</th>
-                                            <th>Foto</th>
-                                            <th>Aksi</th>
+                                            <th class="text-center align-middle">No</th>
+                                            <th class="text-center align-middle">Nama</th>
+                                            <th class="text-center align-middle">Username</th>
+                                            <th class="text-center align-middle">Email</th>
+                                            <th class="text-center align-middle">Jabatan</th>
+                                            <th class="text-center align-middle">Hak Akses</th>
+                                            <th class="text-center align-middle">Foto</th>
+                                            <th class="text-center align-middle">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -108,15 +108,17 @@ require('../layouts/header.php');
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) { ?>
                                         <tr>
-                                            <td><?php echo $no++; ?></td>
-                                            <td><?php echo $row['nama']; ?></td>
-                                            <td><?php echo $row['username']; ?></td>
-                                            <td><?php echo $row['email']; ?></td>
-                                            <td><?php echo $row['jabatan']; ?></td>
-                                            <td><?php echo $row['hak_akses'] == 1 ? 'Aktif' : 'Non Aktif'; ?></td>
-                                            <td><img src="../upload/user/<?php echo $row['foto']; ?>" alt="User Photo"
+                                            <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                            <td class="text-center align-middle"><?php echo $row['nama']; ?></td>
+                                            <td class="text-center align-middle"><?php echo $row['username']; ?></td>
+                                            <td class="text-center align-middle"><?php echo $row['email']; ?></td>
+                                            <td class="text-center align-middle"><?php echo $row['jabatan']; ?></td>
+                                            <td class="text-center align-middle">
+                                                <?php echo $row['hak_akses'] == 1 ? 'Aktif' : 'Non Aktif'; ?></td>
+                                            <td class="text-center align-middle"><img
+                                                    src="../upload/user/<?php echo $row['foto']; ?>" alt="User Photo"
                                                     style="width: 50px; height: 50px;"></td>
-                                            <td>
+                                            <td class="text-center align-middle">
                                                 <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#modal-update-<?php echo $row['id_user']; ?>">Edit</button>
                                                 <button type="button" class="btn btn-danger btn-sm"
@@ -136,7 +138,7 @@ require('../layouts/header.php');
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form method="POST" action="manajemen-user.php"
+                                                        <form method="POST" action="manajemenUser.php"
                                                             enctype="multipart/form-data">
                                                             <input type="hidden" name="action" value="update">
                                                             <input type="hidden" name="id_user"
@@ -175,6 +177,9 @@ require('../layouts/header.php');
                                                                     <option value="operator"
                                                                         <?php if ($row['jabatan'] == 'operator') echo 'selected'; ?>>
                                                                         Operator</option>
+                                                                    <option value="staff"
+                                                                        <?php if ($row['jabatan'] == 'staff') echo 'selected'; ?>>
+                                                                        Staff</option>
                                                                     <option value="administrasi"
                                                                         <?php if ($row['jabatan'] == 'administrasi') echo 'selected'; ?>>
                                                                         Administrasi</option>
@@ -244,7 +249,7 @@ require('../layouts/header.php');
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Batal</button>
-                                                        <form method="get" action="manajemen-user.php">
+                                                        <form method="get" action="manajemenUser.php">
                                                             <input type="hidden" name="delete"
                                                                 value="<?php echo $row['id_user']; ?>">
                                                             <button type="submit" class="btn btn-danger">Hapus</button>
@@ -294,7 +299,7 @@ require('../layouts/header.php');
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="POST" action="manajemen-user.php" enctype="multipart/form-data">
+                                        <form method="POST" action="manajemenUser.php" enctype="multipart/form-data">
                                             <div class="mb-3">
                                                 <label class="form-label">Nama</label>
                                                 <input type="text" name="nama" class="form-control" required
@@ -326,6 +331,7 @@ require('../layouts/header.php');
                                                     oninput="setCustomValidity('')">
                                                     <option value="">Pilih Jabatan</option>
                                                     <option value="operator">Operator</option>
+                                                    <option value="operator">Staff</option>
                                                     <option value="administrasi">Administrasi</option>
                                                     <option value="petugas kontrol">Petugas Kontrol</option>
                                                 </select>

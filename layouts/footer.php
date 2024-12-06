@@ -1,24 +1,16 @@
-<footer class="content-footer footer bg-footer-theme">
-    <div class="container-xxl">
-        <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
-            <div class="text-body">
-                ©
-                <script>
-                    document.write(new Date().getFullYear());
-                </script>
-                , made with ❤️ by <a href="https://pixinvent.com" target="_blank" class="footer-link">Dimas</a>
-            </div>
-            <!-- <div class="d-none d-lg-inline-block">
-                <a href="https://themeforest.net/licenses/standard" class="footer-link me-4" target="_blank">License</a>
-                <a href="https://1.envato.market/pixinvent_portfolio" target="_blank" class="footer-link me-4">More
-                    Themes</a>
-
-                <a href="https://demos.pixinvent.com/vuexy-html-admin-template/documentation/" target="_blank"
-                    class="footer-link me-4">Documentation</a>
-
-                <a href="https://pixinvent.ticksy.com/" target="_blank"
-                    class="footer-link d-none d-sm-inline-block">Support</a>
-            </div> -->
+<footer class="footer bg-light">
+    <div
+        class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center gap-1 container-p-x py-4">
+        <div class="d-flex align-items-center">
+            <a href="https://www.buanakarya.co.id/" target="_blank" class="footer-text fw-medium">PT. Buana Karya
+                Bhakti</a>
+            <span class="ms-2">© <?php echo date('Y'); ?></span>
+        </div>
+        <div class="d-flex align-items-center gap-4">
+            <a class="btn btn-danger waves-effect waves-light" href="../server/sessionDestroy.php">
+                Keluar
+                <span class="ti-xs ti ti-logout"></span>
+            </a>
         </div>
     </div>
 </footer>

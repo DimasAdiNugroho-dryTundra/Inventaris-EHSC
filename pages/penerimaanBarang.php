@@ -52,11 +52,13 @@ require('../layouts/header.php');
                         <?php unset($_SESSION['success_message']); ?>
                         <?php endif; ?>
 
+                        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Penerimaan Barang
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#tambahPenerimaanModal">Tambah Penerimaan</button>
                         </h4>
+                        <?php endif; ?>
 
                         <div class="row p-3">
                             <div class="col-md-6">
@@ -109,10 +111,12 @@ require('../layouts/header.php');
                                         <td class="text-center align-middle"><?php echo $row['satuan']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['status']; ?></td>
                                         <td class="text-center align-middle">
+                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_penerimaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_penerimaan']; ?>">Delete</button>
+                                            <?php endif; ?>
                                             <a href="../report/printLaporanPenerimaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
                                                 class="btn btn-primary btn-sm">Laporan</a>
                         </div>
@@ -235,7 +239,7 @@ require('../layouts/header.php');
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
                                             </div>
                                         </form>
                                     </div>

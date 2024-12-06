@@ -56,8 +56,10 @@ require('../layouts/header.php');
 
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Kehilangan Barang
+                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#tambahKehilanganModal">Tambah Kehilangan</button>
+                            <?php endif; ?>
                         </h4>
 
                         <div class="row p-3">
@@ -113,10 +115,12 @@ require('../layouts/header.php');
                                         </td>
                                         <td class="text-center align-middle"><?php echo $row['keterangan']; ?></td>
                                         <td class="text-center align-middle">
+                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_kehilangan_barang']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_kehilangan_barang']; ?>">Delete</button>
+                                            <?php endif; ?>
                                             <a href="../report/printLaporanKehilanganBarang.php?id=<?php echo $row['id_kehilangan_barang']; ?>"
                                                 class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
@@ -299,8 +303,8 @@ while ($row = mysqli_fetch_assoc($result)) {
                         </nav>
                     </div>
                 </div>
-                <?php require('../layouts/footer.php'); ?>
             </div>
+            <?php require('../layouts/footer.php'); ?>
             <div class="content-backdrop fade"></div>
         </div>
     </div>

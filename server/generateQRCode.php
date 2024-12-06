@@ -6,6 +6,4 @@ $kode = $_GET['id'];
 
 // Outputs image directly into browser, as PNG stream
 QRcode::png($kode);
-
-// File: detail_inventaris.php (bagian yang perlu diubah)
 ?>

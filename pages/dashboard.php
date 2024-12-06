@@ -57,7 +57,8 @@ $totalKehilangan = $rowKehilangan['total_kehilangan'];
 
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="row row-cols-1 row-cols-md-3 g-6 mb-12">
-                            <div class="col-lg-3 col-sm-6">
+                            <!-- Card Inventaris -->
+                            <div class="col-sm-6 col-lg-3">
                                 <div class="card h-100">
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div class="card-title mb-0">
@@ -73,7 +74,8 @@ $totalKehilangan = $rowKehilangan['total_kehilangan'];
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-6">
+                            <!-- Card Kerusakan -->
+                            <div class="col-sm-6 col-lg-3">
                                 <div class="card h-100">
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div class="card-title mb-0">
@@ -89,7 +91,8 @@ $totalKehilangan = $rowKehilangan['total_kehilangan'];
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-6">
+                            <!-- Card Perpindahan -->
+                            <div class="col-sm-6 col-lg-3">
                                 <div class="card h-100">
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div class="card-title mb-0">
@@ -105,7 +108,8 @@ $totalKehilangan = $rowKehilangan['total_kehilangan'];
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-sm-6">
+                            <!-- Card Kehilangan -->
+                            <div class="col-sm-6 col-lg-3">
                                 <div class="card h-100">
                                     <div class="card-body d-flex justify-content-between align-items-center">
                                         <div class="card-title mb-0">
@@ -165,13 +169,14 @@ $totalKehilangan = $rowKehilangan['total_kehilangan'];
                         <!-- / Content -->
 
                         <!-- Footer -->
-                        <?php
-                        require('../layouts/footer.php');
-                        ?>
+
                         <!-- / Footer -->
 
                         <div class="content-backdrop fade"></div>
                     </div>
+                    <?php
+                        require('../layouts/footer.php');
+                        ?>
                     <!-- Content wrapper -->
                 </div>
                 <!-- / Layout page -->

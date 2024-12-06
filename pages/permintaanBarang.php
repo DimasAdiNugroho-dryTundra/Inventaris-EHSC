@@ -54,11 +54,13 @@ require('../layouts/header.php');
                         <?php unset($_SESSION['success_message']); ?>
                         <?php endif; ?>
 
+                        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Permintaan Barang
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#tambahPermintaanModal">Tambah Permintaan</button>
                         </h4>
+                        <?php endif; ?>
 
                         <div class="row p-3">
                             <div class="col-md-6">
@@ -123,10 +125,12 @@ require('../layouts/header.php');
                                                 class="<?php echo $status_class; ?>"><?php echo $status_text; ?></span>
                                         </td>
                                         <td>
+                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Hapus</button>
+                                            <?php endif; ?>
                                             <a href="../report/printLaporanPermintaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
                                                 class="btn btn-primary btn-sm">Cetak</a>
                                         </td>

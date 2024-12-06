@@ -135,12 +135,15 @@ function getDataKontrol($id_inventaris)
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Scanner QR Code</h5>
                             <div>
-                                <button class="btn btn-secondary btn-sm me-2" id="startButton">
+                                <button class="btn btn-success btn-sm me-2" id="startButton">
                                     <i class="ti ti-player-play"></i> Start
                                 </button>
-                                <button class="btn btn-danger btn-sm" id="stopButton">
+                                <button class="btn btn-danger btn-sm me-2" id="stopButton">
                                     <i class="ti ti-player-stop"></i> Stop
                                 </button>
+                                <a href="inventaris.php" class="btn btn-secondary btn-sm">
+                                    <i class="ti ti-arrow-left"></i> Kembali
+                                </a>
                             </div>
                         </div>
                         <div class="card-body">
