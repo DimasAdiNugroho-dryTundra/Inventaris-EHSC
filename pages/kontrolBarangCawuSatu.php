@@ -11,7 +11,7 @@ $currentYear = date('Y');
 $years = range($currentYear - 5, $currentYear + 5); // Tahun dari 5 tahun lalu hingga 5 tahun ke depan
 
 // Query untuk mengambil data kontrol barang
-$query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, u.nama as nama_petugas 
+$query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, i.jumlah_akhir, u.nama as nama_petugas 
           FROM kontrol_barang_cawu_satu kb 
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
           JOIN user u ON kb.id_user = u.id_user 
@@ -247,7 +247,7 @@ $totalPages = ceil($totalRows / $limit);
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Inventaris</label>
                                                                     <input type="text" class="form-control bg-light"
-                                                                        value="<?php echo $row['nama_barang'] . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah: ' . ($row['jumlah_baik'] + $row['jumlah_rusak'] + $row['jumlah_pindah'] + $row['jumlah_hilang']) . ')'; ?>"
+                                                                        value="<?php echo $row['nama_barang'] . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah terkontrol: ' . ($row['jumlah_baik'] + $row['jumlah_rusak'] + $row['jumlah_pindah'] + $row['jumlah_hilang']) . ')'; ?>"
                                                                         readonly>
                                                                 </div>
 

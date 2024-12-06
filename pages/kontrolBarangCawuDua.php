@@ -247,7 +247,7 @@ $totalPages = ceil($totalRows / $limit);
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Inventaris</label>
                                                                     <input type="text" class="form-control bg-light"
-                                                                        value="<?php echo $row['nama_barang'] . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah: ' . ($row['jumlah_baik'] + $row['jumlah_rusak'] + $row['jumlah_pindah'] + $row['jumlah_hilang']) . ')'; ?>"
+                                                                        value="<?php echo $row['nama_barang'] . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah terkontrol: ' . ($row['jumlah_baik'] + $row['jumlah_rusak'] + $row['jumlah_pindah'] + $row['jumlah_hilang']) . ')'; ?>"
                                                                         readonly>
                                                                 </div>
 
