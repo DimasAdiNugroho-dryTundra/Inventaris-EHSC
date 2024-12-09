@@ -1,86 +1,160 @@
 <?php
-require_once('../lib/TCPDF/tcpdf.php');
+// Mulai output buffering
+ob_start();
+
+require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
+require('../lib/TCPDF/tcpdf.php');
 
 // Ambil ID dari URL
 $id_kerusakan_barang = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-// Ambil data kerusakan barang berdasarkan ID
-$query = "SELECT kb.*, i.nama_barang, i.kode_inventaris 
+// Ambil data kerusakan barang berdasarkan ID dengan JOIN ke departemen
+$query = "SELECT kb.*, i.nama_barang, i.kode_inventaris, d.nama_departemen 
           FROM kerusakan_barang kb 
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
+          JOIN departemen d ON i.id_departemen = d.id_departemen
           WHERE kb.id_kerusakan_barang = $id_kerusakan_barang";
 $result = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($result);
 
-// Buat objek TCPDF
-$pdf = new TCPDF();
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Your Name');
-$pdf->SetTitle('Laporan Kerusakan Barang');
-$pdf->SetHeaderData('', 0, 'Laporan Kerusakan Barang', 'Generated on: ' . date('Y-m-d H:i:s'));
-$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-$pdf->SetMargins(15, 20, 15);
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-$pdf->AddPage();
-
-// Tambahkan konten laporan
-$html = '<h1 style="text-align:center;">Laporan Kerusakan Barang</h1>';
-$html .= '<p>Pada tanggal <strong>' . date('d-m-Y', strtotime($row['tanggal_kerusakan'])) . '</strong>, telah dilaporkan kerusakan pada barang dengan kode inventaris <strong>' . $row['kode_inventaris'] . '</strong>. Barang yang dimaksud adalah <strong>' . $row['nama_barang'] . '</strong>, yang termasuk dalam catatan inventaris kami.</p>';
-$html .= '<p>Berdasarkan laporan yang diterima, kerusakan terjadi pada <strong>' . $row['cawu'] . '</strong> dengan jumlah kerusakan sebanyak <strong>' . $row['jumlah_kerusakan'] . '</strong> unit. Kerusakan tersebut telah didokumentasikan dan dilaporkan untuk ditindaklanjuti sesuai prosedur yang berlaku.</p>';
-$html .= '<p>Keterangan tambahan dari pelapor terkait kerusakan ini adalah sebagai berikut: ' . nl2br($row['keterangan']) . '</p>';
-$html .= '<p>Demikian laporan kerusakan barang ini dibuat sebagai dokumentasi resmi. Terima kasih atas perhatian dan kerja samanya dalam menindaklanjuti laporan ini.</p>';
-
-// Tulis konten HTML ke PDF
-$pdf->writeHTML($html, true, false, true, false, '');
-
-// Tambahkan tanda tangan di halaman pertama
-$html = '<br><br><br>
-         <table style="width:100%; text-align:center;">
-            <tr>
-                <td><strong>Pelapor</strong></td>
-                <td><strong>Disetujui Oleh</strong></td>
-            </tr>
-            <tr>
-                <td style="height:100px;">(Nama Pelapor)</td>
-                <td style="height:100px;">(Nama Penanggung Jawab)</td>
-            </tr>
-         </table>';
-$pdf->writeHTML($html, true, false, true, false, '');
-
-// Tambahkan halaman baru untuk gambar
-$pdf->AddPage();
-$pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 10, 'Lampiran: Foto Kerusakan', 0, 1, 'C');
-
-// Cek dan tampilkan gambar
-if ($row['foto_kerusakan']) {
-    $fotoPath = '../upload/kerusakan/' . $row['foto_kerusakan'];
-    if (file_exists($fotoPath)) {
-        // Dapatkan dimensi asli gambar
-        list($width, $height) = getimagesize($fotoPath);
-
-        // Hitung skala untuk menyesuaikan dimensi di halaman PDF
-        $maxWidth = 150; // Lebar maksimum di PDF
-        $maxHeight = 200; // Tinggi maksimum di PDF
-
-        $ratio = min($maxWidth / $width, $maxHeight / $height);
-        $newWidth = $width * $ratio;
-        $newHeight = $height * $ratio;
-
-        // Menampilkan gambar di PDF dengan ukuran yang disesuaikan
-        $pdf->Image($fotoPath, '30', '', $newWidth, $newHeight, '', '', '', false, 300, '', false, false, 1, false, false, false);
-    } else {
-        $pdf->SetFont('helvetica', '', 12);
-        $pdf->Cell(0, 10, 'Tidak ada foto (file tidak ditemukan)', 0, 1, 'C');
+// Buat class turunan TCPDF untuk kustomisasi header
+class MYPDF extends TCPDF
+{
+    public function Header()
+    {
+        $image_file = 'headerLaporan.png';
+        $this->setPageMark();
+        $this->Image($image_file, 10, 5, 190, 0, 'PNG', '', 'T', false, 300, 'T', false, false, 0, false, false, false);
+        $this->SetY(0);
     }
-} else {
-    $pdf->SetFont('helvetica', '', 12);
-    $pdf->Cell(0, 10, 'Tidak ada foto', 0, 1, 'C');
 }
 
-// Output PDF
-$pdf->Output('laporan_kerusakan_barang_' . $id_kerusakan_barang . '.pdf', 'I');
+try {
+    // Buat objek TCPDF dengan class kustom
+    $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+
+    // Set informasi dokumen
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetTitle('Laporan Kerusakan Barang');
+
+    // Set margins
+    $pdf->SetMargins(15, 30, 15);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(10);
+
+    // Set auto page breaks
+    $pdf->SetAutoPageBreak(TRUE, 15);
+
+    // Set image scale factor
+    $pdf->setImageScale(1.25);
+
+    // Set font
+    $pdf->SetFont('helvetica', '', 11);
+
+    // Add a page
+    $pdf->AddPage();
+
+    // Cek apakah ada data yang ditemukan
+    if ($row = mysqli_fetch_assoc($result)) {
+        // HTML Content
+        $html = '
+        <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN KERUSAKAN BARANG</h1>
+
+        <p>
+Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $row['id_kerusakan_barang'] . '<br>
+Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($row['tanggal_kerusakan'])) . '<br>
+Departemen&nbsp;: ' . $row['nama_departemen'] . '<br>
+Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
+</p>
+        
+        <p>Kepada Yth.<br>Admin Gudang<br>Di Tempat</p>
+
+        <p>Dengan Hormat,</p>
+        <p style="text-align: justify;">Laporan ini merinci kerusakan barang yang terjadi pada inventaris kami. 
+        Diharapkan dapat segera ditindaklanjuti sesuai dengan prosedur yang berlaku. 
+        Kami menghargai perhatian dan kerjasama dari pihak terkait dalam proses ini.</p>
+        
+        <br>
+        <table border="1" cellpadding="5">
+            <tr>
+                <td><strong>Nama Barang</strong></td>
+                <td>' . $row['nama_barang'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Kode Inventaris</strong></td>
+                <td>' . $row['kode_inventaris'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Jumlah Kerusakan</strong></td>
+                <td>' . $row['jumlah_kerusakan'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Cawu</strong></td>
+                <td>' . $row['cawu'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Keterangan</strong></td>
+                <td>' . nl2br($row['keterangan']) . '</td>
+            </tr>
+        </table>
+        
+        <br>
+        <p>Demikian laporan ini kami sampaikan. Atas perhatian dan kerjasamanya, kami ucapkan terima kasih.</p>
+        
+        <br><br>
+        <table cellpadding="5">
+            <tr>
+                <td width="50%" style="text-align: center;">Menyetujui,</td>
+                <td width="50%" style="text-align: center;">Pelapor,</td>
+            </tr>
+            <tr>
+                <td height="60"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">(........................)</td>
+                <td style="text-align: center;">(........................)</td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">Admin Gudang</td>
+                <td style="text-align: center;">Admin ' . $row['nama_departemen'] . '</td>
+            </tr>
+        </table>';
+
+        // Output HTML
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Tambahkan halaman baru untuk gambar jika ada
+        if ($row['foto_kerusakan']) {
+            $pdf->AddPage();
+            $pdf->SetFont('helvetica', 'B', 14);
+            $pdf->Cell(0, 10, 'Lampiran: Foto Kerusakan', 0, 1, 'C');
+
+            $fotoPath = '../upload/kerusakan/' . $row['foto_kerusakan'];
+            if (file_exists($fotoPath)) {
+                list($width, $height) = getimagesize($fotoPath);
+                $maxWidth = 160;
+                $maxHeight = 160;
+
+                $ratio = min($maxWidth / $width, $maxHeight / $height);
+                $newWidth = $width * $ratio;
+                $newHeight = $height * $ratio;
+
+                // Posisi X untuk center image
+                $x = ($pdf->getPageWidth() - $newWidth) / 2;
+                $pdf->Image($fotoPath, $x, '', $newWidth, $newHeight, '', '', '', false, 300);
+            }
+        }
+    } else {
+        $pdf->Cell(0, 10, 'Data tidak ditemukan', 0, 1, 'C');
+    }
+
+    // Bersihkan output buffer
+    ob_end_clean();
+
+    // Output PDF
+    $pdf->Output('laporan_kerusakan_barang_' . $id_kerusakan_barang . '.pdf', 'I');
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 ?>

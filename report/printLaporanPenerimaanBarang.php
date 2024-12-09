@@ -1,10 +1,11 @@
 <?php
+ob_start();
+
 require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
 require('../lib/TCPDF/tcpdf.php');
 
-// Ambil data penerimaan barang berdasarkan ID permintaan
-$id_permintaan = $_GET['id']; // Ambil ID dari parameter GET
+$id_permintaan = $_GET['id'];
 
 $query = "
     SELECT pb.*, d.nama_departemen 
@@ -16,83 +17,99 @@ $query = "
 
 $result = $conn->query($query);
 
-// Buat objek TCPDF
-$pdf = new TCPDF();
-
-// Set informasi dokumen
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Admin Gudang');
-$pdf->SetTitle('Laporan Penerimaan Barang');
-$pdf->SetSubject('Laporan Penerimaan Barang');
-$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
-
-// Set font
-$pdf->SetFont('helvetica', '', 12);
-
-// Tambah halaman
-$pdf->AddPage();
-
-// Cek apakah ada data yang ditemukan
-if ($result->num_rows > 0) {
-    // Fetch data
-    $data = $result->fetch_assoc();
-
-    // Konten laporan
-    $departemen = $data['nama_departemen'];
-    $tanggal_terima = $data['tanggal_terima'];
-    $nama_barang = $data['nama_barang'];
-    $jumlah = $data['jumlah'];
-    $satuan = $data['satuan'];
-    $status = $data['status'];
-
-    // Isi konten
-    $pdf->Cell(0, 10, 'LAPORAN PERMINTAAN BARANG', 0, 1, 'C');
-    $pdf->Ln(10);
-    $pdf->Cell(0, 5, 'No: ', 0, 1);
-    $pdf->Cell(0, 5, "Tanggal: $tanggal_terima", 0, 1);
-    $pdf->Cell(0, 5, "Departemen: $departemen", 0, 1);
-    $pdf->Cell(0, 5, 'Lampiran:', 0, 1);
-    $pdf->Ln(5);
-    $pdf->Cell(0, 5, 'Kepada Yth.', 0, 1);
-    $pdf->Cell(0, 5, 'Direksi', 0, 1);
-    $pdf->Cell(0, 5, 'Di Tempat', 0, 1);
-    $pdf->Ln(5);
-    $pdf->Cell(0, 10, 'Dengan Hormat,', 0, 1);
-    $pdf->Ln(5);
-    $pdf->MultiCell(0, 10, 'Laporan ini merinci jenis dan jumlah barang yang telah diterima, diharapkan dapat memastikan kesesuaian dengan permintaan dan kebutuhan. Kami menghargai perhatian dan kerjasama dari pihak terkait dalam proses penerimaan ini.', 0, 'L', 0, 1);
-    $pdf->Ln(5);
-    $pdf->Cell(0, 0, 'Berikut adalah tabel rincian barang yang diterima.', 0, 1);
-    $pdf->Ln(5);
-    $pdf->SetFont('helvetica', '', 12);
-
-    $pdf->Cell(64, 10, 'Nama Barang', 1, 0, 'C');
-    $pdf->Cell(64, 10, 'Jumlah', 1, 0, 'C');
-    $pdf->Cell(64, 10, 'Satuan', 1, 1, 'C');
-
-    // Isi tabel
-    $pdf->SetFont('helvetica', '', 12);
-    $pdf->Cell(64, 10, $nama_barang, 1, 0, 'C');
-    $pdf->Cell(64, 10, $jumlah, 1, 0, 'C');
-    $pdf->Cell(64, 10, $satuan, 1, 1, 'C');
-
-    $pdf->Ln(5);
-    $pdf->MultiCell(0, 10, 'Demikian laporan ini kami buat untuk dapat digunakan sebagaimana mestinya.', 0, 'L', 0, 1);
-
-    $pdf->Ln(5); // Jarak setelah garis
-    $pdf->Cell(90, 10, 'Gudang, ' . $tanggal_terima, 0, 0, 'C');
-    $pdf->Cell(90, 10, $departemen . ', ' . $tanggal_terima, 0, 1, 'C');
-
-    $pdf->Ln(5); // Jarak setelah garis
-    $pdf->Cell(90, 10, '_______________________', 0, 0, 'C');
-    $pdf->Cell(90, 10, '_______________________', 0, 1, 'C');
-
-    $pdf->Cell(90, 10, 'Admin Gudang', 0, 0, 'C');
-    $pdf->Cell(90, 10, 'Admin ' . $departemen, 0, 1, 'C');
-
-} else {
-    $pdf->Cell(0, 10, 'Data penerimaan barang tidak ditemukan.', 0, 1, 'C');
+class MYPDF extends TCPDF
+{
+    public function Header()
+    {
+        $image_file = 'headerLaporan.png';
+        $this->setPageMark();
+        $this->Image($image_file, 10, 5, 190, 0, 'PNG', '', 'T', false, 300, 'T', false, false, 0, false, false, false);
+        $this->SetY(40);
+    }
 }
 
-// Tutup dan output PDF
-$pdf->Output('laporan_penerimaan_barang.pdf', 'I');
-?>
+try {
+    $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetTitle('Laporan Penerimaan Barang');
+    $pdf->SetMargins(15, 30, 15);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(10);
+    $pdf->SetAutoPageBreak(TRUE, 15);
+    $pdf->setImageScale(1.25);
+    $pdf->SetFont('helvetica', '', 11);
+    $pdf->AddPage();
+
+    if ($result->num_rows > 0) {
+        $data = $result->fetch_assoc();
+
+        $html = '
+        <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN PENERIMAAN BARANG</h1>
+
+        <p style="line-height: 1.5;">
+Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $data['id_permintaan'] . '<br>
+Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '<br>
+Departemen&nbsp;: ' . $data['nama_departemen'] . '<br>
+Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
+</p>
+        
+        <p>Kepada Yth.<br>Direksi<br>Di Tempat</p>
+        
+        <br>
+        <p>Dengan Hormat,</p>
+        <p style="text-align: justify;">Laporan ini merinci jenis dan jumlah barang yang telah diterima, diharapkan dapat memastikan kesesuaian dengan permintaan dan kebutuhan. Kami menghargai perhatian dan kerjasama dari pihak terkait dalam proses penerimaan ini.</p>
+        
+        <p>Berikut adalah tabel rincian barang yang diterima.</p>
+        
+        <br>
+        <table border="1" cellpadding="5">
+            <tr style="background-color: #f2f2f2;">
+                <td><strong>Nama Barang</strong></td>
+                <td>' . $data['nama_barang'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Jumlah</strong></td>
+                <td>' . $data['jumlah'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Satuan</strong></td>
+                <td>' . $data['satuan'] . '</td>
+            </tr>
+        </table>
+        
+        <br>
+        <p>Demikian laporan ini kami buat untuk dapat digunakan sebagaimana mestinya.</p>
+        
+        <br><br>
+        <table cellpadding="5">
+            <tr>
+                <td width="50%" style="text-align: center;">Disetujui</td>
+                <td width="50%" style="text-align: center;">Penerima</td>
+            </tr>
+            <tr>
+                <td height="60"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">(........................)</td>
+                <td style="text-align: center;">(........................)</td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">Staff ' . $data['nama_departemen'] . '</td>
+                <td style="text-align: center;">Admin ' . $data['nama_departemen'] . '</td>
+            </tr>
+        </table>';
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+    } else {
+        $pdf->Cell(0, 10, 'Data penerimaan barang tidak ditemukan.', 0, 1, 'C');
+    }
+
+    ob_end_clean();
+    $pdf->Output('laporan_penerimaan_barang.pdf', 'I');
+
+} catch (Exception $e) {
+    error_log('PDF Generation Error: ' . $e->getMessage());
+    echo 'Error: ' . $e->getMessage();
+}

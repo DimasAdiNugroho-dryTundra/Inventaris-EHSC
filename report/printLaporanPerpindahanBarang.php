@@ -1,52 +1,138 @@
 <?php
-require_once('../lib/TCPDF/tcpdf.php');
+// Mulai output buffering
+ob_start();
+
+require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
+require('../lib/TCPDF/tcpdf.php');
 
 // Ambil ID dari URL
 $id_perpindahan_barang = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-// Ambil data perpindahan barang berdasarkan ID
-$query = "SELECT pb.*, i.nama_barang, i.kode_inventaris 
+// Ambil data perpindahan barang berdasarkan ID dengan JOIN ke departemen
+$query = "SELECT pb.*, i.nama_barang, i.kode_inventaris, d.nama_departemen 
           FROM perpindahan_barang pb 
           JOIN inventaris i ON pb.id_inventaris = i.id_inventaris 
+          JOIN departemen d ON i.id_departemen = d.id_departemen
           WHERE pb.id_perpindahan_barang = $id_perpindahan_barang";
 $result = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($result);
 
-// Buat objek TCPDF
-$pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Your Name');
-$pdf->SetTitle('Laporan Perpindahan Barang');
-$pdf->SetHeaderData('', 0, 'Laporan Perpindahan Barang', 'Generated on: ' . date('Y-m-d H:i:s'));
-$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-$pdf->SetMargins(15, 20, 15);
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-$pdf->AddPage();
+// Buat class turunan TCPDF untuk kustomisasi header
+class MYPDF extends TCPDF
+{
+    public function Header()
+    {
+        $image_file = 'headerLaporan.png';
+        $this->setPageMark();
+        $this->Image($image_file, 10, 5, 190, 0, 'PNG', '', 'T', false, 300, 'T', false, false, 0, false, false, false);
+        $this->SetY(0);
+    }
+}
 
-// Tambahkan judul laporan
-$html = '<h1 style="text-align:center;">Laporan Perpindahan Barang</h1>';
-$html .= '<p style="text-align:justify;">Laporan ini dibuat untuk mencatat dan mendokumentasikan proses perpindahan barang yang telah dilaksanakan. Berdasarkan catatan yang tersedia, kegiatan perpindahan barang dilakukan pada tanggal <strong>' . date('d-m-Y', strtotime($row['tanggal_perpindahan'])) . '</strong>. Berikut adalah rincian lebih lanjut terkait barang yang dipindahkan:</p>';
+try {
+    // Buat objek TCPDF dengan class kustom
+    $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
-// Tambahkan rincian barang dalam bentuk kalimat
-$html .= '<p style="text-align:justify;">Barang yang dipindahkan memiliki kode inventaris <strong>' . $row['kode_inventaris'] . '</strong>, dengan nama barang <strong>"' . $row['nama_barang'] . '"</strong>. Perpindahan ini dilakukan untuk periode atau cawu <strong>' . $row['cawu'] . '</strong>. Jumlah barang yang dipindahkan sebanyak <strong>' . $row['jumlah_perpindahan'] . ' unit</strong>. Adapun informasi tambahan mengenai perpindahan ini adalah sebagai berikut:</p>';
+    // Set informasi dokumen
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetTitle('Laporan Perpindahan Barang');
 
-// Tambahkan keterangan
-$html .= '<p style="text-align:justify;"><em>"' . nl2br($row['keterangan']) . '"</em></p>';
-$html .= '<p style="text-align:justify;">Kami mencatat bahwa proses perpindahan barang ini dilakukan sesuai dengan prosedur yang berlaku di lingkungan pengelolaan inventaris. Segala bentuk kendala yang mungkin muncul selama proses perpindahan telah diatasi dengan langkah-langkah yang sesuai untuk menjaga keutuhan dan kelancaran proses.</p>';
+    // Set margins
+    $pdf->SetMargins(15, 30, 15);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(10);
 
-// Tambahkan penutup laporan
-$html .= '<h3>Penutup</h3>';
-$html .= '<p style="text-align:justify;">Demikian laporan ini disusun untuk mendokumentasikan perpindahan barang secara resmi. Diharapkan laporan ini dapat menjadi acuan dalam meningkatkan efisiensi dan ketertiban pengelolaan barang di masa mendatang. Kami mengucapkan terima kasih atas perhatian dan kerja sama yang telah diberikan.</p>';
-$html .= '<p style="text-align:justify;">Banjarmasin, ' . date('d-m-Y') . '</p>';
-$html .= '<p><strong>Penanggung Jawab,</strong></p>';
-$html .= '<br><br><p>(.............................)</p>';
+    // Set auto page breaks
+    $pdf->SetAutoPageBreak(TRUE, 15);
 
-// Tulis konten ke PDF
-$pdf->writeHTML($html, true, false, true, false, '');
+    // Set image scale factor
+    $pdf->setImageScale(1.25);
 
-// Output PDF
-$pdf->Output('laporan_perpindahan_barang_' . $id_perpindahan_barang . '.pdf', 'I');
+    // Set font
+    $pdf->SetFont('helvetica', '', 11);
+
+    // Add a page
+    $pdf->AddPage();
+
+    // Cek apakah ada data yang ditemukan
+    if ($row = mysqli_fetch_assoc($result)) {
+        // HTML Content
+        $html = '
+        <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN PERPINDAHAN BARANG</h1>
+
+        <p>
+Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $row['id_perpindahan_barang'] . '<br>
+Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($row['tanggal_perpindahan'])) . '<br>
+Departemen&nbsp;: ' . $row['nama_departemen'] . '
+</p>
+
+        <p>Kepada Yth.<br>Admin Gudang<br>Di Tempat</p>
+
+        <p>Dengan Hormat,</p>
+        <p style="text-align: justify;">Laporan ini merinci perpindahan barang yang terjadi pada inventaris kami. 
+        Diharapkan dapat segera ditindaklanjuti sesuai dengan prosedur yang berlaku. 
+        Kami menghargai perhatian dan kerjasama dari pihak terkait dalam proses ini.</p>
+        
+        <br>
+        <table border="1" cellpadding="5">
+            <tr style="background-color: #f2f2f2;">
+                <td><strong>Nama Barang</strong></td>
+                <td>' . $row['nama_barang'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Kode Inventaris</strong></td>
+                <td>' . $row['kode_inventaris'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Jumlah Perpindahan</strong></td>
+                <td>' . $row['jumlah_perpindahan'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Cawu</strong></td>
+                <td>' . $row['cawu'] . '</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td><strong>Keterangan</strong></td>
+                <td>' . nl2br($row['keterangan']) . '</td>
+            </tr>
+        </table>
+        
+        <br>
+        <p>Demikian laporan ini kami sampaikan. Atas perhatian dan kerjasamanya, kami ucapkan terima kasih.</p>
+        
+        <br><br>
+        <table cellpadding="5">
+            <tr>
+                <td width="50%" style="text-align: center;">Menyetujui,</td>
+                <td width="50%" style="text-align: center;">Pelapor,</td>
+            </tr>
+            <tr>
+                <td height="60"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">(........................)</td>
+                <td style="text-align: center;">(........................)</td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">Admin Gudang</td>
+                <td style="text-align: center;">Admin ' . $row['nama_departemen'] . '</td>
+            </tr>
+        </table>';
+
+        // Output HTML
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+    } else {
+        $pdf->Cell(0, 10, 'Data tidak ditemukan', 0, 1, 'C');
+    }
+
+    // Bersihkan output buffer
+    ob_end_clean();
+
+    // Output PDF
+    $pdf->Output('laporan_perpindahan_barang_' . $id_perpindahan_barang . '.pdf', 'I');
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 ?>

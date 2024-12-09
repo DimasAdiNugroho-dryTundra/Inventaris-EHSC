@@ -141,59 +141,59 @@ $result = mysqli_query($conn, $query);
                                             while ($row = mysqli_fetch_assoc($result)) {
                                                 $jumlah_akhir = $row['jumlah_baik_cawu_tiga'];
                                                 ?>
-                                                <tr>
-                                                    <td class="text-center align-middle"><?php echo $no++; ?></td>
-                                                    <td class="text-center align-middle">
-                                                        <?php echo ($row['nama_barang']); ?>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <?php echo ($row['kode_inventaris']); ?>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <?php echo ($row['jumlah_awal']); ?>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <?php echo ($row['satuan']); ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-success">
-                                                        <?php echo isset($row['jumlah_baik_cawu_satu']) ? ($row['jumlah_baik_cawu_satu']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-success">
-                                                        <?php echo isset($row['jumlah_rusak_cawu_satu']) ? ($row['jumlah_rusak_cawu_satu']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-success">
-                                                        <?php echo isset($row['jumlah_pindah_cawu_satu']) ? ($row['jumlah_pindah_cawu_satu']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-success">
-                                                        <?php echo isset($row['jumlah_hilang_cawu_satu']) ? ($row['jumlah_hilang_cawu_satu']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-info">
-                                                        <?php echo isset($row['jumlah_baik_cawu_dua']) ? ($row['jumlah_baik_cawu_dua']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-info">
-                                                        <?php echo isset($row['jumlah_rusak_cawu_dua']) ? ($row['jumlah_rusak_cawu_dua']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-info">
-                                                        <?php echo isset($row['jumlah_pindah_cawu_dua']) ? ($row['jumlah_pindah_cawu_dua']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-info">
-                                                        <?php echo isset($row['jumlah_hilang_cawu_dua']) ? ($row['jumlah_hilang_cawu_dua']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-warning">
-                                                        <?php echo isset($row['jumlah_baik_cawu_tiga']) ? ($row['jumlah_baik_cawu_tiga']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-warning">
-                                                        <?php echo isset($row['jumlah_rusak_cawu_tiga']) ? ($row['jumlah_rusak_cawu_tiga']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-warning">
-                                                        <?php echo isset($row['jumlah_pindah_cawu_tiga']) ? ($row['jumlah_pindah_cawu_tiga']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle bg-label-warning">
-                                                        <?php echo isset($row['jumlah_hilang_cawu_tiga']) ? ($row['jumlah_hilang_cawu_tiga']) : 0; ?>
-                                                    </td>
-                                                    <td class="text-center align-middle"><?php echo $jumlah_akhir; ?></td>
-                                                </tr>
-                                                <?php
+                                        <tr>
+                                            <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                            <td class="text-center align-middle">
+                                                <?php echo ($row['nama_barang']); ?>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <?php echo ($row['kode_inventaris']); ?>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <?php echo ($row['jumlah_awal']); ?>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <?php echo ($row['satuan']); ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-success">
+                                                <?php echo isset($row['jumlah_baik_cawu_satu']) ? ($row['jumlah_baik_cawu_satu']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-success">
+                                                <?php echo isset($row['jumlah_rusak_cawu_satu']) ? ($row['jumlah_rusak_cawu_satu']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-success">
+                                                <?php echo isset($row['jumlah_pindah_cawu_satu']) ? ($row['jumlah_pindah_cawu_satu']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-success">
+                                                <?php echo isset($row['jumlah_hilang_cawu_satu']) ? ($row['jumlah_hilang_cawu_satu']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-info">
+                                                <?php echo isset($row['jumlah_baik_cawu_dua']) ? ($row['jumlah_baik_cawu_dua']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-info">
+                                                <?php echo isset($row['jumlah_rusak_cawu_dua']) ? ($row['jumlah_rusak_cawu_dua']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-info">
+                                                <?php echo isset($row['jumlah_pindah_cawu_dua']) ? ($row['jumlah_pindah_cawu_dua']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-info">
+                                                <?php echo isset($row['jumlah_hilang_cawu_dua']) ? ($row['jumlah_hilang_cawu_dua']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-warning">
+                                                <?php echo isset($row['jumlah_baik_cawu_tiga']) ? ($row['jumlah_baik_cawu_tiga']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-warning">
+                                                <?php echo isset($row['jumlah_rusak_cawu_tiga']) ? ($row['jumlah_rusak_cawu_tiga']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-warning">
+                                                <?php echo isset($row['jumlah_pindah_cawu_tiga']) ? ($row['jumlah_pindah_cawu_tiga']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle bg-label-warning">
+                                                <?php echo isset($row['jumlah_hilang_cawu_tiga']) ? ($row['jumlah_hilang_cawu_tiga']) : 0; ?>
+                                            </td>
+                                            <td class="text-center align-middle"><?php echo $jumlah_akhir; ?></td>
+                                        </tr>
+                                        <?php
                                             }
                                         } else {
                                             echo '<tr>';
@@ -216,11 +216,8 @@ $result = mysqli_query($conn, $query);
                             </div>
 
                             <div class="mt-3">
-                                <form method="POST" action="../report/printLaporanRangkumanInventaris.php"
-                                    target="_blank">
-                                    <input type="hidden" name="year" value="<?php echo $selectedYear; ?>">
-                                    <button class="btn btn-primary" type="submit">Cetak Laporan</button>
-                                </form>
+                                <a href="../report/printLaporanRangkumanInventaris.php?year=<?php echo $selectedYear; ?>"
+                                    class="btn btn-primary">Cetak Laporan</a>
                             </div>
                         </div>
                     </div>
