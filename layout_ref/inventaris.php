@@ -209,12 +209,6 @@ require('../layouts/header.php');
                                                         </div>
 
                                                         <div class="mb-3">
-                                                            <label class="form-label">Ruangan</label>
-                                                            <input type="text" class="form-control bg-light"
-                                                                value="<?php echo $row['nama_ruangan']; ?>" readonly>
-                                                        </div>
-
-                                                        <div class="mb-3">
                                                             <label class="form-label">Satuan</label>
                                                             <input type="text" name="satuan"
                                                                 class="form-control bg-light"
@@ -226,6 +220,24 @@ require('../layouts/header.php');
                                                             <input type="text" class="form-control bg-light"
                                                                 value="<?php echo $row['sumber_inventaris']; ?>"
                                                                 readonly>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Ruangan</label>
+                                                            <select name="id_ruangan" class="form-select" required>
+                                                                <option value="">Pilih Ruangan</option>
+                                                                <?php
+                                                                $ruangan_query = "SELECT * FROM ruangan ORDER BY 
+                                                                    CASE WHEN id_ruangan = '{$row['id_ruangan']}' THEN 0 ELSE 1 END,
+                                                                    nama_ruangan ASC";
+                                                                $ruangan_result = mysqli_query($conn, $ruangan_query);
+                                                                while ($ruangan = mysqli_fetch_assoc($ruangan_result)) {
+                                                                    $selected = ($ruangan['id_ruangan'] == $row['id_ruangan']) ? 'selected' : '';
+                                                                    echo "<option value='" . $ruangan['id_ruangan'] . "' $selected>" 
+                                                                        . $ruangan['nama_ruangan'] . "</option>";
+                                                                }
+                                                                ?>
+                                                            </select>
                                                         </div>
 
                                                         <div class="mb-3">
@@ -468,13 +480,6 @@ require('../layouts/header.php');
                                                         </div>
 
                                                         <div class="mb-3">
-                                                            <label class="form-label">Ruangan</label>
-                                                            <input type="text" class="form-control bg-light"
-                                                                value="<?php echo $row_zero['nama_ruangan']; ?>"
-                                                                readonly>
-                                                        </div>
-
-                                                        <div class="mb-3">
                                                             <label class="form-label">Satuan</label>
                                                             <input type="text" name="satuan"
                                                                 class="form-control bg-light"
@@ -486,6 +491,24 @@ require('../layouts/header.php');
                                                             <input type="text" class="form-control bg-light"
                                                                 value="<?php echo $row_zero['sumber_inventaris']; ?>"
                                                                 readonly>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Ruangan</label>
+                                                            <select name="id_ruangan" class="form-select" required>
+                                                                <option value="">Pilih Ruangan</option>
+                                                                <?php
+                                                                $ruangan_query = "SELECT * FROM ruangan ORDER BY 
+                                                                    CASE WHEN id_ruangan = '{$row_zero['id_ruangan']}' THEN 0 ELSE 1 END,
+                                                                    nama_ruangan ASC";
+                                                                $ruangan_result = mysqli_query($conn, $ruangan_query);
+                                                                while ($ruangan = mysqli_fetch_assoc($ruangan_result)) {
+                                                                    $selected = ($ruangan['id_ruangan'] == $row_zero['id_ruangan']) ? 'selected' : '';
+                                                                    echo "<option value='" . $ruangan['id_ruangan'] . "' $selected>" 
+                                                                        . $ruangan['nama_ruangan'] . "</option>";
+                                                                }
+                                                                ?>
+                                                            </select>
                                                         </div>
 
                                                         <div class="mb-3">

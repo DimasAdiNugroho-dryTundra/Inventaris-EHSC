@@ -22,16 +22,15 @@ $totalPages = ceil($totalRow['total'] / $limit);
 if (isset($_POST['tambahPermintaan'])) {
     $id_departemen = $_POST['id_departemen'];
     $nama_barang = $_POST['nama_barang'];
-    // Ubah nama field dari 'tanggal' menjadi 'tanggal_permintaan'
-    $tanggal_permintaan = $_POST['tanggal'] ?? date('Y-m-d'); // Tambahkan default value
+    $merk = $_POST['merk'];
+    $tanggal_permintaan = $_POST['tanggal'] ?? date('Y-m-d'); 
     $spesifikasi = $_POST['spesifikasi'];
-    $kebutuhan_qty = $_POST['kebutuhan_qty'];
-    $harga_satuan = str_replace(['Rp', '.', ' '], '', $_POST['harga_satuan']);
-    $harga_satuan = (int) $harga_satuan;
-    $status = 0;
+    $jumlah_kebutuhan = $_POST['jumlah_kebutuhan'];
+    $satuan = $_POST['satuan'];
+    $status = $_POST['status'];
 
-    $query = "INSERT INTO permintaan_barang (id_departemen, nama_barang, tanggal_permintaan, spesifikasi, kebutuhan_qty, harga_satuan, status) 
-    VALUES ('$id_departemen', '$nama_barang', '$tanggal_permintaan', '$spesifikasi', '$kebutuhan_qty', '$harga_satuan', '$status')";
+    $query = "INSERT INTO permintaan_barang (id_departemen, nama_barang, merk, tanggal_permintaan, spesifikasi, jumlah_kebutuhan, satuan, status) 
+    VALUES ('$id_departemen', '$nama_barang', '$merk', '$tanggal_permintaan', '$spesifikasi', '$jumlah_kebutuhan', '$satuan', '$status')";
     if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Permintaan barang berhasil ditambahkan!";
     } else {
@@ -46,23 +45,23 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_permintaan = $_POST['id_permintaan'];
     $id_departemen = $_POST['id_departemen'];
     $nama_barang = $_POST['nama_barang'];
-    // Ubah nama field dari 'tanggal' menjadi 'tanggal_permintaan'
-    $tanggal_permintaan = $_POST['tanggal'] ?? date('Y-m-d'); // Tambahkan default value
+    $merk = $_POST['merk'];
+    $tanggal_permintaan = $_POST['tanggal'] ?? date('Y-m-d');
     $spesifikasi = $_POST['spesifikasi'];
-    $kebutuhan_qty = $_POST['kebutuhan_qty'];
-    $harga_satuan = str_replace(['Rp', '.', ' '], '', $_POST['harga_satuan']);
-    $harga_satuan = (int) $harga_satuan;
+    $jumlah_kebutuhan = $_POST['jumlah_kebutuhan'];
+    $satuan = $_POST['satuan'];
     $status = $_POST['status'];
 
     $query = "UPDATE permintaan_barang SET 
-                  id_departemen = '$id_departemen', 
-                  nama_barang = '$nama_barang', 
-                  tanggal_permintaan = '$tanggal_permintaan', 
-                  spesifikasi = '$spesifikasi', 
-                  kebutuhan_qty = '$kebutuhan_qty', 
-                  harga_satuan = '$harga_satuan', 
-                  status = '$status' 
-                  WHERE id_permintaan = '$id_permintaan'";
+              id_departemen = '$id_departemen', 
+              nama_barang = '$nama_barang', 
+              merk = '$merk', 
+              tanggal_permintaan = '$tanggal_permintaan', 
+              spesifikasi = '$spesifikasi', 
+              jumlah_kebutuhan = '$jumlah_kebutuhan', 
+              satuan = '$satuan', 
+              status = '$status' 
+              WHERE id_permintaan = '$id_permintaan'";
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Permintaan barang berhasil diubah!";

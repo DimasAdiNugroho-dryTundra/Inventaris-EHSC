@@ -6,17 +6,20 @@ $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Query untuk barang inventaris tersedia
-$query = "SELECT i.*, d.nama_departemen, k.nama_kategori
+$query = "SELECT i.*, d.*, k.nama_kategori, r.nama_ruangan
           FROM inventaris i
           JOIN departemen d ON i.id_departemen = d.id_departemen  
           JOIN kategori k ON i.id_kategori = k.id_kategori
+          JOIN ruangan r ON i.id_ruangan = r.id_ruangan
           WHERE i.jumlah_akhir > 0";
 
 if (!empty($search)) {
     $query .= " AND (i.nama_barang LIKE '%$search%' 
-                     OR i.kode_inventaris LIKE '%$search%' 
-                     OR d.nama_departemen LIKE '%$search%' 
-                     OR k.nama_kategori LIKE '%$search%')";
+                OR i.kode_inventaris LIKE '%$search%' 
+                OR i.merk LIKE '%$search%'
+                OR d.nama_departemen LIKE '%$search%' 
+                OR r.nama_ruangan LIKE '%$search%' 
+                OR k.nama_kategori LIKE '%$search%')";
 }
 
 $query .= " ORDER BY i.id_inventaris DESC";
@@ -38,17 +41,20 @@ $page_zero = isset($_GET['page_zero']) ? (int) $_GET['page_zero'] : 1;
 $offset_zero = ($page_zero - 1) * $limit_zero;
 
 // Query untuk barang inventaris tidak tersedia
-$query_zero = "SELECT i.*, d.nama_departemen, k.nama_kategori
+$query_zero = "SELECT i.*, d.*, k.nama_kategori, r.nama_ruangan
                FROM inventaris i
                JOIN departemen d ON i.id_departemen = d.id_departemen
-               JOIN kategori k ON i.id_kategori = k.id_kategori  
+               JOIN kategori k ON i.id_kategori = k.id_kategori
+               JOIN ruangan r ON i.id_ruangan = r.id_ruangan
                WHERE i.jumlah_akhir = 0";
 
 if (!empty($search_zero)) {
     $query_zero .= " AND (i.nama_barang LIKE '%$search_zero%' 
-                         OR i.kode_inventaris LIKE '%$search_zero%' 
-                         OR d.nama_departemen LIKE '%$search_zero%' 
-                         OR k.nama_kategori LIKE '%$search_zero%')";
+                    OR i.kode_inventaris LIKE '%$search_zero%' 
+                    OR i.merk LIKE '%$search_zero%'
+                    OR d.nama_departemen LIKE '%$search_zero%' 
+                    OR r.nama_ruangan LIKE '%$search_zero%' 
+                    OR k.nama_kategori LIKE '%$search_zero%')";
 }
 
 $query_zero .= " ORDER BY i.id_inventaris DESC";
@@ -84,6 +90,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
     if (!empty($_POST['id_penerimaan'])) {
         $id_penerimaan = $_POST['id_penerimaan'];
         $id_kategori = $_POST['id_kategori'];
+        $id_ruangan = $_POST['id_ruangan'];
 
         // Ambil data penerimaan
         $query_penerimaan = "SELECT * FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
@@ -106,12 +113,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
                 $kode_inventaris = generateKodeInventaris($conn, $dept['kode_departemen'], $kat['kode_kategori']);
 
                 // Query untuk insert
-                $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, id_penerimaan,
-                         id_departemen, id_kategori, tanggal_perolehan, jumlah_awal,
-                         jumlah_akhir, satuan)
-                         VALUES ('$kode_inventaris', '{$penerimaan['nama_barang']}', $id_penerimaan,
-                         $id_departemen, $id_kategori, '{$penerimaan['tanggal_terima']}',
-                         {$penerimaan['jumlah']}, {$penerimaan['jumlah']}, '{$penerimaan['satuan']}')";
+                $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, merk, id_penerimaan,
+                         id_departemen, id_ruangan, id_kategori, tanggal_perolehan, jumlah_awal,
+                         jumlah_akhir, satuan, sumber_inventaris)
+                         VALUES ('$kode_inventaris', '{$penerimaan['nama_barang']}', '{$penerimaan['merk']}', $id_penerimaan,
+                         $id_departemen, $id_ruangan, $id_kategori, '{$penerimaan['tanggal_terima']}',
+                         {$penerimaan['jumlah']}, {$penerimaan['jumlah']}, '{$penerimaan['satuan']}', '{$penerimaan['sumber_penerimaan']}')";
 
                 if (mysqli_query($conn, $query)) {
                     $_SESSION['success_message'] = "Data inventaris berhasil ditambahkan!";
@@ -136,6 +143,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_inventaris = $_POST['id_inventaris'];
     $id_kategori = $_POST['id_kategori'];
+    $id_ruangan = $_POST['id_ruangan'];
     $satuan = $_POST['satuan'];
 
     // Ambil data inventaris
@@ -161,6 +169,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $query = "UPDATE inventaris SET
                   kode_inventaris = '$kode_inventaris_baru',
                   id_kategori = $id_kategori,
+                  id_ruangan = $id_ruangan,
                   satuan = '$satuan'
                   WHERE id_inventaris = $id_inventaris";
 
@@ -181,6 +190,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_inventaris = $_POST['id_inventaris'];
     $id_kategori = $_POST['id_kategori'];
+    $id_ruangan = $_POST['id_ruangan'];
     $satuan = $_POST['satuan'];
 
     // Cek apakah barang dari penerimaan atau input manual
@@ -207,6 +217,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
                   nama_barang = '$nama_barang',
                   id_departemen = $id_departemen,
                   id_kategori = $id_kategori,
+                  id_ruangan = $id_ruangan,
                   tanggal_perolehan = '$tanggal_perolehan',
                   jumlah_awal = $jumlah_awal,
                   satuan = '$satuan'
@@ -215,6 +226,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         // Untuk barang dari penerimaan
         $query = "UPDATE inventaris SET 
                   id_kategori = $id_kategori,
+                  id_ruangan = $id_ruangan,
                   satuan = '$satuan'
                   WHERE id_inventaris = $id_inventaris";
     }
@@ -229,10 +241,34 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-
 // Handling Delete
 if (isset($_GET['delete'])) {
     $id_inventaris = $_GET['delete'];
+
+    // Cek apakah ada data kontrol untuk inventaris ini
+    $checkKontrolQuery = "SELECT 
+        (SELECT COUNT(*) FROM kontrol_barang_cawu_satu WHERE id_inventaris = $id_inventaris) +
+        (SELECT COUNT(*) FROM kontrol_barang_cawu_dua WHERE id_inventaris = $id_inventaris) +
+        (SELECT COUNT(*) FROM kontrol_barang_cawu_tiga WHERE id_inventaris = $id_inventaris) as total_kontrol";
+
+    $checkResult = mysqli_query($conn, $checkKontrolQuery);
+    $kontrolData = mysqli_fetch_assoc($checkResult);
+
+    if ($kontrolData['total_kontrol'] > 0) {
+        $_SESSION['error_message'] = "Inventaris tidak dapat dihapus karena masih memiliki data kontrol terkait!";
+        header("Location: inventaris.php");
+        exit();
+    }
+    // Tidak bisa dihapus jika sumber inventaris
+    $checkSumberQuery = "SELECT sumber_inventaris FROM inventaris WHERE id_inventaris = $id_inventaris";
+    $sumberResult = mysqli_query($conn, $checkSumberQuery);
+    $sumberData = mysqli_fetch_assoc($sumberResult);
+
+    if ($sumberData['sumber_inventaris'] === 'Pindah Barang') {
+        $_SESSION['error_message'] = "Inventaris tidak dapat dihapus karena merupakan hasil dari perpindahan barang!";
+        header("Location: inventaris.php");
+        exit();
+    }
 
     // Hapus data dari tabel kehilangan_barang yang terkait
     $deleteKehilanganQuery = "DELETE FROM kehilangan_barang WHERE id_inventaris = $id_inventaris";
@@ -245,16 +281,6 @@ if (isset($_GET['delete'])) {
     // Hapus data dari tabel perpindahan_barang yang terkait
     $deletePerpindahanQuery = "DELETE FROM perpindahan_barang WHERE id_inventaris = $id_inventaris";
     mysqli_query($conn, $deletePerpindahanQuery);
-
-    // Hapus data dari tabel kontrol_barang_cawu_satu, dua, dan tiga yang terkait
-    $deleteKontrolSatuQuery = "DELETE FROM kontrol_barang_cawu_satu WHERE id_inventaris = $id_inventaris";
-    mysqli_query($conn, $deleteKontrolSatuQuery);
-
-    $deleteKontrolDuaQuery = "DELETE FROM kontrol_barang_cawu_dua WHERE id_inventaris = $id_inventaris";
-    mysqli_query($conn, $deleteKontrolDuaQuery);
-
-    $deleteKontrolTigaQuery = "DELETE FROM kontrol_barang_cawu_tiga WHERE id_inventaris = $id_inventaris";
-    mysqli_query($conn, $deleteKontrolTigaQuery);
 
     // Hapus data dari tabel inventaris
     $query = "DELETE FROM inventaris WHERE id_inventaris = $id_inventaris";

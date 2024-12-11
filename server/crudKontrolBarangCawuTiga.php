@@ -7,15 +7,15 @@ $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian dan filter
-$cawu = isset($_POST['cawu']) ? (int) $_POST['cawu'] : 1; // Set default cawu ke 1
-$year = isset($_POST['year']) ? (int) $_POST['year'] : date('Y');
+$cawu = isset($_POST['cawu']) ? (int) $_POST['cawu'] : 1;
+$tahun = isset($_POST['year']) ? (int) $_POST['year'] : date('Y');
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 
 // Tentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_tiga';
 $diKolom = 'id_kontrol_barang_cawu_tiga';
-$tanggalMulai = "$year-09-01";
-$tanggalAkhir = "$year-12-31";
+$tanggalMulai = "$tahun-09-01";
+$tanggalAkhir = "$tahun-12-31";
 
 // Query untuk mengambil data kontrol barang dengan filter tanggal
 $query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, u.nama as nama_petugas 
@@ -23,7 +23,7 @@ $query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, u.nama as nama_petugas
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
           JOIN user u ON kb.id_user = u.id_user 
           WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%') 
-          AND YEAR(kb.tanggal_kontrol) = '$year'
+          AND YEAR(kb.tanggal_kontrol) = '$tahun'
           ORDER BY kb.$diKolom DESC 
           LIMIT $limit OFFSET $offset";
 
@@ -33,33 +33,39 @@ $result = mysqli_query($conn, $query);
 $totalQuery = "SELECT COUNT(*) as total FROM $table kb 
                JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
                WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%')
-               AND YEAR(kb.tanggal_kontrol) = '$year'";
+               AND YEAR(kb.tanggal_kontrol) = '$tahun'";
 
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalRows = $totalRow['total'];
 $totalPages = ceil($totalRows / $limit);
 
-function getAvailableInventaris($conn, $year, $table)
+function getAvailableInventaris($conn, $tahun, $table)
 {
     $query = "SELECT 
                 i.id_inventaris, 
                 i.kode_inventaris, 
-                i.nama_barang, 
-                i.jumlah_akhir AS jumlah,  -- Menggunakan jumlah_akhir
+                i.nama_barang,
+                i.merk, 
+                i.jumlah_akhir AS jumlah,
                 i.satuan,
                 IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
                          FROM $table 
                          WHERE id_inventaris = i.id_inventaris 
-                         AND YEAR(tanggal_kontrol) = '$year'), 0) AS jumlah_terkontrol
+                         AND YEAR(tanggal_kontrol) = '$tahun'), 0) AS jumlah_terkontrol
               FROM inventaris i 
               WHERE (i.jumlah_akhir - IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
                                                  FROM $table 
                                                  WHERE id_inventaris = i.id_inventaris 
-                                                 AND YEAR(tanggal_kontrol) = '$year'), 0)) > 0
-              AND i.jumlah_akhir > 0"; // Pastikan hanya mengambil barang yang tersedia
+                                                 AND YEAR(tanggal_kontrol) = '$tahun'), 0)) > 0
+              AND i.jumlah_akhir > 0
+              AND (
+                  (YEAR(i.tanggal_perolehan) < '$tahun') OR 
+                  (YEAR(i.tanggal_perolehan) = '$tahun' AND MONTH(i.tanggal_perolehan) BETWEEN 1 AND 12)
+              )";
     return mysqli_query($conn, $query);
 }
+
 
 // Fungsi untuk menghitung total kontrol barang
 function getTotalkontrolBarangCawuTiga($conn, $table)
@@ -70,14 +76,14 @@ function getTotalkontrolBarangCawuTiga($conn, $table)
     return $row['total'] ?: 0;
 }
 
-function getJumlahTerkontrol($conn, $id_inventaris, $year, $exclude_id = null)
+function getJumlahTerkontrol($conn, $id_inventaris, $tahun, $exclude_id = null)
 {
-    $exclude_clause = $exclude_id ? "AND id_kontrol_barang_cawu_satu != $exclude_id" : "";
+    $exclude_clause = $exclude_id ? "AND id_kontrol_barang_cawu_tiga != $exclude_id" : "";
 
     $query = "SELECT COALESCE(SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang), 0) as total 
-              FROM kontrol_barang_cawu_satu 
+              FROM kontrol_barang_cawu_tiga 
               WHERE id_inventaris = '$id_inventaris' 
-              AND YEAR(tanggal_kontrol) = '$year'
+              AND YEAR(tanggal_kontrol) = '$tahun'
               $exclude_clause";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
@@ -88,15 +94,6 @@ function getJumlahTerkontrol($conn, $id_inventaris, $year, $exclude_id = null)
 if (isset($_POST['tambahKontrol'])) {
     $id_inventaris = isset($_POST['id_inventaris']) ? (int) $_POST['id_inventaris'] : 0;
     $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : '';
-
-    // Validasi input kosong
-    if (empty($id_inventaris) || empty($tanggal_kontrol)) {
-        $_SESSION['error_message'] = "Data inventaris dan tanggal kontrol harus diisi!";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    $year = date('Y', strtotime($tanggal_kontrol));
 
     // Inisialisasi dengan nilai default 0 jika tidak ada input
     $jumlah_baik = isset($_POST['jumlah_baik']) ? (int) $_POST['jumlah_baik'] : 0;
@@ -126,18 +123,18 @@ if (isset($_POST['tambahKontrol'])) {
         exit();
     }
 
-    // Validasi periode tanggal Cawu 1
+    // Validasi periode tanggal Cawu 3
     if (
         strtotime($tanggal_kontrol) < strtotime($tanggalMulai) ||
         strtotime($tanggal_kontrol) > strtotime($tanggalAkhir)
     ) {
-        $_SESSION['error_message'] = "Tanggal harus berada di antara 1 September - 31 Desember $year";
+        $_SESSION['error_message'] = "Tanggal harus berada di antara 1 September - 31 Desember $tahun";
         header("Location: kontrolBarangCawuTiga.php");
         exit();
     }
 
     // Ambil jumlah yang sudah terkontrol
-    $jumlah_terkontrol = getJumlahTerkontrol($conn, $id_inventaris, $year);
+    $jumlah_terkontrol = getJumlahTerkontrol($conn, $id_inventaris, $tahun);
 
     // Validasi jumlah kontrol tidak melebihi sisa yang tersedia
     $sisa_dapat_dikontrol = $jumlah_akhir - $jumlah_terkontrol;
@@ -150,7 +147,7 @@ if (isset($_POST['tambahKontrol'])) {
     // Proses insert data
     $query = "INSERT INTO $table (id_inventaris, id_user, tanggal_kontrol, tahun_kontrol, 
               jumlah_baik, jumlah_rusak, jumlah_pindah, jumlah_hilang) 
-              VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$year',
+              VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$tahun',
               '$jumlah_baik', '$jumlah_rusak', '$jumlah_pindah', '$jumlah_hilang')";
 
     if (mysqli_query($conn, $query)) {
@@ -163,7 +160,7 @@ if (isset($_POST['tambahKontrol'])) {
     exit();
 }
 
-// Proses pembaruan kontrol barang
+// Modifikasi pada bagian validasi update di crudKontrolBarangCawuSatu.php
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kontrol = (int) $_POST['id_kontrol'];
     $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : '';
@@ -175,95 +172,31 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         exit();
     }
 
-    $year = date('Y', strtotime($tanggal_kontrol));
+    // Ambil data kontrol yang akan diupdate
+    $query_kontrol = "SELECT kb.*, i.id_inventaris 
+                     FROM kontrol_barang_cawu_tiga kb
+                     JOIN inventaris i ON kb.id_inventaris = i.id_inventaris
+                     WHERE kb.id_kontrol_barang_cawu_tiga = '$id_kontrol'";
 
-    // Inisialisasi dengan nilai default 0 jika tidak ada input
+    $result_kontrol = mysqli_query($conn, $query_kontrol);
+    $data_kontrol = mysqli_fetch_assoc($result_kontrol);
+
+    $tahun = date('Y', strtotime($tanggal_kontrol));
+
+    // Jika tidak ada data di cawu lain, lanjutkan update
     $jumlah_baik = isset($_POST['jumlah_baik']) ? (int) $_POST['jumlah_baik'] : 0;
     $jumlah_rusak = isset($_POST['jumlah_rusak']) ? (int) $_POST['jumlah_rusak'] : 0;
     $jumlah_pindah = isset($_POST['jumlah_pindah']) ? (int) $_POST['jumlah_pindah'] : 0;
     $jumlah_hilang = isset($_POST['jumlah_hilang']) ? (int) $_POST['jumlah_hilang'] : 0;
 
-    $total_kontrol = $jumlah_baik + $jumlah_rusak + $jumlah_pindah + $jumlah_hilang;
-
-    // Validasi periode tanggal Cawu 1
-    if (
-        strtotime($tanggal_kontrol) < strtotime($tanggalMulai) ||
-        strtotime($tanggal_kontrol) > strtotime($tanggalAkhir)
-    ) {
-        $_SESSION['error_message'] = "Tanggal harus berada di antara 1 September - 31 Desember $year";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    // Ambil data kontrol yang akan diupdate dan total jumlah dari database
-    $query_kontrol = "SELECT kb.*, 
-                     (SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
-                      FROM $table 
-                      WHERE id_inventaris = kb.id_inventaris 
-                      AND tahun_kontrol = '$year' 
-                      AND $idKolom != '$id_kontrol') as total_other_kontrol
-                     FROM $table kb
-                     WHERE kb.$idKolom = '$id_kontrol'";
-    
-    $result_kontrol = mysqli_query($conn, $query_kontrol);
-
-    if (!$result_kontrol || mysqli_num_rows($result_kontrol) === 0) {
-        $_SESSION['error_message'] = "Data kontrol barang tidak ditemukan!";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    $data_kontrol = mysqli_fetch_assoc($result_kontrol);
-    $total_other_kontrol = (int) ($data_kontrol['total_other_kontrol'] ?? 0);
-    
-    // Ambil total jumlah dari database (jumlah yang sudah terkontrol)
-    $query_total = "SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) as total_database
-                    FROM $table 
-                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}'
-                    AND tahun_kontrol = '$year'";
-    
-    $result_total = mysqli_query($conn, $query_total);
-    $row_total = mysqli_fetch_assoc($result_total);
-    $total_database = (int) ($row_total['total_database'] ?? 0);
-
-    // Validasi setiap input jumlah tidak boleh negatif
-    if ($jumlah_baik < 0 || $jumlah_rusak < 0 || $jumlah_pindah < 0 || $jumlah_hilang < 0) {
-        $_SESSION['error_message'] = "Jumlah barang tidak boleh negatif!";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    // Validasi total kontrol tidak boleh 0
-    if ($total_kontrol === 0) {
-        $_SESSION['error_message'] = "Total jumlah kontrol tidak boleh 0";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    // Validasi total dengan jumlah yang sudah ada di database
-    $new_total = $total_other_kontrol + $total_kontrol;
-    
-    if ($new_total < $total_database) {
-        $_SESSION['error_message'] = "Total kontrol ($new_total) kurang dari jumlah yang harus dikontrol ($total_database)!";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    if ($new_total > $total_database) {
-        $_SESSION['error_message'] = "Total kontrol ($new_total) melebihi jumlah yang harus dikontrol ($total_database)!";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
-    // Proses update data setelah semua validasi berhasil
-    $query = "UPDATE $table SET 
+    $query = "UPDATE kontrol_barang_cawu_tiga SET 
               tanggal_kontrol = '$tanggal_kontrol',
-              tahun_kontrol = '$year',
+              tahun_kontrol = '$tahun',
               jumlah_baik = '$jumlah_baik',
               jumlah_rusak = '$jumlah_rusak',
               jumlah_pindah = '$jumlah_pindah',
               jumlah_hilang = '$jumlah_hilang'
-              WHERE $idKolom = '$id_kontrol'";
+              WHERE id_kontrol_barang_cawu_tiga = '$id_kontrol'";
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Kontrol barang berhasil diubah!";
@@ -274,6 +207,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     header("Location: kontrolBarangCawuTiga.php");
     exit();
 }
+
 
 // Proses penghapusan kontrol barang
 if (isset($_GET['delete'])) {

@@ -42,28 +42,30 @@ if (isset($_POST['tambahPenerimaan'])) {
 
         $id_departemen = $permintaan_data['id_departemen'];
         $nama_barang = $permintaan_data['nama_barang'];
-        $jumlah = $permintaan_data['kebutuhan_qty'];
+        $merk = $permintaan_data['merk'];
+        $jumlah = $permintaan_data['jumlah_kebutuhan'];
+        $satuan = $permintaan_data['satuan'];
+        $sumber_penerimaan = 'Permintaan';
 
         // Insert data ke penerimaan_barang
-        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, tanggal_terima, jumlah, satuan, status) 
-                  VALUES ('$id_permintaan', '$id_departemen', '$nama_barang', '$tanggal_terima', '$jumlah', '$satuan', '$status')";
-
-        mysqli_query($conn, $query);
-        $_SESSION['success_message'] = "Penerimaan barang berhasil ditambahkan!";
+        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, status, sumber_penerimaan) 
+                  VALUES ('$id_permintaan', '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$status', '$sumber_penerimaan')";
 
     } else {
         // Input manual
         $nama_barang = $_POST['nama_barang'];
+        $merk = $_POST['merk'];
         $id_departemen = $_POST['id_departemen'];
         $jumlah = $_POST['jumlah'];
+        $sumber_penerimaan = 'Pengadaan Kantor';
 
-        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, tanggal_terima, jumlah, satuan, status) 
-                  VALUES (NULL, '$id_departemen', '$nama_barang', '$tanggal_terima', '$jumlah', '$satuan', '$status')";
-
-        mysqli_query($conn, $query);
-        $_SESSION['success_message'] = "Penerimaan barang berhasil ditambahkan!";
+        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, status, sumber_penerimaan) 
+                  VALUES (NULL, '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$status', '$sumber_penerimaan')";
     }
 
+    mysqli_query($conn, $query);
+    $_SESSION['success_message'] = "Penerimaan barang berhasil ditambahkan!";
+    
     header("Location: penerimaanBarang.php");
     exit();
 }

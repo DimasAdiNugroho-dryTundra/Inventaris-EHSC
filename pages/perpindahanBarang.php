@@ -92,6 +92,7 @@ require('../layouts/header.php');
                                         <th class="text-center align-middle">No</th>
                                         <th class="text-center align-middle">Kode Inventaris</th>
                                         <th class="text-center align-middle">Nama Barang</th>
+                                        <th class="text-center align-middle">Ruangan</th>
                                         <th class="text-center align-middle">Tanggal Perpindahan</th>
                                         <th class="text-center align-middle">Cawu</th>
                                         <th class="text-center align-middle">Jumlah Perpindahan</th>
@@ -108,6 +109,7 @@ require('../layouts/header.php');
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_ruangan']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['tanggal_perpindahan']; ?>
                                         </td>
                                         <td class="text-center align-middle"><?php echo $row['cawu']; ?></td>
@@ -160,6 +162,21 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <label class="form-label">Nama Barang</label>
                                                 <input type="text" class="form-control bg-light" name="nama_barang"
                                                     value="<?php echo $row['nama_barang']; ?>" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Ruangan Tujuan</label>
+                                                <select name="id_ruangan" class="form-select" required>
+                                                    <option value="">Pilih Ruangan</option>
+                                                    <?php
+                                                    $ruangan_query = "SELECT * FROM ruangan ORDER BY nama_ruangan ASC";
+                                                    $ruangan_result = mysqli_query($conn, $ruangan_query);
+                                                    while ($ruangan = mysqli_fetch_assoc($ruangan_result)) {
+                                                        $selected = ($ruangan['id_ruangan'] == $row['id_ruangan']) ? 'selected' : '';
+                                                        echo "<option value='" . $ruangan['id_ruangan'] . "' " . $selected . ">" 
+                                                            . $ruangan['nama_ruangan'] . "</option>";
+                                                    }
+                                                    ?>
+                                                </select>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Perpindahan</label>
@@ -236,17 +253,17 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     onchange="fillPerpindahanData(this)">
                                                     <option value="">Pilih Barang</option>
                                                     <?php
-                            $barang = getPerpindahanBarang($conn);
-                            while ($row = mysqli_fetch_assoc($barang)) {
-                                echo "<option value='{$row['id_inventaris']}' 
-                                            data-tanggal='{$row['tanggal_kontrol']}'
-                                            data-cawu='{$row['cawu']}'
-                                            data-jumlah='{$row['jumlah_pindah']}'
-                                            data-tahun='" . date('Y', strtotime($row['tanggal_kontrol'])) . "'>
-                                        {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['cawu']}  - " . date('Y', strtotime($row['tanggal_kontrol'])) . " - {$row['jumlah_pindah']} pindah
-                                    </option>";
-                            }
-                            ?>
+                                                    $barang = getPerpindahanBarang($conn);
+                                                    while ($row = mysqli_fetch_assoc($barang)) {
+                                                        echo "<option value='{$row['id_inventaris']}' 
+                                                                    data-tanggal='{$row['tanggal_kontrol']}'
+                                                                    data-cawu='{$row['cawu']}'
+                                                                    data-jumlah='{$row['jumlah_pindah']}'
+                                                                    data-tahun='" . date('Y', strtotime($row['tanggal_kontrol'])) . "'>
+                                                                {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['cawu']}  - " . date('Y', strtotime($row['tanggal_kontrol'])) . " - {$row['jumlah_pindah']} pindah
+                                                            </option>";
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
@@ -264,6 +281,19 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <label class="form-label">Jumlah Perpindahan</label>
                                                 <input type="number" class="form-control bg-light"
                                                     name="jumlah_perpindahan" id="jumlah_perpindahan" required readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Ruangan</label>
+                                                <select name="id_ruangan" class="form-select" required>
+                                                    <option value="">Pilih Ruangan</option>
+                                                    <?php
+                                                    $ruangan_query = "SELECT * FROM ruangan ORDER BY nama_ruangan ASC";
+                                                    $ruangan_result = mysqli_query($conn, $ruangan_query);
+                                                    while ($ruangan = mysqli_fetch_assoc($ruangan_result)) {
+                                                        echo "<option value='" . $ruangan['id_ruangan'] . "'>" . $ruangan['nama_ruangan'] . "</option>";
+                                                    }
+                                                    ?>
+                                                </select>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>

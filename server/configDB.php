@@ -2,7 +2,7 @@
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
-define('DB_NAME', 'inventaris_ehsc_rev4');
+define('DB_NAME', 'inventaris_ehsc_rev5');
 
 $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
