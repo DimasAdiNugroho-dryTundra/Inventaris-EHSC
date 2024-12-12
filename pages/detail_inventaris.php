@@ -10,20 +10,25 @@ $id_inventaris = $_GET['id'] ?? '';
 
 // Query untuk mengambil data inventaris dan barang yang terkait
 $query = "SELECT 
-        i.jumlah_awal,
-        i.kode_inventaris,
-        i.satuan,
-        d.nama_departemen, 
-        k.nama_kategori,
-        CASE 
-            WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
-            ELSE i.nama_barang 
-        END as nama_barang
-    FROM inventaris i
-    JOIN departemen d ON i.id_departemen = d.id_departemen
-    JOIN kategori k ON i.id_kategori = k.id_kategori
-    LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
-    WHERE i.id_inventaris = '$id_inventaris'";
+            i.jumlah_awal,
+            i.kode_inventaris,
+            i.satuan,
+            i.tanggal_perolehan,
+            i.jumlah_akhir,
+            i.sumber_inventaris,
+            d.nama_departemen, 
+            k.nama_kategori,
+            r.nama_ruangan,
+            CASE 
+                WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
+                ELSE i.nama_barang 
+            END as nama_barang
+        FROM inventaris i
+        JOIN departemen d ON i.id_departemen = d.id_departemen
+        JOIN kategori k ON i.id_kategori = k.id_kategori
+        JOIN ruangan r ON i.id_ruangan = r.id_ruangan
+        LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
+        WHERE i.id_inventaris = '$id_inventaris'";  
 
 $result = mysqli_query($conn, $query);
 $inventaris = mysqli_fetch_assoc($result);
@@ -91,12 +96,20 @@ foreach ($cawu_queries as $query) {
                                                     </td>
                                                 </tr>
                                                 <tr>
+                                                    <th>Tanggal Perolehan</th>
+                                                    <td>: <?php echo $inventaris['tanggal_perolehan']; ?></td>
+                                                </tr>
+                                                <tr>
                                                     <th>Nama Barang</th>
                                                     <td>: <?php echo $inventaris['nama_barang']; ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th>Departemen</th>
                                                     <td>: <?php echo $inventaris['nama_departemen']; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Ruangan</th>
+                                                    <td>: <?php echo $inventaris['nama_ruangan']; ?></td>
                                                 </tr>
                                                 <tr>
                                                     <th>Kategori</th>
@@ -108,10 +121,20 @@ foreach ($cawu_queries as $query) {
                                                         <?php echo $inventaris['jumlah_awal'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <th>Jumlah Akhir</th>
+                                                    <td>:
+                                                        <?php echo $inventaris['jumlah_akhir'] . ' ' . ($inventaris['satuan'] ?? 'unit'); ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Sumber Inventaris</th>
+                                                    <td>: <?php echo $inventaris['sumber_inventaris']; ?></td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div class="col-md-6 text-center">
-                                            <!-- QR Code section -->
+                                            <!-- QR Code -->
                                             <div class="mb-4">
                                                 <h6>QR Code</h6>
                                                 <?php if (isset($inventaris['kode_inventaris'])): ?>

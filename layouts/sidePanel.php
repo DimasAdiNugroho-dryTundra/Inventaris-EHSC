@@ -33,7 +33,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </li>
         <li class="menu-item <?php echo ($current_page == 'ruangan.php') ? 'active' : ''; ?>">
             <a href="ruangan.php" class="menu-link">
-                <i class="menu-icon tf-icons ti ti-mushroom"></i>
+                <i class="menu-icon tf-icons ti ti-door"></i>
                 Ruangan
             </a>
         </li>

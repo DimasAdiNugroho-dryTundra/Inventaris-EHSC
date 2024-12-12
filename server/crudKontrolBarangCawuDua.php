@@ -22,10 +22,12 @@ $query = "SELECT kb.*,
           i.nama_barang,
           i.merk,
           i.jumlah_akhir,
-          u.nama as nama_petugas 
+          u.nama as nama_petugas,
+          r.nama_ruangan 
           FROM $table kb 
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
           JOIN user u ON kb.id_user = u.id_user 
+          JOIN ruangan r ON i.id_ruangan = r.id_ruangan
           WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%' OR i.merk LIKE '%$search%') 
           AND YEAR(kb.tanggal_kontrol) = '$tahun'
           ORDER BY kb.$idKolom DESC 
@@ -53,15 +55,17 @@ function getAvailableInventaris($conn, $tahun, $table)
                 i.merk, 
                 i.jumlah_akhir AS jumlah,
                 i.satuan,
+                r.nama_ruangan,
                 IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
                          FROM $table 
                          WHERE id_inventaris = i.id_inventaris 
                          AND YEAR(tanggal_kontrol) = '$tahun'), 0) AS jumlah_terkontrol
-              FROM inventaris i 
+              FROM inventaris i
+              LEFT JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
               WHERE (i.jumlah_akhir - IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
-                                                 FROM $table 
-                                                 WHERE id_inventaris = i.id_inventaris 
-                                                 AND YEAR(tanggal_kontrol) = '$tahun'), 0)) > 0
+                                               FROM $table 
+                                               WHERE id_inventaris = i.id_inventaris 
+                                               AND YEAR(tanggal_kontrol) = '$tahun'), 0)) > 0
               AND i.jumlah_akhir > 0
               AND (
                   (YEAR(i.tanggal_perolehan) < '$tahun') OR 

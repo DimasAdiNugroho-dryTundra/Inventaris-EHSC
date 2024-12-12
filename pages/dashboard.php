@@ -13,25 +13,45 @@ $resultInventarisTersedia = mysqli_query($conn, $queryInventarisTersedia);
 $rowInventarisTersedia = mysqli_fetch_assoc($resultInventarisTersedia);
 $totalInventarisTersedia = $rowInventarisTersedia['total_inventaris'];
 
-// Query untuk menghitung jumlah kerusakan barang
-$queryKerusakan = "SELECT COUNT(*) as total_kerusakan FROM kerusakan_barang";
+$tahun_sekarang = date('Y');
+$jam = date('H');
+
+// Query untuk menghitung jumlah kerusakan barang yang belum dilaporkan
+$queryKerusakan = "SELECT 
+                    (
+                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_satu WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
+                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_dua WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
+                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_tiga WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) -
+                        COALESCE((SELECT SUM(jumlah_kerusakan) FROM kerusakan_barang WHERE YEAR(tanggal_kerusakan) = $tahun_sekarang), 0)
+                    ) as total_belum_dilaporkan";
 $resultKerusakan = mysqli_query($conn, $queryKerusakan);
 $rowKerusakan = mysqli_fetch_assoc($resultKerusakan);
-$totalKerusakan = $rowKerusakan['total_kerusakan'];
+$totalKerusakanBelumDilaporkan = $rowKerusakan['total_belum_dilaporkan'];
 
-// Query untuk menghitung jumlah perpindahan barang
-$queryPerpindahan = "SELECT COUNT(*) as total_perpindahan FROM perpindahan_barang";
+// Query untuk menghitung jumlah perpindahan barang yang belum dilaporkan
+$queryPerpindahan = "SELECT 
+                    (
+                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_satu WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
+                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_dua WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
+                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_tiga WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) -
+                        COALESCE((SELECT SUM(jumlah_perpindahan) FROM perpindahan_barang WHERE YEAR(tanggal_perpindahan) = $tahun_sekarang), 0)
+                    ) as total_belum_dilaporkan";
 $resultPerpindahan = mysqli_query($conn, $queryPerpindahan);
 $rowPerpindahan = mysqli_fetch_assoc($resultPerpindahan);
-$totalPerpindahan = $rowPerpindahan['total_perpindahan'];
+$totalPerpindahanBelumDilaporkan = $rowPerpindahan['total_belum_dilaporkan'];
 
-// Query untuk menghitung jumlah kehilangan barang
-$queryKehilangan = "SELECT COUNT(*) as total_kehilangan FROM kehilangan_barang";
+// Query untuk menghitung jumlah kehilangan barang yang belum dilaporkan
+$queryKehilangan = "SELECT 
+                    (
+                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_satu WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
+                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_dua WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
+                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_tiga WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) -
+                        COALESCE((SELECT SUM(jumlah_kehilangan) FROM kehilangan_barang WHERE YEAR(tanggal_kehilangan) = $tahun_sekarang), 0)
+                    ) as total_belum_dilaporkan";
 $resultKehilangan = mysqli_query($conn, $queryKehilangan);
 $rowKehilangan = mysqli_fetch_assoc($resultKehilangan);
-$totalKehilangan = $rowKehilangan['total_kehilangan'];
+$totalKehilanganBelumDilaporkan = $rowKehilangan['total_belum_dilaporkan'];
 
-$current_year = date('Y');
 $query_kontrol = "
     (SELECT 
         'Cawu 1' as periode,
@@ -40,7 +60,7 @@ $query_kontrol = "
         SUM(jumlah_hilang) as hilang,
         SUM(jumlah_pindah) as pindah
     FROM kontrol_barang_cawu_satu 
-    WHERE YEAR(tanggal_kontrol) = $current_year)
+    WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
     UNION ALL
     (SELECT 
         'Cawu 2' as periode,
@@ -49,7 +69,7 @@ $query_kontrol = "
         SUM(jumlah_hilang) as hilang,
         SUM(jumlah_pindah) as pindah
     FROM kontrol_barang_cawu_dua
-    WHERE YEAR(tanggal_kontrol) = $current_year)
+    WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
     UNION ALL
     (SELECT 
         'Cawu 3' as periode,
@@ -58,7 +78,7 @@ $query_kontrol = "
         SUM(jumlah_hilang) as hilang,
         SUM(jumlah_pindah) as pindah
     FROM kontrol_barang_cawu_tiga
-    WHERE YEAR(tanggal_kontrol) = $current_year)
+    WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
     ORDER BY periode
 ";
 
@@ -73,26 +93,55 @@ while ($row = mysqli_fetch_assoc($result)) {
 <!-- Layout wrapper -->
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
-        <!-- Menu -->
         <?php
         require('../layouts/sidePanel.php');
         ?>
-        <!-- / Menu -->
-
-        <!-- Layout container -->
         <div class="layout-page">
-            <!-- Navbar -->
-
             <?php require('../layouts/navbar.php'); ?>
-
-            <!-- / Navbar -->
-
-            <!-- Content wrapper -->
             <div class="content-wrapper">
-                <!-- Content -->
-
                 <div class="container-xxl flex-grow-1 container-p-y">
-                    <class="row row-cols-1 row-cols-md-3 g-6 mb-12">
+                    <!-- User Card -->
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="user-avatar-section text-center">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <img class="img-fluid rounded my-4"
+                                            src="../upload/user/<?php echo ($user['foto']); ?>" height="100" width="100"
+                                            alt="User avatar" />
+                                        <div class="user-info text-center mb-3">
+                                            <h4 class="mb-2">Selamat Datang, <?php echo ($user['nama']); ?>!</h4>
+                                            <span
+                                                class="badge bg-label-primary"><?php echo ($user['jabatan']); ?></span>
+                                        </div>
+                                        <?php
+                                            $ucapan = '';
+                                            if ($jam >= 5 && $jam < 12) {
+                                                $ucapan = "Selamat Pagi";
+                                            } elseif ($jam >= 12 && $jam < 15) {
+                                                $ucapan = "Selamat Siang";
+                                            } elseif ($jam >= 15 && $jam < 18) {
+                                                $ucapan = "Selamat Sore";
+                                            } else {
+                                                $ucapan = "Selamat Malam";
+                                            }
+                                            ?>
+                                        <div class="welcome-message text-center">
+                                            <p class="mb-0"><?php echo $ucapan; ?> dan selamat bekerja!</p>
+                                            <!-- <p class="text-muted mt-2">
+                                                    "Sistem Informasi Inventaris siap membantu Anda mengelola dan
+                                                    memantau
+                                                    aset dengan lebih efisien. Jika ada pertanyaan atau masalah,
+                                                    jangan ragu untuk menghubungi admin."
+                                                </p> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row row-cols-1 row-cols-md-3 g-6 mb-12">
                         <!-- Card Inventaris -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="card h-100">
@@ -113,10 +162,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <!-- Card Kerusakan -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="card h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="card-body d-flex justify-content-between align-items-center p-4">
                                     <div class="card-title mb-0">
-                                        <h5 class="mb-1"><?php echo $totalKerusakan; ?></h5>
-                                        <p class="mb-0">Kerusakan Barang</p>
+                                        <h5 class="mb-1"><?php echo $totalKerusakanBelumDilaporkan; ?></h5>
+                                        <p class="mb-0">Kerusakan Belum Dilaporkan</p>
                                     </div>
                                     <div class="card-icon">
                                         <span class="badge bg-label-danger rounded p-2">
@@ -130,10 +179,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <!-- Card Perpindahan -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="card h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="card-body d-flex justify-content-between align-items-center p-4">
                                     <div class="card-title mb-0">
-                                        <h5 class="mb-1"><?php echo $totalPerpindahan; ?></h5>
-                                        <p class="mb-0">Perpindahan Barang</p>
+                                        <h5 class="mb-1"><?php echo $totalPerpindahanBelumDilaporkan; ?></h5>
+                                        <p class="mb-0">Perpindahan Belum Dilaporkan</p>
                                     </div>
                                     <div class="card-icon">
                                         <span class="badge bg-label-warning rounded p-2">
@@ -147,10 +196,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <!-- Card Kehilangan -->
                         <div class="col-sm-6 col-lg-3">
                             <div class="card h-100">
-                                <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="card-body d-flex justify-content-between align-items-center p-4">
                                     <div class="card-title mb-0">
-                                        <h5 class="mb-1"><?php echo $totalKehilangan; ?></h5>
-                                        <p class="mb-0">Kehilangan Barang</p>
+                                        <h5 class="mb-1"><?php echo $totalKehilanganBelumDilaporkan; ?></h5>
+                                        <p class="mb-0">Kehilangan Belum Dilaporkan</p>
                                     </div>
                                     <div class="card-icon">
                                         <span class="badge bg-label-danger rounded p-2">
@@ -165,12 +214,12 @@ while ($row = mysqli_fetch_assoc($result)) {
                             <div class="card mb-6">
                                 <div class="card-header d-flex justify-content-between">
                                     <div class="card-title m-0">
-                                        <h5 class="mb-1">Laporan Inventaris</h5>
+                                        <h5 class="mb-1">Status Inventaris</h5>
                                         <p class="card-subtitle">Ringkasan Status Inventaris
-                                            <?php echo $current_year; ?>
+                                            <?php echo $tahun_sekarang; ?>
                                         </p>
                                     </div>
-                                    <div class="dropdown">
+                                    <!-- <div class="dropdown">
                                         <button
                                             class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1"
                                             type="button" id="inventoryReportsTabsId" data-bs-toggle="dropdown"
@@ -182,7 +231,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             <a class="dropdown-item" href="javascript:void(0);">Lihat Detail</a>
                                             <a class="dropdown-item" href="javascript:void(0);">Cetak Laporan</a>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="card-body">
                                     <ul class="nav nav-tabs widget-nav-tabs pb-8 gap-4 mx-1 d-flex flex-nowrap"
@@ -248,186 +297,145 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- User Card -->
-                            <div class="col-lg-12">
-                                <div class="card mb-6">
-                                    <div class="card-body pt-12">
-                                        <div class="user-avatar-section">
-                                            <div class="d-flex align-items-center flex-column">
-                                                <img class="img-fluid rounded mb-4"
-                                                    src="../upload/user/<?php echo ($user['foto']); ?>" height="120"
-                                                    width="120" alt="User avatar" />
-                                                <div class="user-info text-center">
-                                                    <h5><?php echo ($user['nama']); ?></h5>
-                                                    <span
-                                                        class="badge bg-label-secondary"><?php echo ($user['jabatan']); ?></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <h5 class="pb-4 border-bottom mb-4">Details</h5>
-                                        <div class="info-container">
-                                            <ul class="list-unstyled mb-6">
-                                                <li class="mb-2">
-                                                    <span class="h6">Username:</span>
-                                                    <span><?php echo ($user['username']); ?></span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <span class="h6">Email:</span>
-                                                    <span><?php echo ($user['email']); ?></span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <span class="h6">Status:</span>
-                                                    <span><?php echo $user['hak_akses'] == 0 ? 'Aktif' : 'Non Aktif'; ?></span>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <span class="h6">Jabatan:</span>
-                                                    <span><?php echo ($user['jabatan']); ?></span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="content-backdrop fade"></div>
+                    </div>
+                    <!-- Content wrapper -->
                 </div>
                 <?php
                 require('../layouts/footer.php');
                 ?>
-                <!-- Content wrapper -->
+                <!-- / Layout page -->
             </div>
-            <!-- / Layout page -->
+
+            <!-- Overlay -->
+            <div class="layout-overlay layout-menu-toggle"></div>
+
+            <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+            <div class="drag-target"></div>
         </div>
+        <!-- / Layout wrapper -->
 
-        <!-- Overlay -->
-        <div class="layout-overlay layout-menu-toggle"></div>
+        <?php
+        require('../layouts/assetsFooter.php')
+            ?>
 
-        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
-        <div class="drag-target"></div>
-    </div>
-    <!-- / Layout wrapper -->
+        <script>
+        // Konversi data PHP ke JavaScript
+        const dataKontrol = <?php echo json_encode($data_kontrol); ?>;
 
-    <?php
-    require('../layouts/assetsFooter.php')
-        ?>
+        // Fungsi untuk memformat data untuk grafik
+        function formatDataForChart(data, kondisi) {
+            return data.map(item => ({
+                x: item.periode,
+                y: parseInt(item[kondisi]) || 0
+            }));
+        }
 
-    <script>
-    // Konversi data PHP ke JavaScript
-    const dataKontrol = <?php echo json_encode($data_kontrol); ?>;
-
-    // Fungsi untuk memformat data untuk grafik
-    function formatDataForChart(data, kondisi) {
-        return data.map(item => ({
-            x: item.periode,
-            y: parseInt(item[kondisi]) || 0
-        }));
-    }
-
-    // Fungsi untuk inisialisasi grafik
-    function initializeCharts() {
-        const commonOptions = {
-            chart: {
-                height: 350,
-                type: 'bar',
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 8,
-                    columnWidth: '45%',
-                    distributed: true,
-                    endingShape: 'rounded'
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function(val) {
-                    return val || '0';
+        // Fungsi untuk inisialisasi grafik
+        function initializeCharts() {
+            const commonOptions = {
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    toolbar: {
+                        show: false
+                    }
                 },
-                offsetY: -20,
-                style: {
-                    fontSize: '12px',
-                    colors: ["#697a8d"]
-                }
-            },
-            xaxis: {
-                categories: ['Cawu 1', 'Cawu 2', 'Cawu 3'],
-                axisBorder: {
-                    show: false
+                plotOptions: {
+                    bar: {
+                        borderRadius: 8,
+                        columnWidth: '45%',
+                        distributed: true,
+                        endingShape: 'rounded'
+                    }
                 },
-                axisTicks: {
-                    show: false
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val || '0';
+                    },
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ["#697a8d"]
+                    }
+                },
+                xaxis: {
+                    categories: ['Cawu 1', 'Cawu 2', 'Cawu 3'],
+                    axisBorder: {
+                        show: false
+                    },
+                    axisTicks: {
+                        show: false
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: 'Jumlah Barang'
+                    }
+                },
+                grid: {
+                    borderColor: '#f0f0f0',
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
+                    }
                 }
-            },
-            yaxis: {
-                title: {
-                    text: 'Jumlah Barang'
-                }
-            },
-            grid: {
-                borderColor: '#f0f0f0',
-                padding: {
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0
-                }
-            }
-        };
+            };
 
-        // Grafik Kondisi Baik
-        const chartBaik = new ApexCharts(document.querySelector("#chartKondisiBaik"), {
-            ...commonOptions,
-            series: [{
-                name: 'Barang Baik',
-                data: formatDataForChart(dataKontrol, 'baik')
-            }],
-            colors: ['#28C76F', '#1CAB5E', '#119D4D'], // Gradasi warna hijau
+            // Grafik Kondisi Baik
+            const chartBaik = new ApexCharts(document.querySelector("#chartKondisiBaik"), {
+                ...commonOptions,
+                series: [{
+                    name: 'Barang Baik',
+                    data: formatDataForChart(dataKontrol, 'baik')
+                }],
+                colors: ['#28C76F', '#1CAB5E', '#119D4D'], // Gradasi warna hijau
+            });
+
+            // Grafik Kondisi Rusak
+            const chartRusak = new ApexCharts(document.querySelector("#chartKondisiRusak"), {
+                ...commonOptions,
+                series: [{
+                    name: 'Barang Rusak',
+                    data: formatDataForChart(dataKontrol, 'rusak')
+                }],
+                colors: ['#FF9F43', '#FF8619', '#FF6B00'], // Gradasi warna oranye
+            });
+
+            // Grafik Kondisi Hilang
+            const chartHilang = new ApexCharts(document.querySelector("#chartKondisiHilang"), {
+                ...commonOptions,
+                series: [{
+                    name: 'Barang Hilang',
+                    data: formatDataForChart(dataKontrol, 'hilang')
+                }],
+                colors: ['#EA5455', '#E42728', '#C81E1F'], // Gradasi warna merah
+            });
+
+            // Grafik Kondisi Pindah
+            const chartPindah = new ApexCharts(document.querySelector("#chartKondisiPindah"), {
+                ...commonOptions,
+                series: [{
+                    name: 'Barang Pindah',
+                    data: formatDataForChart(dataKontrol, 'pindah')
+                }],
+                colors: ['#7367F0', '#5E52EC', '#483BE8'], // Gradasi warna ungu
+            });
+
+            // Render semua grafik
+            chartBaik.render();
+            chartRusak.render();
+            chartHilang.render();
+            chartPindah.render();
+        }
+
+        // Panggil fungsi saat dokumen siap
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
         });
-
-        // Grafik Kondisi Rusak
-        const chartRusak = new ApexCharts(document.querySelector("#chartKondisiRusak"), {
-            ...commonOptions,
-            series: [{
-                name: 'Barang Rusak',
-                data: formatDataForChart(dataKontrol, 'rusak')
-            }],
-            colors: ['#FF9F43', '#FF8619', '#FF6B00'], // Gradasi warna oranye
-        });
-
-        // Grafik Kondisi Hilang
-        const chartHilang = new ApexCharts(document.querySelector("#chartKondisiHilang"), {
-            ...commonOptions,
-            series: [{
-                name: 'Barang Hilang',
-                data: formatDataForChart(dataKontrol, 'hilang')
-            }],
-            colors: ['#EA5455', '#E42728', '#C81E1F'], // Gradasi warna merah
-        });
-
-        // Grafik Kondisi Pindah
-        const chartPindah = new ApexCharts(document.querySelector("#chartKondisiPindah"), {
-            ...commonOptions,
-            series: [{
-                name: 'Barang Pindah',
-                data: formatDataForChart(dataKontrol, 'pindah')
-            }],
-            colors: ['#7367F0', '#5E52EC', '#483BE8'], // Gradasi warna ungu
-        });
-
-        // Render semua grafik
-        chartBaik.render();
-        chartRusak.render();
-        chartHilang.render();
-        chartPindah.render();
-    }
-
-    // Panggil fungsi saat dokumen siap
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeCharts();
-    });
-    </script>
+        </script>

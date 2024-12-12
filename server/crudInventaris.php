@@ -73,7 +73,6 @@ function generateKodeInventaris($conn, $departemen_kode, $kategori_kode)
 {
     $year = date('Y');
 
-    // Ambil nomor urut terakhir untuk kombinasi departemen dan kategori ini
     $query = "SELECT MAX(CAST(SUBSTRING_INDEX(kode_inventaris, '/', -1) AS UNSIGNED)) as last_number 
               FROM inventaris 
               WHERE kode_inventaris LIKE '$departemen_kode/$kategori_kode/$year/%'";

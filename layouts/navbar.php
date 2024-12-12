@@ -21,11 +21,10 @@ if (!file_exists($photo_path) || empty($user['foto'])) {
         <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
             <ul class="navbar-nav flex-row align-items-center ms-auto">
 
-                <span class="ms-2 m-1">Hi, <?php echo $user['nama']; ?></span> <!-- Added user name -->
+                <span class="ms-2 m-1"><?php echo $user['nama']; ?></span>
 
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                    <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);"
-                        data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown">
                         <div class="avatar avatar-online">
                             <img src="<?php echo $photo_path; ?>" alt class="rounded-circle" />
                         </div>
@@ -46,32 +45,6 @@ if (!file_exists($photo_path) || empty($user['foto'])) {
                                     </div>
                                 </div>
                             </a>
-                        </li>
-                        <li>
-                            <div class="dropdown-divider my-1 mx-n2"></div>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="pages-profile-user.html">
-                                <i class="ti ti-user me-3 ti-md"></i>
-                                <span class="align-middle">My Profile</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="pages-account-settings-account.html">
-                                <i class="ti ti-settings me-3 ti-md"></i>
-                                <span class="align-middle">Settings</span>
-                            </a>
-                        </li>
-                        <li>
-                            <div class="dropdown-divider my-1"></div>
-                        </li>
-                        <li>
-                            <div class="d-grid px-2 pt-2 pb-1">
-                                <a class="btn btn-sm btn-danger d-flex" href="../server/logout.php">
-                                    <span class="align-middle me-2">Logout</span>
-                                    <i class="ti ti-logout ti-md"></i>
-                                </a>
-                            </div>
                         </li>
                     </ul>
                 </li>

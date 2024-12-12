@@ -11,12 +11,14 @@ $tahunSekarang = date('Y');
 $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5); // Tahun dari 5 tahun lalu hingga 5 tahun ke depan
 
 // Query untuk mengambil data kontrol barang
-$query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, i.merk, i.jumlah_akhir, u.nama as nama_petugas 
+$query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, i.merk, i.jumlah_akhir, u.nama as nama_petugas,
+          r.nama_ruangan 
           FROM kontrol_barang_cawu_tiga kb 
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
           JOIN user u ON kb.id_user = u.id_user 
+          JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
           WHERE YEAR(kb.tanggal_kontrol) = '$tahun'
-          ORDER BY kb.id_kontrol_barang_cawu_tiga DESC";
+          ORDER BY kb.id_kontrol_barang_cawu_dua DESC";
 
 $result = mysqli_query($conn, $query);
 
@@ -144,7 +146,7 @@ $totalPages = ceil($totalRows / $limit);
                                         </form>
                                     </div>
                                 </div>
-                                <!-- Tampilkan informasi cawu dan tahun yang dipilih -->
+
                                 <div class="row p-3">
                                     <div class="col-md-12">
                                         <div class="alert alert-secondary" role="alert">
@@ -153,6 +155,7 @@ $totalPages = ceil($totalRows / $limit);
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="table-responsive text-nowrap">
                                     <table class="table table-hover table-sm">
                                         <thead class="table-light">
@@ -161,7 +164,8 @@ $totalPages = ceil($totalRows / $limit);
                                                 <th rowspan="2" class="text-center align-middle">Kode Inventaris</th>
                                                 <th rowspan="2" class="text-center align-middle">Barang</th>
                                                 <th rowspan="2" class="text-center align-middle">Tanggal</th>
-                                                <th colspan="4" class="text-center">Jumlah</th>
+                                                <th colspan="4" class="text-center align-middle">Jumlah</th>
+                                                <th rowspan="2" class="text-center align-middle">Petugas</th>
                                                 <th rowspan="2" class="text-center align-middle">Aksi</th>
                                             </tr>
                                             <tr>
@@ -176,35 +180,44 @@ $totalPages = ceil($totalRows / $limit);
                                             if ($totalRows > 0) {
                                                 $no = 1;
                                                 while ($row = mysqli_fetch_assoc($result)) {
-                                                    $tampil_nama_merk = $row['nama_barang'] . ($row['merk'] ? ' - ' . $row['merk'] : '');
+                                                    $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
                                             ?>
                                             <tr>
                                                 <td class="text-center align-middle"><?php echo $no++; ?></td>
                                                 <td class="text-center align-middle">
-                                                    <?php echo $row['kode_inventaris']; ?></td>
-                                                <td class="text-center align-middle"><?php echo $tampil_nama_merk; ?>
+                                                    <?php echo $row['kode_inventaris']; ?>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <?php echo $tampil_nama_merk_ruangan; ?>
                                                 </td>
                                                 <td class="text-center align-middle">
                                                     <?php echo date('d/m/Y', strtotime($row['tanggal_kontrol'])); ?>
                                                 </td>
-                                                <td class="text-center align-middle"><?php echo $row['jumlah_baik']; ?>
-                                                </td>
-                                                <td class="text-center align-middle"><?php echo $row['jumlah_rusak']; ?>
+                                                <td class="text-center align-middle">
+                                                    <?php echo $row['jumlah_baik']; ?>
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <?php echo $row['jumlah_pindah']; ?></td>
+                                                    <?php echo $row['jumlah_rusak']; ?>
+                                                </td>
                                                 <td class="text-center align-middle">
-                                                    <?php echo $row['jumlah_hilang']; ?></td>
+                                                    <?php echo $row['jumlah_pindah']; ?>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <?php echo $row['jumlah_hilang']; ?>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <?php echo $row['nama_petugas']; ?>
+                                                </td>
                                                 <td class="align-middle">
                                                     <div class="d-flex gap-2 justify-content-center">
                                                         <button type="button" class="btn btn-info btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#editModal<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>">
+                                                            data-bs-target="#editModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
                                                             Edit
                                                         </button>
                                                         <button type="button" class="btn btn-danger btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>">
+                                                            data-bs-target="#deleteModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
                                                             Hapus
                                                         </button>
                                                     </div>
@@ -249,8 +262,8 @@ $totalPages = ceil($totalRows / $limit);
                                                                     <label class="form-label">Inventaris</label>
                                                                     <input type="text" class="form-control bg-light"
                                                                         value="<?php 
-                                                                                $tampil_nama_merk = $row['nama_barang'] . ($row['merk'] ? ' - ' . $row['merk'] : '');
-                                                                                echo $tampil_nama_merk . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah terkontrol: ' . 
+                                                                                $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
+                                                                                echo $tampil_nama_merk_ruangan . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah terkontrol: ' . 
                                                                                     ($row['jumlah_baik'] + $row['jumlah_rusak'] + $row['jumlah_pindah'] + $row['jumlah_hilang']) . ')'; 
                                                                                 ?>" readonly>
                                                                 </div>
@@ -475,9 +488,9 @@ $totalPages = ceil($totalRows / $limit);
                                                         <?php
                                                         $result = getAvailableInventaris($conn, $tahun, 'kontrol_barang_cawu_tiga');
                                                         while ($row = mysqli_fetch_assoc($result)) {
-                                                            $tampil_nama_merk = $row['nama_barang'] . ($row['merk'] ? ' - ' . $row['merk'] : '');
-                                                            echo "<option value=\"{$row['id_inventaris']}\">{$tampil_nama_merk} (Kode: {$row['kode_inventaris']}, Jumlah: {$row['jumlah']})</option>";
-                                                        }
+                                                            $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
+                                                                echo "<option value=\"{$row['id_inventaris']}\">{$tampil_nama_merk_ruangan} (Kode: {$row['kode_inventaris']}, Jumlah: {$row['jumlah']})</option>";
+                                                            }
                                                         ?>
                                                     </select>
                                                 </div>

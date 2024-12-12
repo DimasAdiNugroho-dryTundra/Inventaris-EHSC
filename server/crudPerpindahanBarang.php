@@ -58,8 +58,29 @@ function getPerpindahanBarang($conn)
     return mysqli_query($conn, $query);
 }
 
+function generateKodeInventarisPindah($conn, $departemen_kode, $kategori_kode, $year)
+{
+    $query = "SELECT MAX(CAST(SUBSTRING_INDEX(kode_inventaris, '/', -1) AS UNSIGNED)) as angka_terakhir 
+              FROM inventaris 
+              WHERE kode_inventaris LIKE '$departemen_kode/$kategori_kode/$year/%'";
+
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    $angka_berikutnya = ($row['angka_terakhir'] ?? 0) + 1;
+
+    return sprintf(
+        "%s/%s/%s/%03d",
+        $departemen_kode,
+        $kategori_kode,
+        $year,
+        $angka_berikutnya
+    );
+}
+
+
 // Proses penambahan perpindahan barang
 if (isset($_POST['tambahPerpindahan'])) {
+    // Ambil data dari form
     $id_inventaris = $_POST['id_inventaris'];
     $id_ruangan = $_POST['id_ruangan'];
     $tanggal_perpindahan = $_POST['tanggal_perpindahan'];
@@ -67,7 +88,24 @@ if (isset($_POST['tambahPerpindahan'])) {
     $jumlah_perpindahan = $_POST['jumlah_perpindahan'];
     $keterangan = $_POST['keterangan'];
 
-    // 1. Insert ke tabel perpindahan_barang
+    // Get data inventaris yang akan dipindah
+    $query = "SELECT i.*, d.kode_departemen, k.kode_kategori 
+              FROM inventaris i
+              JOIN departemen d ON i.id_departemen = d.id_departemen
+              JOIN kategori k ON i.id_kategori = k.id_kategori
+              WHERE i.id_inventaris = '$id_inventaris'";
+    $result = mysqli_query($conn, $query);
+    $inventaris = mysqli_fetch_assoc($result);
+
+    // Generate kode inventaris baru
+    $kode_inventaris_baru = generateKodeInventarisPindah(
+        $conn,
+        $inventaris['kode_departemen'],
+        $inventaris['kode_kategori'],
+        date('Y') // Menggunakan tahun saat ini
+    );
+
+    // Insert ke tabel perpindahan_barang
     $query = "INSERT INTO perpindahan_barang (id_inventaris, id_ruangan, tanggal_perpindahan, 
               cawu, jumlah_perpindahan, keterangan)
               VALUES ('$id_inventaris', '$id_ruangan', '$tanggal_perpindahan', 
@@ -75,27 +113,32 @@ if (isset($_POST['tambahPerpindahan'])) {
     $result = mysqli_query($conn, $query);
 
     if ($result) {
-        // 2. Get data inventaris yang akan dipindah
-        $query = "SELECT * FROM inventaris WHERE id_inventaris = '$id_inventaris'";
-        $result = mysqli_query($conn, $query);
-        $inventaris = mysqli_fetch_assoc($result);
-
-        // 3. Insert inventaris baru dengan ruangan yang baru
-        $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, merk, id_departemen, 
-                  id_ruangan, id_kategori, tanggal_perolehan, jumlah_awal, jumlah_akhir, satuan, sumber_inventaris)
-                  VALUES (
-                      '{$inventaris['kode_inventaris']}',
-                      '{$inventaris['nama_barang']}',
-                      '{$inventaris['merk']}',
-                      '{$inventaris['id_departemen']}',
-                      '$id_ruangan',
-                      '{$inventaris['id_kategori']}',
-                      '{$inventaris['tanggal_perolehan']}',
-                      '$jumlah_perpindahan',
-                      '$jumlah_perpindahan',
-                      '{$inventaris['satuan']}',
-                      'Pindah Barang'
-                  )";
+        // Insert inventaris baru dengan ruangan yang baru
+        $query = "INSERT INTO inventaris (
+                    kode_inventaris, 
+                    nama_barang, 
+                    merk, 
+                    id_departemen, 
+                    id_ruangan, 
+                    id_kategori, 
+                    tanggal_perolehan, 
+                    jumlah_awal, 
+                    jumlah_akhir, 
+                    satuan, 
+                    sumber_inventaris
+                ) VALUES (
+                    '$kode_inventaris_baru',
+                    '{$inventaris['nama_barang']}',
+                    '{$inventaris['merk']}',
+                    '{$inventaris['id_departemen']}',
+                    '$id_ruangan',
+                    '{$inventaris['id_kategori']}',
+                    '{$inventaris['tanggal_perolehan']}',
+                    '$jumlah_perpindahan',
+                    '$jumlah_perpindahan',
+                    '{$inventaris['satuan']}',
+                    'Pindah Barang'
+                )";
         $result = mysqli_query($conn, $query);
 
         if ($result) {

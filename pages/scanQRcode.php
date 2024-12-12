@@ -39,19 +39,26 @@ function getDetailInventaris($kode)
 
     $kode = mysqli_real_escape_string($conn, $kode);
 
-    $query = "SELECT i.*, d.nama_departemen, k.nama_kategori,
-              CASE 
-                  WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
-                  ELSE i.nama_barang 
-              END as nama_barang,
-              i.jumlah_awal,
-              i.jumlah_akhir,
-              i.satuan
-              FROM inventaris i
-              JOIN departemen d ON i.id_departemen = d.id_departemen
-              JOIN kategori k ON i.id_kategori = k.id_kategori
-              LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
-              WHERE i.kode_inventaris = '$kode'";
+    $query = "SELECT i.*, 
+                d.nama_departemen, 
+                k.nama_kategori,
+                r.nama_ruangan,
+                i.sumber_inventaris,
+                CASE 
+                    WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
+                    ELSE i.nama_barang 
+                END as nama_barang,
+                i.merk,
+                i.jumlah_awal,
+                i.jumlah_akhir,
+                i.satuan,
+                i.tanggal_perolehan
+                FROM inventaris i
+                LEFT JOIN departemen d ON i.id_departemen = d.id_departemen
+                LEFT JOIN kategori k ON i.id_kategori = k.id_kategori
+                LEFT JOIN ruangan r ON i.id_ruangan = r.id_ruangan
+                LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
+                WHERE i.kode_inventaris = '$kode'";
 
     $result = mysqli_query($conn, $query);
 
@@ -103,7 +110,6 @@ function getDataKontrol($id_inventaris)
 
     return $cawu_data;
 }
-
 ?>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -277,6 +283,18 @@ function onScanSuccess(decodedText, decodedResult) {
                     <td>: <span id="kategori">Memuat...</span></td>
                 </tr>
                 <tr>
+                    <th>Ruangan</th>
+                    <td>: <span id="ruangan">Memuat...</span></td>
+                </tr>
+                <tr>
+                    <th>Sumber Inventaris</th>
+                    <td>: <span id="sumberInventaris">Memuat...</span></td>
+                </tr>
+                <tr>
+                    <th>Tanggal Perolehan</th>
+                    <td>: <span id="tanggalPerolehan">Memuat...</span></td>
+                </tr>
+                <tr>
                     <th>Jumlah Awal</th>
                     <td>: <span id="jumlahAwal">Memuat...</span></td>
                 </tr>
@@ -298,12 +316,22 @@ function onScanSuccess(decodedText, decodedResult) {
         })
         .then(data => {
             if (data.success) {
+                // Format tanggal
+                const tanggalPerolehan = new Date(data.data.tanggal_perolehan);
+                const formattedDate = tanggalPerolehan.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
                 // Update nilai-nilai dalam tabel
                 document.getElementById('namaBarang').textContent = data.data.nama_barang;
                 document.getElementById('departemen').textContent = data.data.nama_departemen;
                 document.getElementById('kategori').textContent = data.data.nama_kategori;
-                document.getElementById('jumlahAwal').textContent =
-                    `${data.data.jumlah_awal} ${data.data.satuan}`;
+                document.getElementById('ruangan').textContent = data.data.nama_ruangan;
+                document.getElementById('sumberInventaris').textContent = data.data.sumber_inventaris;
+                document.getElementById('tanggalPerolehan').textContent = formattedDate;
+                document.getElementById('jumlahAwal').textContent = `${data.data.jumlah_awal} ${data.data.satuan}`;
                 document.getElementById('jumlahAkhir').textContent =
                     `${data.data.jumlah_akhir} ${data.data.satuan}`;
 
