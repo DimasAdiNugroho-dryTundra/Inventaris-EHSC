@@ -70,89 +70,77 @@ if (isset($_POST['tambahPenerimaan'])) {
     exit();
 }
 
-// Proses update penerimaan barang
+// Proses edit
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_penerimaan = $_POST['id_penerimaan'];
     $tanggal_terima = $_POST['tanggal_terima'];
     $satuan = $_POST['satuan'];
     $status = $_POST['status'];
 
-    // Cek apakah dari permintaan atau input manual
-    $query_cek = "SELECT id_permintaan FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
-    $hasil_cek = mysqli_query($conn, $query_cek);
-    $data_penerimaan = mysqli_fetch_assoc($hasil_cek);
+    // Tidak bisa diedit jika sudah ada di daftar inventaris
+    $checkInventarisQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_penerimaan = $id_penerimaan";
+    $checkInventarisResult = mysqli_query($conn, $checkInventarisQuery);
+    $checkInventarisRow = mysqli_fetch_assoc($checkInventarisResult);
 
-    if ($data_penerimaan['id_permintaan']) {
-        // Update untuk data dari permintaan
-        $query = "UPDATE penerimaan_barang SET 
-                  tanggal_terima = '$tanggal_terima',
-                  satuan = '$satuan',
-                  status = '$status'
-                  WHERE id_penerimaan = $id_penerimaan";
+    if ($checkInventarisRow['count'] > 0) {
+        $_SESSION['error_message'] = "Data penerimaan barang tidak dapat diubah karena sudah ada di inventaris!";
     } else {
-        // Update untuk input manual
-        $nama_barang = $_POST['nama_barang'];
-        $id_departemen = $_POST['id_departemen'];
-        $jumlah = $_POST['jumlah'];
+        // Cek apakah dari permintaan atau input manual
+        $query_cek = "SELECT id_permintaan FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
+        $hasil_cek = mysqli_query($conn, $query_cek);
+        $data_penerimaan = mysqli_fetch_assoc($hasil_cek);
 
-        $query = "UPDATE penerimaan_barang SET 
-                  nama_barang = '$nama_barang',
-                  id_departemen = $id_departemen,
-                  tanggal_terima = '$tanggal_terima',
-                  jumlah = $jumlah,
-                  satuan = '$satuan',
-                  status = '$status'
-                  WHERE id_penerimaan = $id_penerimaan";
-    }
+        if ($data_penerimaan['id_permintaan']) {
+            // Edit untuk data dari permintaan
+            $query = "UPDATE penerimaan_barang SET 
+                      tanggal_terima = '$tanggal_terima',
+                      satuan = '$satuan',
+                      status = '$status'
+                      WHERE id_penerimaan = $id_penerimaan";
+        } else {
+            // Edit untuk input manual
+            $nama_barang = $_POST['nama_barang'];
+            $id_departemen = $_POST['id_departemen'];
+            $jumlah = $_POST['jumlah'];
 
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['success_message'] = "Data penerimaan barang berhasil diperbarui!";
+            $query = "UPDATE penerimaan_barang SET 
+                      nama_barang = '$nama_barang',
+                      id_departemen = $id_departemen,
+                      tanggal_terima = '$tanggal_terima',
+                      jumlah = $jumlah,
+                      satuan = '$satuan',
+                      status = '$status'
+                      WHERE id_penerimaan = $id_penerimaan";
+        }
+
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['success_message'] = "Data penerimaan barang berhasil diperbarui!";
+        }
     }
 
     header("Location: penerimaanBarang.php");
     exit();
 }
 
-// Fungsi hapus penerimaan
-function deletePenerimaan($conn, $id_penerimaan)
-{
-    // Dapatkan id_inventaris terkait
-    $query = "SELECT id_inventaris FROM inventaris WHERE id_penerimaan = $id_penerimaan";
-    $result = mysqli_query($conn, $query);
-    $inventaris = mysqli_fetch_assoc($result);
-
-    if ($inventaris) {
-        $id_inventaris = $inventaris['id_inventaris'];
-
-        // Hapus dari tabel terkait
-        $tables = [
-            'kontrol_barang_cawu_satu',
-            'kontrol_barang_cawu_dua',
-            'kontrol_barang_cawu_tiga',
-            'kerusakan_barang',
-            'kehilangan_barang',
-            'perpindahan_barang'
-        ];
-
-        foreach ($tables as $table) {
-            mysqli_query($conn, "DELETE FROM $table WHERE id_inventaris = $id_inventaris");
-        }
-
-        // Hapus dari inventaris
-        mysqli_query($conn, "DELETE FROM inventaris WHERE id_inventaris = $id_inventaris");
-    }
-
-    // Hapus dari penerimaan_barang
-    mysqli_query($conn, "DELETE FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan");
-    return true;
-}
-
-// Proses hapus penerimaan barang
+// Fungsi hapus
 if (isset($_GET['delete'])) {
     $id_penerimaan = $_GET['delete'];
-    if (deletePenerimaan($conn, $id_penerimaan)) {
-        $_SESSION['success_message'] = "Penerimaan barang berhasil dihapus!";
+
+    // Tidak bisa dihapus jika ada di data inventaris
+    $checkInventarisQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_penerimaan = $id_penerimaan";
+    $checkInventarisResult = mysqli_query($conn, $checkInventarisQuery);
+    $checkInventarisRow = mysqli_fetch_assoc($checkInventarisResult);
+
+    if ($checkInventarisRow['count'] > 0) {
+        $_SESSION['error_message'] = "Data penerimaan barang tidak dapat dihapus karena sudah ada di inventaris!";
+    } else {
+        // Hapus dari penerimaan_barang
+        $deleteQuery = "DELETE FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
+        if (mysqli_query($conn, $deleteQuery)) {
+            $_SESSION['success_message'] = "Penerimaan barang berhasil dihapus!";
+        }
     }
+
     header("Location: penerimaanBarang.php");
     exit();
 }

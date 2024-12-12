@@ -106,9 +106,9 @@ if (isset($_POST['tambahPerpindahan'])) {
     );
 
     // Insert ke tabel perpindahan_barang
-    $query = "INSERT INTO perpindahan_barang (id_inventaris, id_ruangan, tanggal_perpindahan, 
+    $query = "INSERT INTO perpindahan_barang (id_inventaris, id_ruangan, kode_inventaris_baru, tanggal_perpindahan, 
               cawu, jumlah_perpindahan, keterangan)
-              VALUES ('$id_inventaris', '$id_ruangan', '$tanggal_perpindahan', 
+              VALUES ('$id_inventaris', '$id_ruangan', '$kode_inventaris_baru', '$tanggal_perpindahan', 
               '$cawu', '$jumlah_perpindahan', '$keterangan')";
     $result = mysqli_query($conn, $query);
 
@@ -163,42 +163,52 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $jumlah_perpindahan = $_POST['jumlah_perpindahan'];
     $keterangan = $_POST['keterangan'];
 
-    // 1. Get data perpindahan barang yang akan diupdate
-    $query = "SELECT pb.*, i.id_inventaris as inventaris_baru_id 
-             FROM perpindahan_barang pb
-             JOIN inventaris i ON i.id_ruangan = pb.id_ruangan 
-             WHERE pb.id_perpindahan_barang = '$id_perpindahan_barang'";
+    // 1. Get data perpindahan barang dan inventaris terkait
+    $query = "SELECT pb.*, i.id_inventaris as id_inventaris_baru 
+              FROM perpindahan_barang pb
+              JOIN inventaris i ON i.kode_inventaris = pb.kode_inventaris_baru 
+              WHERE pb.id_perpindahan_barang = '$id_perpindahan_barang'";
     $result = mysqli_query($conn, $query);
     $perpindahan = mysqli_fetch_assoc($result);
 
-    // 2. Update data di tabel perpindahan_barang
-    $query = "UPDATE perpindahan_barang SET 
-              id_ruangan = '$id_ruangan',
-              tanggal_perpindahan = '$tanggal_perpindahan',
-              cawu = '$cawu',
-              jumlah_perpindahan = '$jumlah_perpindahan',
-              keterangan = '$keterangan'
-              WHERE id_perpindahan_barang = $id_perpindahan_barang";
-    $result = mysqli_query($conn, $query);
-
-    if ($result) {
-        // 3. Update data di tabel inventaris untuk barang yang dipindah
-        $query = "UPDATE inventaris SET 
-                  id_ruangan = '$id_ruangan',
-                  jumlah_awal = '$jumlah_perpindahan',
-                  jumlah_akhir = '$jumlah_perpindahan'
-                  WHERE id_inventaris = '{$perpindahan['inventaris_baru_id']}'";
-        $result = mysqli_query($conn, $query);
-
-        if ($result) {
-            $_SESSION['success_message'] = "Data perpindahan barang berhasil diperbarui!";
+    if ($perpindahan) {
+        // 2. Cek apakah ada data kontrol untuk inventaris baru
+        $checkKontrolQuery = "SELECT COUNT(*) as total_kontrol 
+                             FROM (
+                                 SELECT id_inventaris FROM kontrol_barang_cawu_satu 
+                                 WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
+                                 UNION ALL
+                                 SELECT id_inventaris FROM kontrol_barang_cawu_dua 
+                                 WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
+                                 UNION ALL
+                                 SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
+                                 WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
+                             ) as kontrol";
+        
+        $kontrolResult = mysqli_query($conn, $checkKontrolQuery);
+        $kontrolData = mysqli_fetch_assoc($kontrolResult);
+        
+        if ($kontrolData['total_kontrol'] > 0) {
+            $_SESSION['error_message'] = "Data perpindahan tidak dapat diubah karena inventaris baru telah memiliki data kontrol!";
         } else {
-            $_SESSION['error_message'] = "Gagal memperbarui data inventaris!";
+            // 3. Update data perpindahan barang
+            $updatePerpindahan = "UPDATE perpindahan_barang SET 
+                                id_ruangan = '$id_ruangan',
+                                keterangan = '$keterangan'
+                                WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
+            
+            // 4. Update data inventaris baru
+            $updateInventaris = "UPDATE inventaris SET 
+                               id_ruangan = '$id_ruangan'
+                               WHERE kode_inventaris = '{$perpindahan['kode_inventaris_baru']}'";
+            
+            if (mysqli_query($conn, $updatePerpindahan) && mysqli_query($conn, $updateInventaris)) {
+                $_SESSION['success_message'] = "Data perpindahan barang berhasil diperbarui!";
+            } else {
+                $_SESSION['error_message'] = "Gagal memperbarui data perpindahan barang!";
+            }
         }
-    } else {
-        $_SESSION['error_message'] = "Gagal memperbarui data perpindahan barang!";
     }
-
     header("Location: perpindahanBarang.php");
     exit();
 }
@@ -207,36 +217,58 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 if (isset($_GET['delete'])) {
     $id_perpindahan_barang = $_GET['delete'];
 
-    // 1. Get perpindahan barang data
-    $query = "SELECT * FROM perpindahan_barang WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
+    // 1. Get data perpindahan barang dan inventaris terkait
+    $query = "SELECT pb.*, i.id_inventaris as id_inventaris_baru 
+              FROM perpindahan_barang pb
+              JOIN inventaris i ON i.kode_inventaris = pb.kode_inventaris_baru 
+              WHERE pb.id_perpindahan_barang = '$id_perpindahan_barang'";
     $result = mysqli_query($conn, $query);
     $perpindahan = mysqli_fetch_assoc($result);
 
-    if ($result) {
-        // 2. Delete inventaris yang terkait dengan perpindahan
-        $query = "DELETE FROM inventaris 
-                 WHERE id_ruangan = '{$perpindahan['id_ruangan']}' 
-                 AND id_inventaris IN (
-                     SELECT id_inventaris FROM perpindahan_barang 
-                     WHERE id_perpindahan_barang = '$id_perpindahan_barang'
-                 )";
-        $result = mysqli_query($conn, $query);
+    if ($perpindahan) {
+        // 2. Cek apakah ada data kontrol untuk inventaris baru
+        $checkKontrolQuery = "SELECT COUNT(*) as total_kontrol 
+                             FROM (
+                                 SELECT id_inventaris FROM kontrol_barang_cawu_satu 
+                                 WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
+                                 UNION ALL
+                                 SELECT id_inventaris FROM kontrol_barang_cawu_dua 
+                                 WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
+                                 UNION ALL
+                                 SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
+                                 WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
+                             ) as kontrol";
+        
+        $kontrolResult = mysqli_query($conn, $checkKontrolQuery);
+        $kontrolData = mysqli_fetch_assoc($kontrolResult);
+        
+        if ($kontrolData['total_kontrol'] > 0) {
+            $_SESSION['error_message'] = "Data perpindahan tidak dapat dihapus karena inventaris baru telah memiliki data kontrol!";
+        } else {
+            // Begin transaction
+            mysqli_begin_transaction($conn);
+            try {
+                // 3. Hapus data inventaris baru
+                $deleteInventaris = "DELETE FROM inventaris 
+                                   WHERE kode_inventaris = '{$perpindahan['kode_inventaris_baru']}'";
+                mysqli_query($conn, $deleteInventaris);
 
-        if ($result) {
-            // 3. Delete perpindahan barang
-            $query = "DELETE FROM perpindahan_barang WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
-            $result = mysqli_query($conn, $query);
+                // 4. Hapus data perpindahan
+                $deletePerpindahan = "DELETE FROM perpindahan_barang 
+                                    WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
+                mysqli_query($conn, $deletePerpindahan);
 
-            if ($result) {
+                // Commit transaction
+                mysqli_commit($conn);
                 $_SESSION['success_message'] = "Data perpindahan barang berhasil dihapus!";
-            } else {
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                mysqli_rollback($conn);
                 $_SESSION['error_message'] = "Gagal menghapus data perpindahan barang!";
             }
-        } else {
-            $_SESSION['error_message'] = "Gagal menghapus data inventaris terkait!";
         }
     } else {
-        $_SESSION['error_message'] = "Gagal mendapatkan data perpindahan barang!";
+        $_SESSION['error_message'] = "Data perpindahan barang tidak ditemukan!";
     }
 
     header("Location: perpindahanBarang.php");

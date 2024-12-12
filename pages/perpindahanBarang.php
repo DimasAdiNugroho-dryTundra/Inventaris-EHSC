@@ -91,6 +91,7 @@ require('../layouts/header.php');
                                     <tr>
                                         <th class="text-center align-middle">No</th>
                                         <th class="text-center align-middle">Kode Inventaris</th>
+                                        <th class="text-center align-middle">Kode Inventaris Baru</th>
                                         <th class="text-center align-middle">Nama Barang</th>
                                         <th class="text-center align-middle">Ruangan</th>
                                         <th class="text-center align-middle">Tanggal Perpindahan</th>
@@ -108,6 +109,8 @@ require('../layouts/header.php');
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['kode_inventaris_baru']; ?>
+                                        </td>
                                         <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['nama_ruangan']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['tanggal_perpindahan']; ?>
