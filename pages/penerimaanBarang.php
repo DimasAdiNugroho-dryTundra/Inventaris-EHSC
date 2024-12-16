@@ -101,9 +101,9 @@ require('../layouts/header.php');
                                 </thead>
                                 <tbody>
                                     <?php
-        $no = $offset + 1;
-        while ($row = mysqli_fetch_assoc($result)) {
-        ?>
+                                    $no = $offset + 1;
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                    ?>
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
@@ -149,13 +149,13 @@ require('../layouts/header.php');
                                             <input type="hidden" name="id_penerimaan"
                                                 value="<?php echo $row['id_penerimaan']; ?>">
                                             <?php
-                    $query_cek = "SELECT id_permintaan FROM penerimaan_barang WHERE id_penerimaan = " . $row['id_penerimaan'];
-                    $hasil_cek = mysqli_query($conn, $query_cek);
-                    $data_penerimaan = mysqli_fetch_assoc($hasil_cek);
-                    
-                    if ($data_penerimaan['id_permintaan']): // Jika berasal dari permintaan 
-                    ?>
-                                            <!-- Form untuk data dari permintaan - editing terbatas -->
+                                            $query_cek = "SELECT id_permintaan FROM penerimaan_barang WHERE id_penerimaan = " . $row['id_penerimaan'];
+                                            $hasil_cek = mysqli_query($conn, $query_cek);
+                                            $data_penerimaan = mysqli_fetch_assoc($hasil_cek);
+                                            
+                                            if ($data_penerimaan['id_permintaan']):
+                                            ?>
+                                            <!-- Form untuk data dari permintaan -->
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Barang</label>
                                                 <input type="text" class="form-control bg-light"
@@ -185,7 +185,6 @@ require('../layouts/header.php');
                                                 <input type="hidden" name="satuan"
                                                     value="<?php echo $row['satuan']; ?>">
                                             </div>
-                                            <!-- Field yang bisa diedit -->
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Terima</label>
                                                 <input type="date" name="tanggal_terima" class="form-control"
@@ -202,8 +201,8 @@ require('../layouts/header.php');
                                                         Ditolak</option>
                                                 </select>
                                             </div>
-                                            <?php else: // Jika input manual ?>
-                                            <!-- Form untuk input manual - bisa edit semua -->
+                                            <?php else: ?>
+                                            <!-- Form untuk pengadaan kantor-->
                                             <div class="mb-3">
                                                 <label class="form-label">Nama Barang</label>
                                                 <input type="text" name="nama_barang" class="form-control"
@@ -213,15 +212,15 @@ require('../layouts/header.php');
                                                 <label class="form-label">Departemen</label>
                                                 <select name="id_departemen" class="form-select" required>
                                                     <?php
-                                $query_dept = "SELECT * FROM departemen ORDER BY 
-                                    CASE WHEN id_departemen = '{$row['id_departemen']}' THEN 0 ELSE 1 END";
-                                $hasil_dept = mysqli_query($conn, $query_dept);
-                                while ($dept = mysqli_fetch_assoc($hasil_dept)) {
-                                    $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
-                                    echo "<option value='" . $dept['id_departemen'] . "' " . $selected . ">" 
-                                        . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-                                }
-                                ?>
+                                                    $query_dept = "SELECT * FROM departemen ORDER BY 
+                                                        CASE WHEN id_departemen = '{$row['id_departemen']}' THEN 0 ELSE 1 END";
+                                                    $hasil_dept = mysqli_query($conn, $query_dept);
+                                                    while ($dept = mysqli_fetch_assoc($hasil_dept)) {
+                                                        $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
+                                                        echo "<option value='" . $dept['id_departemen'] . "' " . $selected . ">" 
+                                                            . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
@@ -337,7 +336,7 @@ require('../layouts/header.php');
                                             <select name="jenis_input" class="form-select" id="jenis_input"
                                                 onchange="togglePenerimaanForm()" required>
                                                 <option value="permintaan">Dari Permintaan</option>
-                                                <option value="manual">Input Manual</option>
+                                                <option value="manual">Pengadaan</option>
                                             </select>
                                         </div>
 
@@ -349,27 +348,27 @@ require('../layouts/header.php');
                                                     required>
                                                     <option value="">Pilih Permintaan Barang</option>
                                                     <?php
-            $permintaan_query = "SELECT pb.id_permintaan, pb.nama_barang, pb.merk, d.nama_departemen, d.kode_departemen, pb.jumlah_kebutuhan, pb.satuan 
-                                FROM permintaan_barang pb 
-                                JOIN departemen d ON pb.id_departemen = d.id_departemen 
-                                WHERE pb.status = 1 
-                                AND NOT EXISTS (
-                                    SELECT 1 FROM penerimaan_barang pr 
-                                    WHERE pr.id_permintaan = pb.id_permintaan
-                                )";
-            $permintaan_result = mysqli_query($conn, $permintaan_query);
-            while ($permintaan = mysqli_fetch_assoc($permintaan_result)) {
-                echo "<option value='" . $permintaan['id_permintaan'] . "' 
-                      data-qty='" . $permintaan['jumlah_kebutuhan'] . "'
-                      data-merk='" . $permintaan['merk'] . "'
-                      data-satuan='" . $permintaan['satuan'] . "'>
-                      " . $permintaan['nama_barang'] . " - " 
-                      . $permintaan['merk'] . " - "
-                      . $permintaan['kode_departemen'] . " - "
-                      . $permintaan['jumlah_kebutuhan'] . " " 
-                      . $permintaan['satuan'] . "</option>";
-            }
-            ?>
+                                                    $permintaan_query = "SELECT pb.id_permintaan, pb.nama_barang, pb.merk, d.nama_departemen, d.kode_departemen, pb.jumlah_kebutuhan, pb.satuan 
+                                                                        FROM permintaan_barang pb 
+                                                                        JOIN departemen d ON pb.id_departemen = d.id_departemen 
+                                                                        WHERE pb.status = 1 
+                                                                        AND NOT EXISTS (
+                                                                            SELECT 1 FROM penerimaan_barang pr 
+                                                                            WHERE pr.id_permintaan = pb.id_permintaan
+                                                                        )";
+                                                    $permintaan_result = mysqli_query($conn, $permintaan_query);
+                                                    while ($permintaan = mysqli_fetch_assoc($permintaan_result)) {
+                                                        echo "<option value='" . $permintaan['id_permintaan'] . "' 
+                                                            data-qty='" . $permintaan['jumlah_kebutuhan'] . "'
+                                                            data-merk='" . $permintaan['merk'] . "'
+                                                            data-satuan='" . $permintaan['satuan'] . "'>
+                                                            " . $permintaan['nama_barang'] . " - " 
+                                                            . $permintaan['merk'] . " - "
+                                                            . $permintaan['kode_departemen'] . " - "
+                                                            . $permintaan['jumlah_kebutuhan'] . " " 
+                                                            . $permintaan['satuan'] . "</option>";
+                                                    }
+                                                    ?>
                                                 </select>
                                                 <input type="hidden" name="jumlah">
                                                 <input type="hidden" name="merk" id="merk_permintaan">
@@ -392,13 +391,13 @@ require('../layouts/header.php');
                                                 <select name="id_departemen" class="form-select" data-required="true">
                                                     <option value="">Pilih Departemen</option>
                                                     <?php
-            $dept_query = "SELECT * FROM departemen WHERE nama_departemen != ''";
-            $dept_result = mysqli_query($conn, $dept_query);
-            while ($dept = mysqli_fetch_assoc($dept_result)) {
-                echo "<option value='" . $dept['id_departemen'] . "'>" 
-                    . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
-            }
-            ?>
+                                                    $dept_query = "SELECT * FROM departemen WHERE nama_departemen != ''";
+                                                    $dept_result = mysqli_query($conn, $dept_query);
+                                                    while ($dept = mysqli_fetch_assoc($dept_result)) {
+                                                        echo "<option value='" . $dept['id_departemen'] . "'>" 
+                                                            . $dept['nama_departemen'] . " (" . $dept['kode_departemen'] . ")</option>";
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                             <div class="mb-3">

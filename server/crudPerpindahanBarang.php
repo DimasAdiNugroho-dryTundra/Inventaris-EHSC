@@ -6,12 +6,32 @@ $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
-$query = "SELECT pb.*, i.nama_barang, i.kode_inventaris, r.nama_ruangan 
-          FROM perpindahan_barang pb
-          JOIN inventaris i ON pb.id_inventaris = i.id_inventaris 
-          JOIN ruangan r ON pb.id_ruangan = r.id_ruangan
-          WHERE i.nama_barang LIKE '%$search%' OR i.kode_inventaris LIKE '%$search%'
-          LIMIT $limit OFFSET $offset";
+$query = "SELECT pb.*, 
+            i.nama_barang, 
+            i.kode_inventaris AS kode_inventaris_asal, 
+            i.merk, 
+            r_asal.nama_ruangan AS ruangan_asal, 
+            r_tujuan.nama_ruangan AS ruangan_tujuan, 
+            i.sumber_inventaris,
+            d.nama_departemen,
+            COALESCE(u1.nama, u2.nama, u3.nama) AS nama_petugas
+        FROM perpindahan_barang pb
+        JOIN inventaris i ON pb.id_inventaris = i.id_inventaris
+        JOIN ruangan r_asal ON i.id_ruangan = r_asal.id_ruangan
+        JOIN inventaris i_baru ON pb.kode_inventaris_baru = i_baru.kode_inventaris
+        JOIN ruangan r_tujuan ON i_baru.id_ruangan = r_tujuan.id_ruangan
+        JOIN departemen d ON i.id_departemen = d.id_departemen  
+        LEFT JOIN kontrol_barang_cawu_satu k1 ON k1.id_inventaris = i.id_inventaris
+        LEFT JOIN kontrol_barang_cawu_dua k2 ON k2.id_inventaris = i.id_inventaris
+        LEFT JOIN kontrol_barang_cawu_tiga k3 ON k3.id_inventaris = i.id_inventaris
+        LEFT JOIN user u1 ON k1.id_user = u1.id_user
+        LEFT JOIN user u2 ON k2.id_user = u2.id_user
+        LEFT JOIN user u3 ON k3.id_user = u3.id_user
+        WHERE (i.nama_barang LIKE '%$search%' 
+        OR i.kode_inventaris LIKE '%$search%')
+        ORDER BY pb.tanggal_perpindahan DESC
+        LIMIT $limit OFFSET $offset";
+
 $result = mysqli_query($conn, $query);
 
 // Hitung total data untuk pagination
@@ -23,39 +43,107 @@ $totalRow = mysqli_fetch_assoc($totalResult);
 $totalPages = ceil($totalRow['total'] / $limit);
 
 // Fungsi untuk mendapatkan data perpindahan barang
-function getPerpindahanBarang($conn)
+function getBarangPindah($conn)
 {
-    $query = "SELECT i.id_inventaris, i.kode_inventaris, i.nama_barang, i.merk, i.id_kategori,
-                     i.tanggal_perolehan, i.id_departemen, k.jumlah_pindah, 
-                     'Caturwulan 1' as cawu, k.tanggal_kontrol
-              FROM kontrol_barang_cawu_satu k
-              JOIN inventaris i ON k.id_inventaris = i.id_inventaris
-              LEFT JOIN perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris 
-                   AND k.tanggal_kontrol = pb.tanggal_perpindahan
-              WHERE k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL
-              
-              UNION ALL
-              
-              SELECT i.id_inventaris, i.kode_inventaris, i.nama_barang, i.merk, i.id_kategori,
-                     i.tanggal_perolehan, i.id_departemen, k.jumlah_pindah, 
-                     'Caturwulan 2' as cawu, k.tanggal_kontrol
-              FROM kontrol_barang_cawu_dua k
-              JOIN inventaris i ON k.id_inventaris = i.id_inventaris
-              LEFT JOIN perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris 
-                   AND k.tanggal_kontrol = pb.tanggal_perpindahan
-              WHERE k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL
-              
-              UNION ALL
-              
-              SELECT i.id_inventaris, i.kode_inventaris, i.nama_barang, i.merk, i.id_kategori,
-                     i.tanggal_perolehan, i.id_departemen, k.jumlah_pindah, 
-                     'Caturwulan 3' as cawu, k.tanggal_kontrol
-              FROM kontrol_barang_cawu_tiga k
-              JOIN inventaris i ON k.id_inventaris = i.id_inventaris
-              LEFT JOIN perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris 
-                   AND k.tanggal_kontrol = pb.tanggal_perpindahan
-              WHERE k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL";
-    return mysqli_query($conn, $query);
+    $query = "SELECT 
+                i.id_inventaris, 
+                i.kode_inventaris, 
+                i.nama_barang, 
+                i.merk, 
+                i.sumber_inventaris, 
+                k.jumlah_pindah, 
+                i.id_ruangan, 
+                r.nama_ruangan, 
+                i.satuan, 
+                'Caturwulan 1' AS cawu, 
+                k.tanggal_kontrol, 
+                d.nama_departemen,
+                u.nama AS nama_petugas
+            FROM 
+                kontrol_barang_cawu_satu k
+            JOIN 
+                inventaris i ON k.id_inventaris = i.id_inventaris
+            JOIN 
+                ruangan r ON i.id_ruangan = r.id_ruangan
+            JOIN 
+                departemen d ON i.id_departemen = d.id_departemen
+            LEFT JOIN 
+                user u ON k.id_user = u.id_user
+            LEFT JOIN 
+                perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_perpindahan
+            WHERE 
+                k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL
+                
+            UNION ALL
+            
+            SELECT 
+                i.id_inventaris, 
+                i.kode_inventaris, 
+                i.nama_barang, 
+                i.merk, 
+                i.sumber_inventaris, 
+                k.jumlah_pindah, 
+                i.id_ruangan, 
+                r.nama_ruangan, 
+                i.satuan, 
+                'Caturwulan 2' AS cawu, 
+                k.tanggal_kontrol, 
+                d.nama_departemen,
+                u.nama AS nama_petugas
+            FROM 
+                kontrol_barang_cawu_dua k
+            JOIN 
+                inventaris i ON k.id_inventaris = i.id_inventaris
+            JOIN 
+                ruangan r ON i.id_ruangan = r.id_ruangan
+            JOIN 
+                departemen d ON i.id_departemen = d.id_departemen
+            LEFT JOIN 
+                user u ON k.id_user = u.id_user
+            LEFT JOIN 
+                perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_perpindahan
+            WHERE 
+                k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL
+                
+            UNION ALL
+            
+            SELECT 
+                i.id_inventaris, 
+                i.kode_inventaris, 
+                i.nama_barang, 
+                i.merk, 
+                i.sumber_inventaris, 
+                k.jumlah_pindah, 
+                i.id_ruangan, 
+                r.nama_ruangan, 
+                i.satuan, 
+                'Caturwulan 3' AS cawu, 
+                k.tanggal_kontrol, 
+                d.nama_departemen,
+                u.nama AS nama_petugas
+            FROM 
+                kontrol_barang_cawu_tiga k
+            JOIN 
+                inventaris i ON k.id_inventaris = i.id_inventaris
+            JOIN 
+                ruangan r ON i.id_ruangan = r.id_ruangan
+            JOIN 
+                departemen d ON i.id_departemen = d.id_departemen
+            LEFT JOIN 
+                user u ON k.id_user = u.id_user
+            LEFT JOIN 
+                perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_perpindahan
+            WHERE 
+                k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL
+    ";
+
+    $result = mysqli_query($conn, $query);
+
+    if (!$result) {
+        die('Query Error: ' . mysqli_error($conn));
+    }
+
+    return $result;
 }
 
 function generateKodeInventarisPindah($conn, $departemen_kode, $kategori_kode, $year)
@@ -158,10 +246,6 @@ if (isset($_POST['tambahPerpindahan'])) {
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_perpindahan_barang = $_POST['id_perpindahan_barang'];
     $id_ruangan = $_POST['id_ruangan'];
-    $tanggal_perpindahan = $_POST['tanggal_perpindahan'];
-    $cawu = $_POST['cawu'];
-    $jumlah_perpindahan = $_POST['jumlah_perpindahan'];
-    $keterangan = $_POST['keterangan'];
 
     // 1. Get data perpindahan barang dan inventaris terkait
     $query = "SELECT pb.*, i.id_inventaris as id_inventaris_baru 
@@ -184,10 +268,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
                                  SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
                                  WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
                              ) as kontrol";
-        
+
         $kontrolResult = mysqli_query($conn, $checkKontrolQuery);
         $kontrolData = mysqli_fetch_assoc($kontrolResult);
-        
+
         if ($kontrolData['total_kontrol'] > 0) {
             $_SESSION['error_message'] = "Data perpindahan tidak dapat diubah karena inventaris baru telah memiliki data kontrol!";
         } else {
@@ -196,12 +280,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
                                 id_ruangan = '$id_ruangan',
                                 keterangan = '$keterangan'
                                 WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
-            
+
             // 4. Update data inventaris baru
             $updateInventaris = "UPDATE inventaris SET 
                                id_ruangan = '$id_ruangan'
                                WHERE kode_inventaris = '{$perpindahan['kode_inventaris_baru']}'";
-            
+
             if (mysqli_query($conn, $updatePerpindahan) && mysqli_query($conn, $updateInventaris)) {
                 $_SESSION['success_message'] = "Data perpindahan barang berhasil diperbarui!";
             } else {
@@ -238,10 +322,10 @@ if (isset($_GET['delete'])) {
                                  SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
                                  WHERE id_inventaris = '{$perpindahan['id_inventaris_baru']}'
                              ) as kontrol";
-        
+
         $kontrolResult = mysqli_query($conn, $checkKontrolQuery);
         $kontrolData = mysqli_fetch_assoc($kontrolResult);
-        
+
         if ($kontrolData['total_kontrol'] > 0) {
             $_SESSION['error_message'] = "Data perpindahan tidak dapat dihapus karena inventaris baru telah memiliki data kontrol!";
         } else {

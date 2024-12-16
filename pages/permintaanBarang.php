@@ -103,11 +103,11 @@ require('../layouts/header.php');
                                 </thead>
                                 <tbody>
                                     <?php
-    $no = $offset + 1;
-    while ($row = mysqli_fetch_assoc($result)) {
-        $status_text = $row['status'] == 1 ? 'Disetujui' : ($row['status'] == 2 ? 'Tidak Disetujui' : 'Menunggu');
-        $warna_status = $row['status'] == 1 ? 'text-success' : ($row['status'] == 2 ? 'text-danger' : 'text-warning');
-    ?>
+                                    $no = $offset + 1;
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        $status_text = $row['status'] == 1 ? 'Disetujui' : ($row['status'] == 2 ? 'Tidak Disetujui' : 'Menunggu');
+                                        $warna_status = $row['status'] == 1 ? 'text-success' : ($row['status'] == 2 ? 'text-danger' : 'text-warning');
+                                    ?>
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
@@ -156,13 +156,13 @@ require('../layouts/header.php');
                                                             <select class='form-select' name='id_departemen' required>
                                                                 <option value="">Pilih Departemen</option>
                                                                 <?php
-        $dept_query = "SELECT * FROM departemen";
-        $dept_result = mysqli_query($conn, $dept_query);
-        while ($dept = mysqli_fetch_assoc($dept_result)) {
-            $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
-            echo "<option value='" . $dept['id_departemen'] . "' $selected>" . $dept['nama_departemen'] . "</option>";
-        }
-        ?>
+                                                                $dept_query = "SELECT * FROM departemen";
+                                                                $dept_result = mysqli_query($conn, $dept_query);
+                                                                while ($dept = mysqli_fetch_assoc($dept_result)) {
+                                                                    $selected = ($dept['id_departemen'] == $row['id_departemen']) ? 'selected' : '';
+                                                                    echo "<option value='" . $dept['id_departemen'] . "' $selected>" . $dept['nama_departemen'] . "</option>";
+                                                                }
+                                                                ?>
                                                             </select>
                                                         </div>
 
@@ -214,13 +214,10 @@ require('../layouts/header.php');
                                                             <select class='form-select' name='status' required>
                                                                 <option value="">Pilih Status</option>
                                                                 <option value='0'
-                                                                    <?php echo ($row['status'] == 0 ? 'selected' : ''); ?>>
-                                                                    Menunggu</option>
-                                                                <option value='1'
                                                                     <?php echo ($row['status'] == 1 ? 'selected' : ''); ?>>
                                                                     Disetujui</option>
-                                                                <option value='2'
-                                                                    <?php echo ($row['status'] == 2 ? 'selected' : ''); ?>>
+                                                                <option value='1'
+                                                                    <?php echo ($row['status'] == 0 ? 'selected' : ''); ?>>
                                                                     Tidak Disetujui</option>
                                                             </select>
                                                         </div>
@@ -312,12 +309,12 @@ require('../layouts/header.php');
                                             <select name="id_departemen" class="form-select" required>
                                                 <option value="">Pilih Departemen</option>
                                                 <?php
-                            $dept_query = "SELECT * FROM departemen";
-                            $dept_result = mysqli_query($conn, $dept_query);
-                            while ($dept = mysqli_fetch_assoc($dept_result)) {
-                                echo "<option value='" . $dept['id_departemen'] . "'>" . $dept['nama_departemen'] . "</option>";
-                            }
-                            ?>
+                                                $dept_query = "SELECT * FROM departemen";
+                                                $dept_result = mysqli_query($conn, $dept_query);
+                                                while ($dept = mysqli_fetch_assoc($dept_result)) {
+                                                    echo "<option value='" . $dept['id_departemen'] . "'>" . $dept['nama_departemen'] . "</option>";
+                                                }
+                                                ?>
                                             </select>
                                         </div>
 
@@ -355,7 +352,6 @@ require('../layouts/header.php');
                                         <div class="mb-3">
                                             <label class="form-label">Status</label>
                                             <select name="status" class="form-select" required>
-                                                <option value="0">Menunggu</option>
                                                 <option value="1">Disetujui</option>
                                                 <option value="2">Tidak Disetujui</option>
                                             </select>

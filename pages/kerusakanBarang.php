@@ -92,27 +92,36 @@ require('../layouts/header.php');
                                         <th class="text-center align-middle">No</th>
                                         <th class="text-center align-middle">Kode Inventaris</th>
                                         <th class="text-center align-middle">Nama Barang</th>
+                                        <th class="text-center align-middle">Merk</th>
+                                        <th class="text-center align-middle">Ruangan</th>
                                         <th class="text-center align-middle">Tanggal Kerusakan</th>
                                         <th class="text-center align-middle">Cawu</th>
                                         <th class="text-center align-middle">Jumlah Kerusakan</th>
+                                        <th class="text-center align-middle">Sumber Inventaris</th>
                                         <th class="text-center align-middle">Foto Kerusakan</th>
-                                        <th class="text-center align-middle">Keterangan</th>
+                                        <th class="text-center align-middle">Nama Petugas Kontrol</th>
+                                        <th class="text-center align-middle">Keterangan</th>w
                                         <th class="text-center align-middle">Aksi</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     <?php
-        $no = $offset + 1;
-        while ($row = mysqli_fetch_assoc($result)) {
-        ?>
+                                    $no = $offset + 1;
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                    ?>
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['merk']; ?></td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_ruangan']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['tanggal_kerusakan']; ?>
                                         </td>
                                         <td class="text-center align-middle"><?php echo $row['cawu']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['jumlah_kerusakan']; ?>
+                                        </td>
+                                        <td class="text-center align-middle"><?php echo $row['sumber_inventaris']; ?>
                                         </td>
                                         <td class="text-center align-middle">
                                             <?php if ($row['foto_kerusakan']) { ?>
@@ -122,6 +131,7 @@ require('../layouts/header.php');
                                             <span>Tidak ada foto</span>
                                             <?php } ?>
                                         </td>
+                                        <td class="text-center align-middle"><?php echo $row['nama_petugas']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['keterangan']; ?></td>
                                         <td class="text-center align-middle">
                                             <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
@@ -135,17 +145,17 @@ require('../layouts/header.php');
                                         </td>
                                     </tr>
                                     <?php
-        }
-        ?>
+                                    }
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Modal Edit/Update -->
                         <?php
-mysqli_data_seek($result, 0);
-while ($row = mysqli_fetch_assoc($result)) {
-?>
+                        mysqli_data_seek($result, 0);
+                        while ($row = mysqli_fetch_assoc($result)) {
+                        ?>
                         <div class="modal fade" id="modal-update-<?php echo $row['id_kerusakan_barang']; ?>"
                             tabindex="-1" aria-labelledby="modalUpdateLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -156,7 +166,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form method="POST" enctype="multipart/form-data">
+                                        <form method="post" enctype="multipart/form-data">
                                             <input type="hidden" name="action" value="update">
                                             <input type="hidden" name="id_kerusakan_barang"
                                                 value="<?php echo $row['id_kerusakan_barang']; ?>">
@@ -171,9 +181,26 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     value="<?php echo $row['nama_barang']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
+                                                <label class="form-label">Merk</label>
+                                                <input type="text" class="form-control bg-light" name="merk"
+                                                    value="<?php echo $row['merk']; ?>" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Ruangan</label>
+                                                <input type="text" class="form-control bg-light" name="ruangan"
+                                                    value="<?php echo $row['nama_ruangan']; ?>" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Sumber Inventaris</label>
+                                                <input type="text" class="form-control bg-light"
+                                                    name="sumber_inventaris"
+                                                    value="<?php echo $row['sumber_inventaris']; ?>" readonly>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label">Tanggal Kerusakan</label>
-                                                <input type="date" class="form-control" name="tanggal_kerusakan"
-                                                    value="<?php echo $row['tanggal_kerusakan']; ?>" required>
+                                                <input type="date" class="form-control bg-light"
+                                                    name="tanggal_kerusakan"
+                                                    value="<?php echo $row['tanggal_kerusakan']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Cawu</label>
@@ -182,13 +209,27 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Jumlah Kerusakan</label>
-                                                <input type="number" class="form-control" name="jumlah_kerusakan"
-                                                    value="<?php echo $row['jumlah_kerusakan']; ?>" required>
+                                                <input type="number" class="form-control bg-light"
+                                                    name="jumlah_kerusakan"
+                                                    value="<?php echo $row['jumlah_kerusakan']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Foto Kerusakan</label>
                                                 <input type="file" class="form-control" name="foto_kerusakan"
                                                     accept="image/*">
+                                                <?php if ($row['foto_kerusakan']) { ?>
+                                                <div class="mt-2 text-center">
+                                                    <div class="card" style="display: inline-block; width: 200px;">
+                                                        <img src="../upload/kerusakan/<?php echo $row['foto_kerusakan']; ?>"
+                                                            class="card-img-top" alt="Foto Kerusakan">
+                                                    </div>
+                                                </div>
+                                                <?php } ?>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nama Petugas Kontrol</label>
+                                                <input type="text" class="form-control bg-light" name="nama_petugas"
+                                                    value="<?php echo $row['nama_petugas']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
@@ -248,18 +289,45 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     onchange="fillKerusakanData(this)">
                                                     <option value="">Pilih Barang</option>
                                                     <?php
-                            $barangRusak = getBarangRusak($conn);
-                            while ($row = mysqli_fetch_assoc($barangRusak)) {
-                                echo "<option value='{$row['id_inventaris']}' 
-                                            data-tanggal='{$row['tanggal_kontrol']}'
-                                            data-cawu='{$row['cawu']}'
-                                            data-jumlah='{$row['jumlah_rusak']}'
-                                            data-tahun='" . date('Y', strtotime($row['tanggal_kontrol'])) . "'>
-                                        {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['cawu']}  - " . date('Y', strtotime($row['tanggal_kontrol'])) . " - {$row['jumlah_rusak']} rusak
-                                    </option>";
-                            }
-                            ?>
+                                                    $barang = getBarangRusak($conn); 
+                                                    while ($row = mysqli_fetch_assoc($barang)) {
+                                                        echo "<option value='{$row['id_inventaris']}'
+                                                                data-nama-barang='{$row['nama_barang']}'
+                                                                data-merk='{$row['merk']}'
+                                                                data-ruangan='{$row['nama_ruangan']}'
+                                                                data-sumber='{$row['sumber_inventaris']}'
+                                                                data-departemen='{$row['nama_departemen']}'
+                                                                data-tanggal='{$row['tanggal_kontrol']}'
+                                                                data-cawu='{$row['cawu']}'
+                                                                data-jumlah='{$row['jumlah_rusak']}'
+                                                                data-nama-petugas='{$row['nama_petugas']}'>
+                                                                {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['merk']} - Ruang {$row['nama_ruangan']} - 
+                                                                {$row['sumber_inventaris']} - {$row['cawu']} - " . date('Y', strtotime($row['tanggal_kontrol'])) . " - 
+                                                                {$row['jumlah_rusak']} {$row['satuan']}
+                                                            </option>";
+                                                    }
+                                                    ?>
                                                 </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nama Barang</label>
+                                                <input type="text" class="form-control bg-light" name="nama_barang"
+                                                    id="nama_barang" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Merk</label>
+                                                <input type="text" class="form-control bg-light" name="merk" id="merk"
+                                                    readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Departemen</label>
+                                                <input type="text" class="form-control bg-light" name="departemen"
+                                                    id="departemen" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Ruangan</label>
+                                                <input type="text" class="form-control bg-light" name="ruangan"
+                                                    id="ruangan" readonly>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Kerusakan</label>
@@ -280,6 +348,16 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <label class="form-label">Foto Kerusakan</label>
                                                 <input type="file" class="form-control" name="foto_kerusakan"
                                                     accept="image/*" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Sumber Inventaris</label>
+                                                <input type="text" class="form-control bg-light"
+                                                    name="sumber_inventaris" id="sumber_inventaris" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nama Petugas Kontrol</label>
+                                                <input type="text" class="form-control bg-light" name="nama_petugas"
+                                                    id="nama_petugas" required readonly>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Keterangan</label>
@@ -333,12 +411,28 @@ while ($row = mysqli_fetch_assoc($result)) {
 </div>
 
 <script>
-function fillKerusakanData(selectElement) {
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
+function fillKerusakanData(select) {
+    const selectedOption = select.options[select.selectedIndex];
 
-    document.getElementById('tanggal_kerusakan').value = selectedOption.dataset.tanggal;
-    document.getElementById('cawu').value = selectedOption.dataset.cawu;
-    document.getElementById('jumlah_kerusakan').value = selectedOption.dataset.jumlah;
+    const namaBarang = selectedOption.getAttribute('data-nama-barang');
+    const merk = selectedOption.getAttribute('data-merk');
+    const ruangan = selectedOption.getAttribute('data-ruangan');
+    const sumber = selectedOption.getAttribute('data-sumber');
+    const departemen = selectedOption.getAttribute('data-departemen');
+    const tanggal = selectedOption.getAttribute('data-tanggal');
+    const cawu = selectedOption.getAttribute('data-cawu');
+    const jumlah = selectedOption.getAttribute('data-jumlah');
+    const namaPetugas = selectedOption.getAttribute('data-nama-petugas');
+
+    document.getElementById('nama_barang').value = namaBarang;
+    document.getElementById('merk').value = merk;
+    document.getElementById('ruangan').value = ruangan;
+    document.getElementById('departemen').value = departemen;
+    document.getElementById('tanggal_kerusakan').value = tanggal;
+    document.getElementById('cawu').value = cawu;
+    document.getElementById('jumlah_kerusakan').value = jumlah;
+    document.getElementById('sumber_inventaris').value = sumber;
+    document.getElementById('nama_petugas').value = namaPetugas;
 }
 
 // Fungsi untuk mendapatkan pesan validasi

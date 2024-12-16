@@ -5,15 +5,17 @@ require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
 require('../lib/TCPDF/tcpdf.php');
 
-$id_permintaan = $_GET['id'];
+$id_permintaan = $_GET['id'] ?? null;
 
-$query = "
-    SELECT pb.*, d.nama_departemen 
-    FROM penerimaan_barang pb
-    JOIN permintaan_barang p ON pb.id_permintaan = p.id_permintaan
-    JOIN departemen d ON p.id_departemen = d.id_departemen
-    WHERE pb.id_permintaan = '$id_permintaan'
-";
+$query = "SELECT pb.*, 
+            COALESCE(d.nama_departemen, d2.nama_departemen) AS nama_departemen,
+            COALESCE(d.kode_departemen, d2.kode_departemen) AS kode_departemen
+            FROM penerimaan_barang pb
+            LEFT JOIN permintaan_barang p ON pb.id_permintaan = p.id_permintaan
+            LEFT JOIN departemen d ON p.id_departemen = d.id_departemen
+            LEFT JOIN departemen d2 ON pb.id_departemen = d2.id_departemen
+            WHERE pb.id_permintaan IS NULL OR pb.id_permintaan = '$id_permintaan'
+        ";
 
 $result = $conn->query($query);
 
@@ -48,11 +50,11 @@ try {
         <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN PENERIMAAN BARANG</h1>
 
         <p style="line-height: 1.5;">
-Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $data['id_permintaan'] . '<br>
-Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '<br>
-Departemen&nbsp;: ' . $data['nama_departemen'] . '<br>
-Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
-</p>
+        Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $data['id_penerimaan'] . '<br>
+        Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '<br>
+        Departemen&nbsp;: ' . $data['nama_departemen'] . '<br>
+        Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
+        </p>
         
         <p>Kepada Yth.<br>Direksi<br>Di Tempat</p>
         
@@ -69,12 +71,24 @@ Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
                 <td>' . $data['nama_barang'] . '</td>
             </tr>
             <tr>
+                <td><strong>Merk</strong></td>
+                <td>' . $data['merk'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Sumber</strong></td>
+                <td>' . $data['sumber_penerimaan'] . '</td>
+            </tr>
+            <tr>
                 <td><strong>Jumlah</strong></td>
                 <td>' . $data['jumlah'] . '</td>
             </tr>
             <tr>
                 <td><strong>Satuan</strong></td>
                 <td>' . $data['satuan'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Status</strong></td>
+                <td>' . $data['status'] . '</td>
             </tr>
         </table>
         
@@ -96,8 +110,8 @@ Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
                 <td style="text-align: center;">(........................)</td>
             </tr>
             <tr>
-                <td style="text-align: center;">Staff ' . $data['nama_departemen'] . '</td>
-                <td style="text-align: center;">Admin ' . $data['nama_departemen'] . '</td>
+                <td style="text-align: center;">Staff ' . $data['kode_departemen'] . '</td>
+                <td style="text-align: center;">Admin ' . $data['kode_departemen'] . '</td>
             </tr>
         </table>';
 
@@ -113,3 +127,4 @@ Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
     error_log('PDF Generation Error: ' . $e->getMessage());
     echo 'Error: ' . $e->getMessage();
 }
+?>

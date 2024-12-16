@@ -18,7 +18,7 @@ $query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, i.merk, i.jumlah_akhir,
           JOIN user u ON kb.id_user = u.id_user 
           JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
           WHERE YEAR(kb.tanggal_kontrol) = '$tahun'
-          ORDER BY kb.id_kontrol_barang_cawu_dua DESC";
+          ORDER BY kb.id_kontrol_barang_cawu_tiga DESC";
 
 $result = mysqli_query($conn, $query);
 
@@ -212,12 +212,12 @@ $totalPages = ceil($totalRows / $limit);
                                                     <div class="d-flex gap-2 justify-content-center">
                                                         <button type="button" class="btn btn-info btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#editModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
+                                                            data-bs-target="#editModal<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>">
                                                             Edit
                                                         </button>
                                                         <button type="button" class="btn btn-danger btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
+                                                            data-bs-target="#deleteModal<?php echo $row['id_kontrol_barang_cawu_tiga']; ?>">
                                                             Hapus
                                                         </button>
                                                     </div>

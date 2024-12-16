@@ -13,7 +13,7 @@ $search = isset($_POST['search']) ? $_POST['search'] : '';
 
 // Tentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_tiga';
-$diKolom = 'id_kontrol_barang_cawu_tiga';
+$idKolom = 'id_kontrol_barang_cawu_tiga';
 $tanggalMulai = "$tahun-09-01";
 $tanggalAkhir = "$tahun-12-31";
 
@@ -174,13 +174,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kontrol = (int) $_POST['id_kontrol'];
     $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : '';
 
-    // Validasi input kosong
-    if (empty($id_kontrol) || empty($tanggal_kontrol)) {
-        $_SESSION['error_message'] = "ID kontrol dan tanggal harus diisi!";
-        header("Location: kontrolBarangCawuTiga.php");
-        exit();
-    }
-
     // Ambil data kontrol yang akan diupdate
     $query_kontrol = "SELECT kb.*, i.id_inventaris 
                      FROM kontrol_barang_cawu_tiga kb
@@ -191,6 +184,22 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $data_kontrol = mysqli_fetch_assoc($result_kontrol);
 
     $tahun = date('Y', strtotime($tanggal_kontrol));
+
+    // Cek apakah ada data kontrol di tahun berikutnya
+    $tahun_berikutnya = $tahun + 1;
+    $query_cek = "SELECT COUNT(*) as total 
+                    FROM kontrol_barang_cawu_satu
+                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
+                    AND tahun_kontrol = '$tahun_berikutnya'";
+
+    $result_cek = mysqli_query($conn, $query_cek);
+    $count = mysqli_fetch_assoc($result_cek)['total'];
+
+    if ($count > 0) {
+        $_SESSION['error_message'] = "Data tidak dapat diubah karena sudah ada data kontrol di tahun berikutnya!";
+        header("Location: kontrolBarangCawuTiga.php");
+        exit();
+    }
 
     // Jika tidak ada data di cawu lain, lanjutkan update
     $jumlah_baik = isset($_POST['jumlah_baik']) ? (int) $_POST['jumlah_baik'] : 0;
@@ -222,7 +231,23 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 if (isset($_GET['delete'])) {
     $id_kontrol = $_GET['delete'];
 
-    $query = "DELETE FROM $table WHERE $diKolom='$id_kontrol'";
+    // Cek apakah ada data kontrol di tahun berikutnya
+    $tahun_berikutnya = $tahun + 1;
+    $query_cek = "SELECT COUNT(*) as total 
+                    FROM kontrol_barang_cawu_satu 
+                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
+                    AND tahun_kontrol = '$tahun_berikutnya'";
+
+    $result_cek = mysqli_query($conn, $query_cek);
+    $count = mysqli_fetch_assoc($result_cek)['total'];
+
+    if ($count > 0) {
+        $_SESSION['error_message'] = "Data tidak dapat dihapus karena sudah ada data kontrol di tahun berikutnya!";
+        header("Location: kontrolBarangCawuTiga.php");
+        exit();
+    }
+
+    $query = "DELETE FROM $table WHERE $idKolom='$id_kontrol'";
     if (mysqli_query($conn, $query)) {
         $_SESSION['success_message'] = "Kontrol barang berhasil dihapus!";
     } else {

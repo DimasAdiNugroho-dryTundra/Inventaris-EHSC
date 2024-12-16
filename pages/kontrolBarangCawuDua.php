@@ -211,12 +211,12 @@ $totalPages = ceil($totalRows / $limit);
                                                     <div class="d-flex gap-2 justify-content-center">
                                                         <button type="button" class="btn btn-info btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#editModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
+                                                            data-bs-target="#editModal<?php echo $row['id_kontrol_barang_cawu_dua']; ?>">
                                                             Edit
                                                         </button>
                                                         <button type="button" class="btn btn-danger btn-sm"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>">
+                                                            data-bs-target="#deleteModal<?php echo $row['id_kontrol_barang_cawu_dua']; ?>">
                                                             Hapus
                                                         </button>
                                                     </div>

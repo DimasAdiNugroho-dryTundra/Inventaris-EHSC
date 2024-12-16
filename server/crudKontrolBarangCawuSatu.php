@@ -101,8 +101,8 @@ function getJumlahTerkontrol($conn, $id_inventaris, $tahun, $exclude_id = null)
 // Proses penambahan kontrol barang
 if (isset($_POST['tambahKontrol'])) {
     $id_inventaris = isset($_POST['id_inventaris']) ? (int) $_POST['id_inventaris'] : 0;
-    $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : ''; 
-    
+    $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : '';
+
     // Inisialisasi dengan nilai default 0 jika tidak ada input
     $jumlah_baik = isset($_POST['jumlah_baik']) ? (int) $_POST['jumlah_baik'] : 0;
     $jumlah_rusak = isset($_POST['jumlah_rusak']) ? (int) $_POST['jumlah_rusak'] : 0;
@@ -171,7 +171,7 @@ if (isset($_POST['tambahKontrol'])) {
 // Proses pembaruan kontrol barang
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kontrol = (int) $_POST['id_kontrol'];
-    $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : ''; 
+    $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : '';
 
     // Ambil data kontrol yang akan diupdate
     $query_kontrol = "SELECT kb.*, i.id_inventaris 
@@ -186,18 +186,18 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 
     // Cek apakah ada data di cawu dua atau tiga
     $query_cek = "SELECT COUNT(*) as total FROM (
-        SELECT id_inventaris FROM kontrol_barang_cawu_dua 
-        WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' AND tahun_kontrol = '$tahun'
-        UNION ALL
-        SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
-        WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' AND tahun_kontrol = '$tahun'
-    ) as kombinasi";
+                    SELECT id_inventaris FROM kontrol_barang_cawu_dua 
+                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' AND tahun_kontrol = '$tahun'
+                    UNION ALL
+                    SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
+                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' AND tahun_kontrol = '$tahun'
+                ) as kombinasi";
 
     $result_cek = mysqli_query($conn, $query_cek);
     $count = mysqli_fetch_assoc($result_cek)['total'];
 
     if ($count > 0) {
-        $_SESSION['error_message'] = "Data tidak dapat diubah karena sudah ada data kontrol di cawu berikutnya!";
+        $_SESSION['error_message'] = "Data tidak dapat diubah karena sudah ada data kontrol di cawu dua dan cawu tiga!";
         header("Location: kontrolBarangCawuSatu.php");
         exit();
     }
@@ -228,7 +228,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
                       FROM $table 
                       WHERE id_inventaris = kb.id_inventaris 
                       AND tahun_kontrol = '$tahun' 
-                      AND $idKolom != '$id_kontrol') as total_other_kontrol
+                      AND $idKolom != '$id_kontrol') as total_kontrol_lainnya
                      FROM $table kb
                      WHERE kb.$idKolom = '$id_kontrol'";
 
@@ -241,7 +241,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     }
 
     $data_kontrol = mysqli_fetch_assoc($result_kontrol);
-    $total_other_kontrol = (int) ($data_kontrol['total_other_kontrol'] ?? 0);
+    $total_kontrol_lainnya = (int) ($data_kontrol['total_kontrol_lainnya'] ?? 0);
 
     // Ambil total jumlah dari database (jumlah yang sudah terkontrol)
     $query_total = "SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) as total_database
@@ -268,7 +268,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     }
 
     // Validasi total dengan jumlah yang sudah ada di database
-    $new_total = $total_other_kontrol + $total_kontrol;
+    $new_total = $total_kontrol_lainnya + $total_kontrol;
 
     if ($new_total < $total_database) {
         $_SESSION['error_message'] = "Total kontrol ($new_total) kurang dari jumlah yang harus dikontrol ($total_database)!";
@@ -323,20 +323,20 @@ if (isset($_GET['delete'])) {
 
     // Cek apakah ada data di cawu dua atau tiga
     $query_cek = "SELECT COUNT(*) as total FROM (
-        SELECT id_inventaris FROM kontrol_barang_cawu_dua 
-        WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
-        AND tahun_kontrol = '{$data_kontrol['tahun_kontrol']}'
-        UNION ALL
-        SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
-        WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
-        AND tahun_kontrol = '{$data_kontrol['tahun_kontrol']}'
-    ) as combined";
+                    SELECT id_inventaris FROM kontrol_barang_cawu_dua 
+                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
+                    AND tahun_kontrol = '{$data_kontrol['tahun_kontrol']}'
+                    UNION ALL
+                    SELECT id_inventaris FROM kontrol_barang_cawu_tiga 
+                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
+                    AND tahun_kontrol = '{$data_kontrol['tahun_kontrol']}'
+                ) as kombinasi";
 
     $result_cek = mysqli_query($conn, $query_cek);
     $count = mysqli_fetch_assoc($result_cek)['total'];
 
     if ($count > 0) {
-        $_SESSION['error_message'] = "Data tidak dapat dihapus karena sudah ada data kontrol di cawu berikutnya!";
+        $_SESSION['error_message'] = "Data tidak dapat dihapus karena sudah ada data kontrol di cawu dua dan cawu tiga!";
         header("Location: kontrolBarangCawuSatu.php");
         exit();
     }
