@@ -1,14 +1,14 @@
 <?php
 // crudkontrolBarangCawuSatuCawuSatu.php
 
-// Pengaturan untuk pagination
+// Pengaturan untuk pagination yang disederhanakan
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Penanganan pencarian dan filter
-$tahun = isset($_POST['year']) ? (int) $_POST['year'] : date('Y');
-$search = isset($_POST['search']) ? $_POST['search'] : '';
+// Penanganan pencarian dan filter 
+$tahun = isset($_POST['year']) ? (int) $_POST['year'] : (isset($_GET['year']) ? (int) $_GET['year'] : date('Y'));
+$search = isset($_POST['search']) ? $_POST['search'] : (isset($_GET['search']) ? $_GET['search'] : '');
 
 // Tentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_satu';
@@ -16,7 +16,7 @@ $idKolom = 'id_kontrol_barang_cawu_satu';
 $tanggalMulai = "$tahun-01-01";
 $tanggalAkhir = "$tahun-04-30";
 
-// Query untuk mengambil data kontrol barang dengan filter tanggal
+// Query untuk mengambil data dengan pagination
 $query = "SELECT kb.*, 
           i.kode_inventaris, 
           i.nama_barang,
@@ -27,18 +27,23 @@ $query = "SELECT kb.*,
           FROM $table kb 
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
           JOIN user u ON kb.id_user = u.id_user 
-          JOIN ruangan r ON i.id_ruangan = r.id_ruangan
-          WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%' OR i.merk LIKE '%$search%') 
+          JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
+          WHERE (i.kode_inventaris LIKE '%$search%' 
+                OR i.nama_barang LIKE '%$search%' 
+                OR i.merk LIKE '%$search%')
           AND YEAR(kb.tanggal_kontrol) = '$tahun'
-          ORDER BY kb.$idKolom DESC 
+          ORDER BY kb.$idKolom DESC
           LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $query);
 
-// Hitung total data untuk pagination dengan filter yang sama
-$totalQuery = "SELECT COUNT(*) as total FROM $table kb 
+// Hitung total data untuk pagination
+$totalQuery = "SELECT COUNT(*) as total 
+               FROM $table kb 
                JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
-               WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%')
+               WHERE (i.kode_inventaris LIKE '%$search%' 
+                     OR i.nama_barang LIKE '%$search%' 
+                     OR i.merk LIKE '%$search%')
                AND YEAR(kb.tanggal_kontrol) = '$tahun'";
 
 $totalResult = mysqli_query($conn, $totalQuery);
@@ -57,14 +62,14 @@ function getAvailableInventaris($conn, $tahun, $table)
                 i.satuan,
                 r.nama_ruangan,
                 IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
-                         FROM $table 
-                         WHERE id_inventaris = i.id_inventaris 
+                    FROM $table 
+                    WHERE id_inventaris = i.id_inventaris 
                          AND YEAR(tanggal_kontrol) = '$tahun'), 0) AS jumlah_terkontrol
               FROM inventaris i
               LEFT JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
               WHERE (i.jumlah_akhir - IFNULL((SELECT SUM(jumlah_baik + jumlah_rusak + jumlah_pindah + jumlah_hilang) 
-                                               FROM $table 
-                                               WHERE id_inventaris = i.id_inventaris 
+                      FROM $table 
+                      WHERE id_inventaris = i.id_inventaris 
                                                AND YEAR(tanggal_kontrol) = '$tahun'), 0)) > 0
               AND i.jumlah_akhir > 0
               AND (

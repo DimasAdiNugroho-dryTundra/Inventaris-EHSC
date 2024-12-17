@@ -21,14 +21,14 @@ $query = "SELECT i.*, d.*, r.nama_ruangan, k.nama_kategori
           JOIN departemen d ON i.id_departemen = d.id_departemen 
           JOIN ruangan r ON i.id_ruangan = r.id_ruangan
           JOIN kategori k ON i.id_kategori = k.id_kategori 
-          WHERE i.jumlah_akhir < 0";
+          WHERE i.jumlah_akhir = 0";
 
 $result = $conn->query($query);
 
 $pdf = new MYPDF('L', 'mm', 'A4', true, 'UTF-8', false); // Ubah 'P' menjadi 'L'
 
 $pdf->SetCreator(PDF_CREATOR);
-$pdf->SetTitle('Laporan Inventaris Tersedia');
+$pdf->SetTitle('Laporan Inventaris Tidak Tersedia');
 $pdf->SetMargins(15, 30, 15);
 $pdf->SetHeaderMargin(0);
 $pdf->SetFooterMargin(10);

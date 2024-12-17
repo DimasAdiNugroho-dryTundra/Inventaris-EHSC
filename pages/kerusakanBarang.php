@@ -6,6 +6,54 @@ require('../server/crudKerusakanBarang.php'); // Ganti dengan file CRUD yang ses
 require('../layouts/header.php');
 ?>
 
+<style>
+.w-50px {
+    width: 50px !important;
+}
+
+.w-80px {
+    width: 80px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.w-120px {
+    width: 120px !important;
+}
+
+.w-150px {
+    width: 150px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.4rem !important;
+}
+
+.table-sm img {
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.table-sm .img-thumbnail {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-pointer:hover {
+    transform: scale(1.05);
+}
+</style>
+
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <?php require('../layouts/sidePanel.php'); ?>
@@ -85,26 +133,25 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-hover table-sm">
+                        <div class="table-responsive text-nowrap" style="max-height: 340px;">
+                            <table class="table table-hover table-sm small">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="text-center align-middle">No</th>
-                                        <th class="text-center align-middle">Kode Inventaris</th>
-                                        <th class="text-center align-middle">Nama Barang</th>
-                                        <th class="text-center align-middle">Merk</th>
-                                        <th class="text-center align-middle">Ruangan</th>
-                                        <th class="text-center align-middle">Tanggal Kerusakan</th>
-                                        <th class="text-center align-middle">Cawu</th>
-                                        <th class="text-center align-middle">Jumlah Kerusakan</th>
-                                        <th class="text-center align-middle">Sumber Inventaris</th>
-                                        <th class="text-center align-middle">Foto Kerusakan</th>
-                                        <th class="text-center align-middle">Nama Petugas Kontrol</th>
-                                        <th class="text-center align-middle">Keterangan</th>w
-                                        <th class="text-center align-middle">Aksi</th>
+                                        <th class="text-center align-middle w-50px">No</th>
+                                        <th class="text-center align-middle w-100px">Kode</th>
+                                        <th class="text-center align-middle w-150px">Nama Barang</th>
+                                        <th class="text-center align-middle w-100px">Merk</th>
+                                        <th class="text-center align-middle w-120px">Ruangan</th>
+                                        <th class="text-center align-middle w-120px">Tanggal</th>
+                                        <th class="text-center align-middle w-80px">Cawu</th>
+                                        <th class="text-center align-middle w-100px">Jumlah</th>
+                                        <th class="text-center align-middle w-120px">Sumber</th>
+                                        <th class="text-center align-middle w-120px">Foto</th>
+                                        <th class="text-center align-middle w-120px">Petugas</th>
+                                        <th class="text-center align-middle w-150px">Keterangan</th>
+                                        <th class="text-center align-middle w-150px">Aksi</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
                                     <?php
                                     $no = $offset + 1;
@@ -126,7 +173,28 @@ require('../layouts/header.php');
                                         <td class="text-center align-middle">
                                             <?php if ($row['foto_kerusakan']) { ?>
                                             <img src="../upload/kerusakan/<?php echo $row['foto_kerusakan']; ?>"
-                                                width="100">
+                                                class="img-thumbnail cursor-pointer" width="60" height="60"
+                                                style="object-fit: cover;" data-bs-toggle="modal"
+                                                data-bs-target="#modal-foto-<?php echo $row['id_kerusakan_barang']; ?>">
+
+                                            <!-- Modal untuk foto -->
+                                            <div class="modal fade"
+                                                id="modal-foto-<?php echo $row['id_kerusakan_barang']; ?>"
+                                                tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Foto Kerusakan</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-center">
+                                                            <img src="../upload/kerusakan/<?php echo $row['foto_kerusakan']; ?>"
+                                                                class="img-fluid" style="max-height: 500px;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <?php } else { ?>
                                             <span>Tidak ada foto</span>
                                             <?php } ?>
@@ -138,15 +206,15 @@ require('../layouts/header.php');
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_kerusakan_barang']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_kerusakan_barang']; ?>">Delete</button>
+                                                data-bs-target="#modal-delete-<?php echo $row['id_kerusakan_barang']; ?>">Hapus</button>
                                             <?php endif; ?>
                                             <a href="../report/printLaporanKerusakanBarang.php?id=<?php echo $row['id_kerusakan_barang']; ?>"
                                                 class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
                                     </tr>
                                     <?php
-                                    }
-                                    ?>
+           }
+           ?>
                                 </tbody>
                             </table>
                         </div>
@@ -186,15 +254,14 @@ require('../layouts/header.php');
                                                     value="<?php echo $row['merk']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
+                                                <label class="form-label">Departemen</label>
+                                                <input type="text" class="form-control bg-light" name="departemen"
+                                                    value="<?php echo $row['nama_departemen']; ?>" readonly>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label">Ruangan</label>
                                                 <input type="text" class="form-control bg-light" name="ruangan"
                                                     value="<?php echo $row['nama_ruangan']; ?>" readonly>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Sumber Inventaris</label>
-                                                <input type="text" class="form-control bg-light"
-                                                    name="sumber_inventaris"
-                                                    value="<?php echo $row['sumber_inventaris']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Tanggal Kerusakan</label>
@@ -227,6 +294,12 @@ require('../layouts/header.php');
                                                 <?php } ?>
                                             </div>
                                             <div class="mb-3">
+                                                <label class="form-label">Sumber Inventaris</label>
+                                                <input type="text" class="form-control bg-light"
+                                                    name="sumber_inventaris"
+                                                    value="<?php echo $row['sumber_inventaris']; ?>" readonly>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label">Nama Petugas Kontrol</label>
                                                 <input type="text" class="form-control bg-light" name="nama_petugas"
                                                     value="<?php echo $row['nama_petugas']; ?>" readonly>
@@ -247,10 +320,10 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <!-- Modal Delete -->
+                        <!-- Modal Hapus -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_kerusakan_barang']; ?>"
                             tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Konfirmasi Hapus</h5>
@@ -274,7 +347,7 @@ require('../layouts/header.php');
 
                         <!-- Modal Tambah -->
                         <div class="modal fade" id="tambahKerusakanModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Tambah Kerusakan Barang</h5>
@@ -284,10 +357,10 @@ require('../layouts/header.php');
                                     <div class="modal-body">
                                         <form method="POST" enctype="multipart/form-data">
                                             <div class="mb-3">
-                                                <label class="form-label">Barang</label>
+                                                <label class="form-label">Data Kerusakan Barang</label>
                                                 <select name="id_inventaris" class="form-select" required
                                                     onchange="fillKerusakanData(this)">
-                                                    <option value="">Pilih Barang</option>
+                                                    <option value="">Pilih Data Kerusakan Barang</option>
                                                     <?php
                                                     $barang = getBarangRusak($conn); 
                                                     while ($row = mysqli_fetch_assoc($barang)) {
@@ -364,10 +437,10 @@ require('../layouts/header.php');
                                                 <textarea class="form-control" name="keterangan" required></textarea>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="submit" name="tambahKerusakan"
-                                                    class="btn btn-primary">Tambah</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" name="tambahKerusakan"
+                                                    class="btn btn-primary">Tambah</button>
                                             </div>
                                         </form>
                                     </div>
@@ -400,8 +473,7 @@ require('../layouts/header.php');
                             </ul>
                         </nav>
                     </div>
-                </div>
-                <?php require('../layouts/footer.php'); ?>
+                </div> <?php require('../layouts/footer.php'); ?>
             </div>
             <div class="content-backdrop fade"></div>
         </div>

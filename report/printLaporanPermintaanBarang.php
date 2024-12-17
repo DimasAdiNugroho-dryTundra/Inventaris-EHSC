@@ -8,10 +8,8 @@ require('../lib/TCPDF/tcpdf.php');
 
 $id_permintaan = $_GET['id'];
 
-$query = "SELECT pb.*, d.*, p.nama_barang AS nama_barang_penerimaan, p.merk, p.tanggal_terima, p.jumlah, p.satuan 
-            FROM permintaan_barang pb
-            JOIN departemen d ON pb.id_departemen = d.id_departemen
-            JOIN penerimaan_barang p ON pb.id_departemen = p.id_departemen
+$query = "SELECT pb.*, d.* FROM permintaan_barang pb 
+          JOIN departemen d ON pb.id_departemen = d.id_departemen 
             WHERE pb.id_permintaan = '$id_permintaan'";
 
 $result = $conn->query($query);
@@ -45,7 +43,7 @@ try {
     $pdf->SetFont('helvetica', '', 11);
 
     $pdf->AddPage();
-    
+
     if ($result->num_rows > 0) {
         $data = $result->fetch_assoc();
 
@@ -54,15 +52,9 @@ try {
         $html = '
         <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN PERMINTAAN BARANG</h1>
 
-        <p>
-        Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $data['id_permintaan'] . '<br>
-        Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($data['tanggal_permintaan'])) . '<br>
-        Departemen&nbsp;: ' . $data['nama_departemen'] . '<br>
-        Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
-        </p>
+        <p>Nomor: ' . $data['id_permintaan'] . '<br>Tanggal: ' . date('d/m/Y', strtotime($data['tanggal_permintaan'])) . '<br>Departemen: ' . $data['nama_departemen'] . '</p>
         
-        <br>
-        <p>Kepada Yth.<br>Admin Gudang<br>Di Tempat</p>
+        <p>Kepada Yth.<br>Staff ' . $data['kode_departemen'] . '<br>Di Tempat</p>
 
         <p>Dengan Hormat,</p>
         <p style="text-align: justify;">Laporan ini merinci jenis dan jumlah barang yang diperlukan, 
@@ -73,23 +65,23 @@ try {
         <table border="1" cellpadding="5">
             <tr style="background-color: #f2f2f2;">
                 <td><strong>Nama Barang</strong></td>
-                <td>' . $data['nama_barang_penerimaan'] . '</td>
+                <td>' . $data['nama_barang'] . '</td>
             </tr>
             <tr>
                 <td><strong>Merk</strong></td>
                 <td>' . $data['merk'] . '</td>
             </tr>
             <tr>
-                <td><strong>Tanggal Terima</strong></td>
-                <td>' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '</td>
+                <td><strong>Tanggal Permintaan</strong></td>
+                <td>' . date('d/m/Y', strtotime($data['tanggal_permintaan'])) . '</td>
             </tr>
             <tr>
                 <td><strong>Jumlah</strong></td>
-                <td>' . $data['jumlah'] . ' ' . $data['satuan'] . '</td>
+                <td>' . $data['jumlah_kebutuhan'] . ' ' . $data['satuan'] . '</td>
             </tr>
             <tr>
                 <td><strong>Spesifikasi</strong></td>
-                <td>' . $data['spesifikasi'] . ' ' . $data['satuan'] . '</td>
+                <td>' . $data['spesifikasi'] . '</td>
             </tr>
              <tr>
                 <td><strong>Status</strong></td>
@@ -115,7 +107,7 @@ try {
                 <td style="text-align: center;">(........................)</td>
             </tr>
             <tr>
-                <td style="text-align: center;">Staff</td>
+                <td style="text-align: center;">Staff ' . $data['kode_departemen'] . '</td>
                 <td style="text-align: center;">Admin ' . $data['kode_departemen'] . '</td>
             </tr>
         </table>';

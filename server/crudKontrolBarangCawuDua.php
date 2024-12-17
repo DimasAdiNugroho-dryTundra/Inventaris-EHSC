@@ -16,7 +16,7 @@ $idKolom = 'id_kontrol_barang_cawu_dua';
 $tanggalMulai = "$tahun-05-01";
 $tanggalAkhir = "$tahun-08-31";
 
-// Query untuk mengambil data kontrol barang dengan filter tanggal
+// Query untuk mengambil data dengan pagination
 $query = "SELECT kb.*, 
           i.kode_inventaris, 
           i.nama_barang,
@@ -27,18 +27,23 @@ $query = "SELECT kb.*,
           FROM $table kb 
           JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
           JOIN user u ON kb.id_user = u.id_user 
-          JOIN ruangan r ON i.id_ruangan = r.id_ruangan
-          WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%' OR i.merk LIKE '%$search%') 
+          JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
+          WHERE (i.kode_inventaris LIKE '%$search%' 
+                OR i.nama_barang LIKE '%$search%' 
+                OR i.merk LIKE '%$search%')
           AND YEAR(kb.tanggal_kontrol) = '$tahun'
-          ORDER BY kb.$idKolom DESC 
+          ORDER BY kb.$idKolom DESC
           LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $query);
 
-// Hitung total data untuk pagination dengan filter yang sama
-$totalQuery = "SELECT COUNT(*) as total FROM $table kb 
+// Hitung total data untuk pagination
+$totalQuery = "SELECT COUNT(*) as total 
+               FROM $table kb 
                JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
-               WHERE (i.kode_inventaris LIKE '%$search%' OR i.nama_barang LIKE '%$search%')
+               WHERE (i.kode_inventaris LIKE '%$search%' 
+                     OR i.nama_barang LIKE '%$search%' 
+                     OR i.merk LIKE '%$search%')
                AND YEAR(kb.tanggal_kontrol) = '$tahun'";
 
 $totalResult = mysqli_query($conn, $totalQuery);

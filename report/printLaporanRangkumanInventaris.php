@@ -21,56 +21,55 @@ if (!is_numeric($tahunTerpilih) || $tahunTerpilih < 2000) {
     die('Tahun tidak valid.');
 }
 
-$query = "
-SELECT 
-    i.nama_barang, 
-    i.merk,
-    r.nama_ruangan,
-    i.sumber_inventaris,
-    i.kode_inventaris,
-    i.satuan,
-    d.kode_departemen,
-    u1.nama AS nama_petugas_cawu_satu,
-    u2.nama AS nama_petugas_cawu_dua,
-    u3.nama AS nama_petugas_cawu_tiga,
-    COALESCE(
-        CASE 
-            WHEN kbc1.jumlah_baik IS NOT NULL THEN kbc1.jumlah_baik + kbc1.jumlah_rusak + kbc1.jumlah_pindah + kbc1.jumlah_hilang
-            WHEN kbc2.jumlah_baik IS NOT NULL THEN kbc2.jumlah_baik + kbc2.jumlah_rusak + kbc2.jumlah_pindah + kbc2.jumlah_hilang
-            WHEN kbc3.jumlah_baik IS NOT NULL THEN kbc3.jumlah_baik + kbc3.jumlah_rusak + kbc3.jumlah_pindah + kbc3.jumlah_hilang
-            ELSE 0
-        END, 0
-    ) AS jumlah_awal,
-    COALESCE(kbc1.jumlah_baik, 0) as jumlah_baik_cawu_satu,
-    COALESCE(kbc1.jumlah_rusak, 0) as jumlah_rusak_cawu_satu,
-    COALESCE(kbc1.jumlah_pindah, 0) as jumlah_pindah_cawu_satu,
-    COALESCE(kbc1.jumlah_hilang, 0) as jumlah_hilang_cawu_satu,
-    COALESCE(kbc2.jumlah_baik, 0) as jumlah_baik_cawu_dua,
-    COALESCE(kbc2.jumlah_rusak, 0) as jumlah_rusak_cawu_dua,
-    COALESCE(kbc2.jumlah_pindah, 0) as jumlah_pindah_cawu_dua,
-    COALESCE(kbc2.jumlah_hilang, 0) as jumlah_hilang_cawu_dua,
-    COALESCE(kbc3.jumlah_baik, 0) as jumlah_baik_cawu_tiga,
-    COALESCE(kbc3.jumlah_rusak, 0) as jumlah_rusak_cawu_tiga,
-    COALESCE(kbc3.jumlah_pindah, 0) as jumlah_pindah_cawu_tiga,
-    COALESCE(kbc3.jumlah_hilang, 0) as jumlah_hilang_cawu_tiga,
-    COALESCE(
-        CASE 
-            WHEN kbc3.jumlah_baik IS NOT NULL THEN kbc3.jumlah_baik
-            WHEN kbc2.jumlah_baik IS NOT NULL THEN kbc2.jumlah_baik
-            WHEN kbc1.jumlah_baik IS NOT NULL THEN kbc1.jumlah_baik
-            ELSE 0
-        END, 0
-    ) AS jumlah_akhir
-FROM inventaris i
-LEFT JOIN ruangan r ON i.id_ruangan = r.id_ruangan
-LEFT JOIN departemen d ON i.id_departemen = d.id_departemen 
-LEFT JOIN kontrol_barang_cawu_satu kbc1 ON i.id_inventaris = kbc1.id_inventaris AND kbc1.tahun_kontrol = $tahunTerpilih
-LEFT JOIN kontrol_barang_cawu_dua kbc2 ON i.id_inventaris = kbc2.id_inventaris AND kbc2.tahun_kontrol = $tahunTerpilih
-LEFT JOIN kontrol_barang_cawu_tiga kbc3 ON i.id_inventaris = kbc3.id_inventaris AND kbc3.tahun_kontrol = $tahunTerpilih
-LEFT JOIN user u1 ON kbc1.id_user = u1.id_user
-LEFT JOIN user u2 ON kbc2.id_user = u2.id_user
-LEFT JOIN user u3 ON kbc3.id_user = u3.id_user
-WHERE 1=1";
+$query = "SELECT 
+            i.nama_barang, 
+            i.merk,
+            r.nama_ruangan,
+            i.sumber_inventaris,
+            i.kode_inventaris,
+            i.satuan,
+            d.kode_departemen,
+            u1.nama AS nama_petugas_cawu_satu,
+            u2.nama AS nama_petugas_cawu_dua,
+            u3.nama AS nama_petugas_cawu_tiga,
+            COALESCE(
+                CASE 
+                    WHEN kbc1.jumlah_baik IS NOT NULL THEN kbc1.jumlah_baik + kbc1.jumlah_rusak + kbc1.jumlah_pindah + kbc1.jumlah_hilang
+                    WHEN kbc2.jumlah_baik IS NOT NULL THEN kbc2.jumlah_baik + kbc2.jumlah_rusak + kbc2.jumlah_pindah + kbc2.jumlah_hilang
+                    WHEN kbc3.jumlah_baik IS NOT NULL THEN kbc3.jumlah_baik + kbc3.jumlah_rusak + kbc3.jumlah_pindah + kbc3.jumlah_hilang
+                    ELSE 0
+                END, 0
+            ) AS jumlah_awal,
+            COALESCE(kbc1.jumlah_baik, 0) as jumlah_baik_cawu_satu,
+            COALESCE(kbc1.jumlah_rusak, 0) as jumlah_rusak_cawu_satu,
+            COALESCE(kbc1.jumlah_pindah, 0) as jumlah_pindah_cawu_satu,
+            COALESCE(kbc1.jumlah_hilang, 0) as jumlah_hilang_cawu_satu,
+            COALESCE(kbc2.jumlah_baik, 0) as jumlah_baik_cawu_dua,
+            COALESCE(kbc2.jumlah_rusak, 0) as jumlah_rusak_cawu_dua,
+            COALESCE(kbc2.jumlah_pindah, 0) as jumlah_pindah_cawu_dua,
+            COALESCE(kbc2.jumlah_hilang, 0) as jumlah_hilang_cawu_dua,
+            COALESCE(kbc3.jumlah_baik, 0) as jumlah_baik_cawu_tiga,
+            COALESCE(kbc3.jumlah_rusak, 0) as jumlah_rusak_cawu_tiga,
+            COALESCE(kbc3.jumlah_pindah, 0) as jumlah_pindah_cawu_tiga,
+            COALESCE(kbc3.jumlah_hilang, 0) as jumlah_hilang_cawu_tiga,
+            COALESCE(
+                CASE 
+                    WHEN kbc3.jumlah_baik IS NOT NULL THEN kbc3.jumlah_baik
+                    WHEN kbc2.jumlah_baik IS NOT NULL THEN kbc2.jumlah_baik
+                    WHEN kbc1.jumlah_baik IS NOT NULL THEN kbc1.jumlah_baik
+                    ELSE 0
+                END, 0
+            ) AS jumlah_akhir
+        FROM inventaris i
+        LEFT JOIN ruangan r ON i.id_ruangan = r.id_ruangan
+        LEFT JOIN departemen d ON i.id_departemen = d.id_departemen 
+        LEFT JOIN kontrol_barang_cawu_satu kbc1 ON i.id_inventaris = kbc1.id_inventaris AND kbc1.tahun_kontrol = $tahunTerpilih
+        LEFT JOIN kontrol_barang_cawu_dua kbc2 ON i.id_inventaris = kbc2.id_inventaris AND kbc2.tahun_kontrol = $tahunTerpilih
+        LEFT JOIN kontrol_barang_cawu_tiga kbc3 ON i.id_inventaris = kbc3.id_inventaris AND kbc3.tahun_kontrol = $tahunTerpilih
+        LEFT JOIN user u1 ON kbc1.id_user = u1.id_user
+        LEFT JOIN user u2 ON kbc2.id_user = u2.id_user
+        LEFT JOIN user u3 ON kbc3.id_user = u3.id_user
+        WHERE 1=1";
 
 $result = mysqli_query($conn, $query);
 
@@ -78,7 +77,7 @@ try {
     $pdf = new MYPDF('L', 'mm', 'A4', true, 'UTF-8', false);
 
     $pdf->SetCreator(PDF_CREATOR);
-    $pdf->SetTitle('Laporan Rangkuman Inventaris ' . $tahunTerpilih);
+    $pdf->SetTitle('Laporan Hasil Kontrol Inventaris ' . $tahunTerpilih);
 
     $pdf->SetMargins(10, 30, 10);
     $pdf->SetHeaderMargin(0);
@@ -90,7 +89,7 @@ try {
     $pdf->AddPage('L', 'A4');
 
     $html = '
-    <h3 style="text-align: center;">LAPORAN RANGKUMAN INVENTARIS<br>TAHUN ' . $tahunTerpilih . '</h3>
+    <h3 style="text-align: center;">LAPORAN HASIL KONTROL INVENTARIS<br>TAHUN ' . $tahunTerpilih . '</h3>
     <style>
         table {
             border-collapse: collapse;
@@ -281,7 +280,7 @@ try {
     ob_end_clean();
 
     $pdf->writeHTML($html, true, false, true, false, '');
-    $pdf->Output('Laporan_Inventaris_' . $tahunTerpilih . '.pdf', 'I');
+    $pdf->Output('Laporan_Hasil_Kontrol_Inventaris_' . $tahunTerpilih . '.pdf', 'I');
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }

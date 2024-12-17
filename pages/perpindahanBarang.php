@@ -6,6 +6,37 @@ require('../server/crudPerpindahanBarang.php');
 require('../layouts/header.php');
 ?>
 
+<style>
+.w-50px {
+    width: 50px !important;
+}
+
+.w-80px {
+    width: 80px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.w-120px {
+    width: 120px !important;
+}
+
+.w-150px {
+    width: 150px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.4rem !important;
+}
+
+.table thead th {
+    border: 1px solid #e9ecef;
+}
+</style>
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <?php require('../layouts/sidePanel.php'); ?>
@@ -85,31 +116,35 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-hover table-sm">
-                                <thead class="table-light">
+                        <div class="table-responsive text-nowrap" style="max-height: 340px;">
+                            <table class="table table-hover table-sm small">
+                                <thead class="table-light small">
                                     <tr>
-                                        <th class="text-center align-middle">No</th>
-                                        <th class="text-center align-middle">Kode Inventaris Asal</th>
-                                        <th class="text-center align-middle">Kode Inventaris Baru</th>
-                                        <th class="text-center align-middle">Merk</th>
-                                        <th class="text-center align-middle">Nama Barang</th>
-                                        <th class="text-center align-middle">Ruangan Asal</th>
-                                        <th class="text-center align-middle">Ruangan Tujuan</th>
-                                        <th class="text-center align-middle">Tanggal Perpindahan</th>
-                                        <th class="text-center align-middle">Cawu</th>
-                                        <th class="text-center align-middle">Jumlah Perpindahan</th>
-                                        <th class="text-center align-middle">Sumber Inventaris</th>
-                                        <th class="text-center align-middle">Petugas Kontrol</th>
-                                        <th class="text-center align-middle">Keterangan</th>
-                                        <th class="text-center align-middle">Aksi</th>
+                                        <th class="text-center align-middle w-50px" rowspan="2">No</th>
+                                        <th class="text-center align-middle w-150px" colspan="2">Kode Inventaris</th>
+                                        <th class="text-center align-middle w-100px" rowspan="2">Merk</th>
+                                        <th class="text-center align-middle w-150px" rowspan="2">Nama Barang</th>
+                                        <th class="text-center align-middle w-150px" colspan="2">Ruangan</th>
+                                        <th class="text-center align-middle w-100px" rowspan="2">Tanggal</th>
+                                        <th class="text-center align-middle w-80px" rowspan="2">Cawu</th>
+                                        <th class="text-center align-middle w-100px" rowspan="2">Jumlah</th>
+                                        <th class="text-center align-middle w-100px" rowspan="2">Sumber</th>
+                                        <th class="text-center align-middle w-120px" rowspan="2">Petugas</th>
+                                        <th class="text-center align-middle w-150px" rowspan="2">Keterangan</th>
+                                        <th class="text-center align-middle w-150px" rowspan="2">Aksi</th>
+                                    </tr>
+                                    <tr class="small">
+                                        <th class="text-center align-middle">Asal</th>
+                                        <th class="text-center align-middle">Baru</th>
+                                        <th class="text-center align-middle">Asal</th>
+                                        <th class="text-center align-middle">Tujuan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $no = $offset + 1;
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                    ?>
+           $no = $offset + 1;
+           while ($row = mysqli_fetch_assoc($result)) {
+           ?>
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris_asal']; ?>
@@ -134,15 +169,13 @@ require('../layouts/header.php');
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_perpindahan_barang']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_perpindahan_barang']; ?>">Delete</button>
+                                                data-bs-target="#modal-delete-<?php echo $row['id_perpindahan_barang']; ?>">Hapus</button>
                                             <?php endif; ?>
                                             <a href="../report/printLaporanPerpindahanBarang.php?id=<?php echo $row['id_perpindahan_barang']; ?>"
                                                 class="btn btn-primary btn-sm">Cetak</a>
                                         </td>
                                     </tr>
-                                    <?php
-                                    }
-                                    ?>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>
@@ -185,6 +218,12 @@ require('../layouts/header.php');
                                                 <label class="form-label">Nama Barang</label>
                                                 <input type="text" class="form-control bg-light" name="nama_barang"
                                                     value="<?php echo $row['nama_barang']; ?>" readonly>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Merk</label>
+                                                <input type="text" class="form-control bg-light" name="merk"
+                                                    value="<?php echo $row['merk']; ?>" readonly>
                                             </div>
 
                                             <div class="mb-3">
@@ -254,9 +293,9 @@ require('../layouts/header.php');
                                             </div>
 
                                             <div class="modal-footer">
-                                                <button type="submit" class="btn btn-primary">Simpan</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
                                             </div>
                                         </form>
                                     </div>
@@ -264,10 +303,10 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <!-- Modal Delete -->
+                        <!-- Modal Hapus -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_perpindahan_barang']; ?>"
                             tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Konfirmasi Hapus</h5>
@@ -291,7 +330,7 @@ require('../layouts/header.php');
 
                         <!-- Modal Tambah -->
                         <div class="modal fade" id="tambahPerpindahanModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Tambah Perpindahan Barang</h5>
@@ -301,10 +340,10 @@ require('../layouts/header.php');
                                     <div class="modal-body">
                                         <form method="POST" enctype="multipart/form-data">
                                             <div class="mb-3">
-                                                <label class="form-label">Barang</label>
+                                                <label class="form-label">Data Perpindahan Barang</label>
                                                 <select name="id_inventaris" class="form-select" required
                                                     onchange="fillPerpindahanData(this)">
-                                                    <option value="">Pilih Barang</option>
+                                                    <option value="">Pilih Data Perpindahan Barang</option>
                                                     <?php
                                                     $barang = getBarangPindah($conn);
                                                     while ($row = mysqli_fetch_assoc($barang)) {
@@ -400,10 +439,10 @@ require('../layouts/header.php');
                                             </div>
 
                                             <div class="modal-footer">
-                                                <button type="submit" name="tambahPerpindahan"
-                                                    class="btn btn-primary">Tambah</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" name="tambahPerpindahan"
+                                                    class="btn btn-primary">Tambah</button>
                                             </div>
                                         </form>
                                     </div>

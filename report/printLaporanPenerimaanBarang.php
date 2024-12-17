@@ -15,7 +15,7 @@ $query = "SELECT pb.*,
             LEFT JOIN departemen d ON p.id_departemen = d.id_departemen
             LEFT JOIN departemen d2 ON pb.id_departemen = d2.id_departemen
             WHERE pb.id_permintaan IS NULL OR pb.id_permintaan = '$id_permintaan'
-        ";
+            ";
 
 $result = $conn->query($query);
 
@@ -49,16 +49,10 @@ try {
         $html = '
         <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN PENERIMAAN BARANG</h1>
 
-        <p style="line-height: 1.5;">
-        Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . $data['id_penerimaan'] . '<br>
-        Tanggal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '<br>
-        Departemen&nbsp;: ' . $data['nama_departemen'] . '<br>
-        Lampiran&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -
-        </p>
+        <p>Nomor: ' . $data['id_penerimaan'] . '<br>Tanggal: ' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '<br>Departemen: ' . $data['nama_departemen'] . '</p>
         
-        <p>Kepada Yth.<br>Direksi<br>Di Tempat</p>
-        
-        <br>
+        <p>Kepada Yth.<br>Staff ' . $data['kode_departemen'] . '<br>Di Tempat</p>
+
         <p>Dengan Hormat,</p>
         <p style="text-align: justify;">Laporan ini merinci jenis dan jumlah barang yang telah diterima, diharapkan dapat memastikan kesesuaian dengan permintaan dan kebutuhan. Kami menghargai perhatian dan kerjasama dari pihak terkait dalam proses penerimaan ini.</p>
         

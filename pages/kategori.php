@@ -108,7 +108,7 @@ require('../layouts/header.php');
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_kategori']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_kategori']; ?>">Delete</button>
+                                                data-bs-target="#modal-delete-<?php echo $row['id_kategori']; ?>">Hapus</button>
                                         </td>
                                     </tr>
                                     <?php 
@@ -120,9 +120,9 @@ require('../layouts/header.php');
 
                         <!-- Modal Edit -->
                         <?php
-mysqli_data_seek($result, 0);
-while ($row = mysqli_fetch_assoc($result)) { 
-?>
+                        mysqli_data_seek($result, 0);
+                        while ($row = mysqli_fetch_assoc($result)) { 
+                        ?>
                         <div class="modal fade" id="modal-update-<?php echo $row['id_kategori']; ?>" tabindex="-1"
                             aria-labelledby="modalUpdateLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -148,9 +148,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     value="<?php echo $row['nama_kategori']; ?>" required>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="submit" class="btn btn-primary">Simpan</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
                                             </div>
                                         </form>
                                     </div>
@@ -158,7 +158,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                             </div>
                         </div>
 
-                        <!-- Modal Delete -->
+                        <!-- Modal Hapus -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_kategori']; ?>" tabindex="-1"
                             aria-labelledby="modalDeleteLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -169,7 +169,8 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        Apakah Anda yakin ingin menghapus kategori <?php echo $row['nama_kategori']; ?>?
+                                        Apakah Anda yakin ingin menghapus kategori
+                                        "<?php echo $row['nama_kategori']; ?>"?
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
@@ -202,10 +203,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <input type="text" name="nama_kategori" class="form-control" required>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="submit" name="tambahKategori"
-                                                    class="btn btn-primary">Tambah</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" name="tambahKategori"
+                                                    class="btn btn-primary">Tambah</button>
                                             </div>
                                         </form>
                                     </div>

@@ -22,16 +22,17 @@ require('../layouts/header.php');
                                     <li class="breadcrumb-item">
                                         <a href="dashboard.php">Dashboard</a>
                                     </li>
-                                    <li class="breadcrumb-item active">Caturwulan</li>
+                                    <li class="breadcrumb-item active">Pilih Caturwulan</li>
                                 </ol>
                             </nav>
                         </div>
                     </div>
-                    <div class="alert alert-warning d-flex align-items-center" role="alert">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Penting!</strong> Pastikan untuk melakukan kontrol barang sesuai dengan tanggal dan
-                        tahun yang telah ditentukan.
-                        Periksa kembali semua data sebelum melanjutkan.
+                    <div class="alert alert-warning d-flex align-items-top" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                        <div>
+                            <p class="mb-1"><strong>Penting!</strong>&nbsp;Pastikan untuk melakukan kontrol barang
+                                sesuai dengan tanggal dan tahun yang telah ditentukan.</p>
+                        </div>
                     </div>
                     <div class="row row-cols-1 row-cols-md-3 g-6 mb-12">
                         <div class="col">

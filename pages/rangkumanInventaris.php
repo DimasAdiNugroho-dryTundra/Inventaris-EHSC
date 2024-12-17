@@ -134,8 +134,7 @@ $result = mysqli_query($conn, $query);
                                 <div class="row p-3">
                                     <div class="col-12 d-flex justify-content-start align-items-center">
                                         <a href="../report/printLaporanRangkumanInventaris.php?year=<?php echo $tahunTerpilih; ?>"
-                                            class="btn btn-success">
-                                            <i class="ti ti-printer"></i> Cetak Laporan
+                                            class="btn btn-success"> Cetak Laporan
                                         </a>
                                     </div>
                                 </div>
@@ -201,10 +200,10 @@ $result = mysqli_query($conn, $query);
                                                 if ($memilikiDataCawu1 || $memilikiDataCawu2 || $memilikiDataCawu3) {
                                                     $memilikiDataKontrol = true;
                                                     ?>
-                                        <tr>
-                                            <td class=" text-center align-middle"><?php echo $no++; ?></td>
-                                            <td class="text-center align-middle">
-                                                <?php
+                                                    <tr>
+                                                        <td class=" text-center align-middle"><?php echo $no++; ?></td>
+                                                        <td class="text-center align-middle">
+                                                            <?php
                                                             if ($memilikiDataCawu3) {
                                                                 echo $row['nama_petugas_cawu_tiga'];
                                                             } elseif ($memilikiDataCawu2) {
@@ -215,85 +214,85 @@ $result = mysqli_query($conn, $query);
                                                                 echo '-';
                                                             }
                                                             ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <?php echo ($row['nama_barang'] . ' - ' . $row['nama_barang']); ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <?php echo ($row['kode_inventaris']); ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <?php echo ($row['nama_ruangan']); ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <?php echo ($row['sumber_inventaris']); ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <?php echo $row['jumlah_awal']; ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <?php echo ($row['satuan']); ?>
-                                            </td>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <?php echo ($row['nama_barang'] . ' - ' . $row['nama_barang']); ?>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <?php echo ($row['kode_inventaris']); ?>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <?php echo ($row['nama_ruangan']); ?>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <?php echo ($row['sumber_inventaris']); ?>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <?php echo $row['jumlah_awal']; ?>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <?php echo ($row['satuan']); ?>
+                                                        </td>
 
-                                            <!-- Cawu 1 -->
-                                            <?php if ($memilikiDataCawu1): ?>
-                                            <td class="text-center align-middle bg-label-success">
-                                                <?php echo $row['jumlah_baik_cawu_satu']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-success">
-                                                <?php echo $row['jumlah_rusak_cawu_satu']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-success">
-                                                <?php echo $row['jumlah_pindah_cawu_satu']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-success">
-                                                <?php echo $row['jumlah_hilang_cawu_satu']; ?>
-                                            </td>
-                                            <?php else: ?>
-                                            <td colspan="4" class="text-center align-middle bg-label-success">Tidak ada
-                                                kontrol</td>
-                                            <?php endif; ?>
+                                                        <!-- Cawu 1 -->
+                                                        <?php if ($memilikiDataCawu1): ?>
+                                                            <td class="text-center align-middle bg-label-success">
+                                                                <?php echo $row['jumlah_baik_cawu_satu']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-success">
+                                                                <?php echo $row['jumlah_rusak_cawu_satu']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-success">
+                                                                <?php echo $row['jumlah_pindah_cawu_satu']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-success">
+                                                                <?php echo $row['jumlah_hilang_cawu_satu']; ?>
+                                                            </td>
+                                                        <?php else: ?>
+                                                            <td colspan="4" class="text-center align-middle bg-label-success">Tidak ada
+                                                                kontrol</td>
+                                                        <?php endif; ?>
 
-                                            <!-- Cawu 2 -->
-                                            <?php if ($memilikiDataCawu2): ?>
-                                            <td class="text-center align-middle bg-label-info">
-                                                <?php echo $row['jumlah_baik_cawu_dua']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-info">
-                                                <?php echo $row['jumlah_rusak_cawu_dua']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-info">
-                                                <?php echo $row['jumlah_pindah_cawu_dua']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-info">
-                                                <?php echo $row['jumlah_hilang_cawu_dua']; ?>
-                                            </td>
-                                            <?php else: ?>
-                                            <td colspan="4" class="text-center align-middle bg-label-info">Tidak ada
-                                                kontrol</td>
-                                            <?php endif; ?>
+                                                        <!-- Cawu 2 -->
+                                                        <?php if ($memilikiDataCawu2): ?>
+                                                            <td class="text-center align-middle bg-label-info">
+                                                                <?php echo $row['jumlah_baik_cawu_dua']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-info">
+                                                                <?php echo $row['jumlah_rusak_cawu_dua']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-info">
+                                                                <?php echo $row['jumlah_pindah_cawu_dua']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-info">
+                                                                <?php echo $row['jumlah_hilang_cawu_dua']; ?>
+                                                            </td>
+                                                        <?php else: ?>
+                                                            <td colspan="4" class="text-center align-middle bg-label-info">Tidak ada
+                                                                kontrol</td>
+                                                        <?php endif; ?>
 
-                                            <!-- Cawu 3 -->
-                                            <?php if ($memilikiDataCawu3): ?>
-                                            <td class="text-center align-middle bg-label-warning">
-                                                <?php echo $row['jumlah_baik_cawu_tiga']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-warning">
-                                                <?php echo $row['jumlah_rusak_cawu_tiga']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-warning">
-                                                <?php echo $row['jumlah_pindah_cawu_tiga']; ?>
-                                            </td>
-                                            <td class="text-center align-middle bg-label-warning">
-                                                <?php echo $row['jumlah_hilang_cawu_tiga']; ?>
-                                            </td>
-                                            <?php else: ?>
-                                            <td colspan="4" class="text-center align-middle bg-label-warning">Tidak ada
-                                                kontrol</td>
-                                            <?php endif; ?>
+                                                        <!-- Cawu 3 -->
+                                                        <?php if ($memilikiDataCawu3): ?>
+                                                            <td class="text-center align-middle bg-label-warning">
+                                                                <?php echo $row['jumlah_baik_cawu_tiga']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-warning">
+                                                                <?php echo $row['jumlah_rusak_cawu_tiga']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-warning">
+                                                                <?php echo $row['jumlah_pindah_cawu_tiga']; ?>
+                                                            </td>
+                                                            <td class="text-center align-middle bg-label-warning">
+                                                                <?php echo $row['jumlah_hilang_cawu_tiga']; ?>
+                                                            </td>
+                                                        <?php else: ?>
+                                                            <td colspan="4" class="text-center align-middle bg-label-warning">Tidak ada
+                                                                kontrol</td>
+                                                        <?php endif; ?>
 
-                                            <td class="text-center align-middle">
-                                                <?php
+                                                        <td class="text-center align-middle">
+                                                            <?php
                                                             echo $row['jumlah_akhir'];
                                                             if ($row['jumlah_baik_cawu_tiga'] > 0) {
                                                                 echo " (Cawu 3)";
@@ -303,10 +302,10 @@ $result = mysqli_query($conn, $query);
                                                                 echo " (Cawu 1)";
                                                             }
                                                             ?>
-                                            </td>
+                                                        </td>
 
-                                        </tr>
-                                        <?php
+                                                    </tr>
+                                                    <?php
                                                 }
                                             }
 
@@ -348,23 +347,23 @@ require('../layouts/assetsFooter.php');
 ?>
 
 <script>
-$(document).ready(function() {
-    // Inisialisasi DataTables
-    $('#inventarisTable').DataTable({
-        responsive: true,
-        language: {
-            search: "Cari:",
-            lengthMenu: "Tampilkan _MENU_ data",
-            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-            infoEmpty: "Tidak ada data yang ditampilkan",
-            infoFiltered: "(disaring dari _MAX_ total data)",
-            paginate: {
-                first: "Pertama",
-                last: "Terakhir",
-                next: "Selanjutnya",
-                previous: "Sebelumnya"
+    $(document).ready(function () {
+        // Inisialisasi DataTables
+        $('#inventarisTable').DataTable({
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data yang ditampilkan",
+                infoFiltered: "(disaring dari _MAX_ total data)",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
             }
-        }
+        });
     });
-});
 </script>

@@ -5,27 +5,9 @@ require('../server/crudKontrolBarangCawuSatu.php');
 require('../layouts/header.php');
 
 // Ambil tahun dari POST atau session
-$tahun = isset($_POST['year']) ? intval($_POST['year']) : date('Y');
-
-
+$tahun = isset($_GET['year']) ? (int) $_GET['year'] : date('Y');
 $tahunSekarang = date('Y');
-$tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5); // Tahun dari 5 tahun lalu hingga 5 tahun ke depan
-
-// Query untuk mengambil data kontrol barang
-$query = "SELECT kb.*, i.kode_inventaris, i.nama_barang, i.merk, i.jumlah_akhir, u.nama as nama_petugas,
-          r.nama_ruangan 
-          FROM kontrol_barang_cawu_satu kb 
-          JOIN inventaris i ON kb.id_inventaris = i.id_inventaris 
-          JOIN user u ON kb.id_user = u.id_user 
-          JOIN ruangan r ON i.id_ruangan = r.id_ruangan 
-          WHERE YEAR(kb.tanggal_kontrol) = '$tahun'
-          ORDER BY kb.id_kontrol_barang_cawu_satu DESC";
-
-$result = mysqli_query($conn, $query);
-
-// Hitung total data untuk pagination
-$totalRows = mysqli_num_rows($result);
-$totalPages = ceil($totalRows / $limit);
+$tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
 ?>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -92,19 +74,24 @@ $totalPages = ceil($totalRows / $limit);
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <form method="POST" class="d-flex">
+                                    <form method="GET">
                                         <div class="flex-grow-1 me-2">
                                             <label for="year" class="form-label">Tahun</label>
                                             <select id="year" name="year" class="form-select"
                                                 onchange="this.form.submit()">
                                                 <?php foreach ($tahunRange as $thn): ?>
                                                 <option value="<?php echo $thn; ?>"
-                                                    <?php if (isset($_SESSION['selected_year']) && $_SESSION['selected_year'] == $thn) echo 'selected'; ?>>
+                                                    <?php echo $thn == $tahun ? 'selected' : ''; ?>>
                                                     <?php echo $thn; ?>
                                                 </option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
+                                        <input type="hidden" name="limit" value="<?php echo $limit; ?>">
+                                        <?php if (!empty($search)): ?>
+                                        <input type="hidden" name="search"
+                                            value="<?php echo htmlspecialchars($search); ?>">
+                                        <?php endif; ?>
                                     </form>
                                 </div>
                             </div>
@@ -119,7 +106,7 @@ $totalPages = ceil($totalRows / $limit);
                                 <div class="row p-3">
                                     <!-- Search, Cawu and Year Dropdown -->
                                     <div class="col-md-6">
-                                        <form method="POST" class="d-flex">
+                                        <form method=GET" class="d-flex">
                                             <div class="flex-grow-1 me-2">
                                                 <label for="search" class="form-label">Cari kode inventaris</label>
                                                 <input type="text" class="form-control" id="search" name="search"
@@ -134,20 +121,26 @@ $totalPages = ceil($totalRows / $limit);
                                     </div>
                                     <!-- Form limit -->
                                     <div class="col-md-6">
-                                        <form class="flex-grow-1 me-2">
-                                            <label for="limit" class="form-label">Tampilkan</label>
-                                            <select id="limit" class="select2 form-select"
-                                                onchange="changeLimit(this.value);">
-                                                <option value="5" <?php if ($limit == 5) echo 'selected'; ?>>5</option>
-                                                <option value="10" <?php if ($limit == 10) echo 'selected'; ?>>10
-                                                </option>
-                                                <option value="20" <?php if ($limit == 20) echo 'selected'; ?>>20
-                                                </option>
+                                        <form method="GET">
+                                            <label for="limit" class="form-label">Tampilkan: </label>
+                                            <select id="limit" name="limit" class="select2 form-select"
+                                                onchange="this.form.submit()">
+                                                <?php
+                                                $limitOptions = [5, 10, 20];
+                                                foreach ($limitOptions as $option) {
+                                                    $selected = $limit == $option ? 'selected' : '';
+                                                    echo "<option value='{$option}' {$selected}>{$option}</option>";
+                                                }
+                                                ?>
                                             </select>
+                                            <input type="hidden" name="year" value="<?php echo $tahun; ?>">
+                                            <?php if (!empty($search)): ?>
+                                            <input type="hidden" name="search"
+                                                value="<?php echo htmlspecialchars($search); ?>">
+                                            <?php endif; ?>
                                         </form>
                                     </div>
                                 </div>
-
                                 <div class="row p-3">
                                     <div class="col-md-12">
                                         <div class="alert alert-secondary" role="alert">
@@ -178,10 +171,10 @@ $totalPages = ceil($totalRows / $limit);
                                         </thead>
                                         <tbody>
                                             <?php
-                                            if ($totalRows > 0) {
-                                                $no = 1;
+                                            if (mysqli_num_rows($result) > 0) {
+                                                $no = $offset + 1; // Calculate the correct row number
                                                 while ($row = mysqli_fetch_assoc($result)) {
-                                                    $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
+                                                    $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - ' . $row['nama_ruangan'];
                                             ?>
                                             <tr>
                                                 <td class="text-center align-middle"><?php echo $no++; ?></td>
@@ -229,7 +222,7 @@ $totalPages = ceil($totalRows / $limit);
                                             <div class="modal fade"
                                                 id="editModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>"
                                                 tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg">
+                                                <div class="modal-dialog modal-lg modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Edit Kontrol Barang Cawu 1</h5>
@@ -263,7 +256,7 @@ $totalPages = ceil($totalRows / $limit);
                                                                     <label class="form-label">Inventaris</label>
                                                                     <input type="text" class="form-control bg-light"
                                                                         value="<?php 
-                                                                                $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
+                                                                                $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - ' . $row['nama_ruangan'];
                                                                                 echo $tampil_nama_merk_ruangan . ' (Kode: ' . $row['kode_inventaris'] . ', Jumlah terkontrol: ' . 
                                                                                     ($row['jumlah_baik'] + $row['jumlah_rusak'] + $row['jumlah_pindah'] + $row['jumlah_hilang']) . ')'; 
                                                                                 ?>" readonly>
@@ -387,7 +380,7 @@ $totalPages = ceil($totalRows / $limit);
                                             <div class="modal fade"
                                                 id="deleteModal<?php echo $row['id_kontrol_barang_cawu_satu']; ?>"
                                                 tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog">
+                                                <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Konfirmasi Hapus</h5>
@@ -423,42 +416,43 @@ $totalPages = ceil($totalRows / $limit);
                                 </div>
 
                                 <!-- Pagination -->
-                                <nav aria-label="Page navigation" class="mt-4">
+                                <nav aria-label="Page navigation" class="mt-4 mb-4">
                                     <ul class="pagination pagination-rounded justify-content-center">
-                                        <?php if ($page > 1) { ?>
+                                        <?php if ($page > 1): ?>
                                         <li class="page-item">
                                             <a class="page-link"
-                                                href="?page=<?php echo ($page - 1); ?>&limit=<?php echo $limit; ?>&year=<?php echo $tahun; ?>"
+                                                href="?page=<?php echo ($page - 1); ?>&limit=<?php echo $limit; ?>&year=<?php echo $tahun; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>"
                                                 aria-label="Previous">
                                                 <span aria-hidden="true">&laquo;</span>
                                             </a>
                                         </li>
-                                        <?php } ?>
+                                        <?php endif; ?>
 
-                                        <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
-                                        <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                                        <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
+                                        <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
                                             <a class="page-link"
-                                                href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&year=<?php echo $tahun; ?>"><?php echo $i; ?></a>
+                                                href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>&year=<?php echo $tahun; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">
+                                                <?php echo $i; ?>
+                                            </a>
                                         </li>
-                                        <?php } ?>
+                                        <?php endfor; ?>
 
-                                        <?php if ($page < $totalPages) { ?>
+                                        <?php if ($page < $totalPages): ?>
                                         <li class="page-item">
                                             <a class="page-link"
-                                                href="?page=<?php echo ($page + 1); ?>&limit=<?php echo $limit; ?>&year=<?php echo $tahun; ?>"
+                                                href="?page=<?php echo ($page + 1); ?>&limit=<?php echo $limit; ?>&year=<?php echo $tahun; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>"
                                                 aria-label="Next">
                                                 <span aria-hidden="true">&raquo;</span>
                                             </a>
                                         </li>
-                                        <?php } ?>
+                                        <?php endif; ?>
                                     </ul>
                                 </nav>
-
                             </div>
 
                             <!-- Modal Tambah Kontrol -->
                             <div class="modal fade" id="tambahKontrolModal" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title">Tambah Kontrol Barang Cawu 1</h5>
@@ -489,7 +483,7 @@ $totalPages = ceil($totalRows / $limit);
                                                         <?php
                                                         $result = getAvailableInventaris($conn, $tahun, 'kontrol_barang_cawu_satu');
                                                         while ($row = mysqli_fetch_assoc($result)) {
-                                                            $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
+                                                            $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - ' . $row['nama_ruangan'];
                                                             echo "<option value=\"{$row['id_inventaris']}\">{$tampil_nama_merk_ruangan} (Kode: {$row['kode_inventaris']}, Jumlah: {$row['jumlah']})</option>";
                                                         }
                                                         ?>
@@ -564,7 +558,7 @@ $totalPages = ceil($totalRows / $limit);
                                                 <div class="d-flex justify-content-end gap-2">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                                    <button type="submit" class="btn btn-primary">Tambah</button>
                                                 </div>
                                             </form>
                                         </div>

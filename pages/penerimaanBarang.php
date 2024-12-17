@@ -83,7 +83,7 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <div class="table-responsive text-nowrap">
+                        <div class="table-responsive text-nowrap" style="max-height: 340px;">
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
@@ -120,10 +120,10 @@ require('../layouts/header.php');
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_penerimaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_penerimaan']; ?>">Delete</button>
+                                                data-bs-target="#modal-delete-<?php echo $row['id_penerimaan']; ?>">Hapus</button>
                                             <?php endif; ?>
                                             <a href="../report/printLaporanPenerimaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
-                                                class="btn btn-primary btn-sm">Laporan</a>
+                                                class="btn btn-primary btn-sm">Cetak</a>
                         </div>
                         </td>
                         </tr>
@@ -209,6 +209,11 @@ require('../layouts/header.php');
                                                     value="<?php echo $row['nama_barang']; ?>" required>
                                             </div>
                                             <div class="mb-3">
+                                                <label class="form-label">Merk</label>
+                                                <input type="text" name="merk" class="form-control"
+                                                    value="<?php echo $row['merk']; ?>" required>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label">Departemen</label>
                                                 <select name="id_departemen" class="form-select" required>
                                                     <?php
@@ -262,7 +267,7 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <!-- Modal Delete -->
+                        <!-- Modal Hapus -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_penerimaan']; ?>" tabindex="-1"
                             aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -274,7 +279,7 @@ require('../layouts/header.php');
                                     </div>
                                     <div class="modal-body">
                                         Apakah Anda yakin ingin menghapus penerimaan barang
-                                        <?php echo $row['nama_barang']; ?>?
+                                        "<?php echo $row['nama_barang']; ?>"?
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
@@ -336,7 +341,7 @@ require('../layouts/header.php');
                                             <select name="jenis_input" class="form-select" id="jenis_input"
                                                 onchange="togglePenerimaanForm()" required>
                                                 <option value="permintaan">Dari Permintaan</option>
-                                                <option value="manual">Pengadaan</option>
+                                                <option value="manual">Pengadaan Kantor</option>
                                             </select>
                                         </div>
 

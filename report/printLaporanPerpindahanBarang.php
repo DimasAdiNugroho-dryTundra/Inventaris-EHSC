@@ -155,7 +155,7 @@ try {
             <tr>
                 <td style="text-align: center;">Staff ' . $row['kode_departemen'] . '</td>
                 <td style="text-align: center;">Admin ' . $row['kode_departemen'] . '</td>
-                <td style="text-align: center;">' . $row['nama_petugas'] . '</td>
+                <td style="text-align: center;">' . $row['cawu'] . '</td>
             </tr>
         </table>';
 

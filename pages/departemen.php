@@ -72,19 +72,19 @@ require('../layouts/header.php');
                                 <form class="d-flex justify-content-end align-items-center">
                                     <label for="limit" class="label me-2">Tampilkan:</label>
                                     <select id="limit" class="select2 form-select" onchange="location = this.value;">
-                                        <option value="manajemen-user.php?limit=5"
+                                        <option value="departemen.php?limit=5"
                                             <?php if ($limit == 5) echo 'selected'; ?>>5</option>
-                                        <option value="manajemen-user.php?limit=10"
+                                        <option value="departemen.php?limit=10"
                                             <?php if ($limit == 10) echo 'selected'; ?>>10</option>
-                                        <option value="manajemen-user.php?limit=20"
+                                        <option value="departemen.php?limit=20"
                                             <?php if ($limit == 20) echo 'selected'; ?>>20</option>
                                     </select>
                                 </form>
                             </div>
                         </div>
 
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-hover table-sm">
+                        <div class="table-responsive text-nowrap" style="max-height: 340px;">
+                            <table class=" table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="text-center align-middle">No</th>
@@ -95,9 +95,9 @@ require('../layouts/header.php');
                                 </thead>
                                 <tbody>
                                     <?php
-            $no = $offset + 1;
-            while ($row = mysqli_fetch_assoc($result)) { 
-            ?>
+                                    $no = $offset + 1;
+                                    while ($row = mysqli_fetch_assoc($result)) { 
+                                    ?>
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_departemen']; ?></td>
@@ -106,12 +106,12 @@ require('../layouts/header.php');
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_departemen']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_departemen']; ?>">Delete</button>
+                                                data-bs-target="#modal-delete-<?php echo $row['id_departemen']; ?>">Hapus</button>
                                         </td>
                                     </tr>
                                     <?php 
-            } 
-            ?>
+                                    } 
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
@@ -146,10 +146,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     value=" <?php echo $row['nama_departemen']; ?>" required>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="submit" class="btn btn-primary"
-                                                    id="submit-btn">Simpan</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary"
+                                                    id="submit-btn">Simpan</button>
                                             </div>
                                         </form>
                                     </div>
@@ -158,7 +158,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                         </div>
 
 
-                        <!-- Modal Delete -->
+                        <!-- Modal Hapus -->
                         <div class="modal fade" id="modal-delete-<?php echo $row['id_departemen']; ?>" tabindex="-1"
                             aria-labelledby="modalDeleteLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -203,10 +203,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 <input type="text" name="nama_departemen" class="form-control" required>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="submit" name="tambahDepartemen"
-                                                    class="btn btn-primary">Tambah</button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" name="tambahDepartemen"
+                                                    class="btn btn-primary">Tambah</button>
                                             </div>
                                         </form>
                                     </div>
@@ -246,20 +246,10 @@ while ($row = mysqli_fetch_assoc($result)) {
             require('../layouts/footer.php');
             ?>
             </div>
-            <!-- Footer -->
-
-            <!-- / Footer -->
-
             <div class="content-backdrop fade"></div>
         </div>
-        <!-- Content wrapper -->
     </div>
-    <!-- / Layout page -->
-
-    <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>
-
-    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
 </div>
 

@@ -85,7 +85,7 @@ require('../layouts/header.php');
                             </div>
                         </div>
 
-                        <div class="table-responsive text-nowrap">
+                        <div class="table-responsive text-nowrap" style="max-height: 340px;">
                             <table class="table table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
@@ -123,7 +123,7 @@ require('../layouts/header.php');
                                             <span
                                                 class="<?php echo $warna_status; ?>"><?php echo $status_text; ?></span>
                                         </td>
-                                        <td>
+                                        <td class="text-center align-middle">
                                             <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
@@ -233,7 +233,7 @@ require('../layouts/header.php');
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Modal Delete -->
+                                    <!-- Modal Hapus -->
                                     <div class='modal fade' id='modal-delete-<?php echo $row['id_permintaan']; ?>'
                                         tabindex='-1' aria-labelledby='modalDeleteLabel' aria-hidden='true'>
                                         <div class='modal-dialog modal-dialog-centered' role='document'>
@@ -245,7 +245,7 @@ require('../layouts/header.php');
                                                 </div>
                                                 <div class='modal-body'>
                                                     Apakah Anda yakin ingin menghapus permintaan barang
-                                                    <?php echo $row['nama_barang']; ?>?
+                                                    "<?php echo $row['nama_barang']; ?>"?
                                                 </div>
                                                 <div class='modal-footer'>
                                                     <button type='button' class='btn btn-secondary'
@@ -359,7 +359,7 @@ require('../layouts/header.php');
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                            <button type="submit" class="btn btn-primary">Tambah</button>
                                         </div>
                                     </form>
                                 </div>
@@ -368,25 +368,15 @@ require('../layouts/header.php');
                     </div>
                 </div>
             </div>
-            <!-- Footer -->
             <?php
             require('../layouts/footer.php');
             ?>
-            <!-- / Footer -->
-
             <div class="content-backdrop fade"></div>
         </div>
-        <!-- Content wrapper -->
     </div>
-    <!-- / Layout page -->
-
-    <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>
-
-    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
 </div>
-<!-- / Layout wrapper -->
 
 <?php
 require('../layouts/assetsFooter.php')

@@ -12,6 +12,7 @@ $query = "SELECT pb.*, d.nama_departemen
           FROM penerimaan_barang pb
           LEFT JOIN departemen d ON pb.id_departemen = d.id_departemen
           WHERE pb.nama_barang LIKE '%$search%'
+          ORDER BY pb.id_penerimaan DESC
           LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 
@@ -36,7 +37,8 @@ if (isset($_POST['tambahPenerimaan'])) {
         $get_permintaan = "SELECT pb.*, d.id_departemen 
                           FROM permintaan_barang pb 
                           JOIN departemen d ON pb.id_departemen = d.id_departemen 
-                          WHERE pb.id_permintaan = '$id_permintaan'";
+                          WHERE pb.id_permintaan = '$id_permintaan'
+                          ORDER BY pb.tanggal_permintaan DESC";
         $permintaan_result = mysqli_query($conn, $get_permintaan);
         $permintaan_data = mysqli_fetch_assoc($permintaan_result);
 
@@ -63,7 +65,7 @@ if (isset($_POST['tambahPenerimaan'])) {
 
     mysqli_query($conn, $query);
     $_SESSION['success_message'] = "Penerimaan barang berhasil ditambahkan!";
-    
+
     header("Location: penerimaanBarang.php");
     exit();
 }
@@ -98,11 +100,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         } else {
             // Edit untuk input manual
             $nama_barang = $_POST['nama_barang'];
+            $merk = $_POST['merk'];
             $id_departemen = $_POST['id_departemen'];
             $jumlah = $_POST['jumlah'];
 
             $query = "UPDATE penerimaan_barang SET 
                       nama_barang = '$nama_barang',
+                      merk = '$merk',
                       id_departemen = $id_departemen,
                       tanggal_terima = '$tanggal_terima',
                       jumlah = $jumlah,

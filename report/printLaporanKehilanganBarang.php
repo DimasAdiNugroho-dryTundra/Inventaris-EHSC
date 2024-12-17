@@ -14,7 +14,7 @@ $query = "SELECT kb.*,
             i.merk,
             r.nama_ruangan,
             i.sumber_inventaris,
-            d.nama_departemen,
+            d.*,
             COALESCE(u1.nama, u2.nama, u3.nama) AS nama_petugas
             FROM kehilangan_barang kb
             JOIN inventaris i ON kb.id_inventaris = i.id_inventaris
@@ -129,7 +129,7 @@ try {
             <tr>
                 <td style="text-align: center;">Staff ' . $row['kode_departemen'] . '</td>
                 <td style="text-align: center;">Admin ' . $row['kode_departemen'] . '</td>
-                <td style="text-align: center;">' . $row['nama_petugas'] . '</td>
+                <td style="text-align: center;">' . $row['cawu'] . '</td>
             </tr>
         </table>';
 

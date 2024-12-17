@@ -68,6 +68,15 @@ $totalPages_zero = ceil($total_records_zero / $limit_zero);
 $query_zero .= " LIMIT $offset_zero, $limit_zero";
 $result_zero = mysqli_query($conn, $query_zero);
 
+// Query mengambil data dari pebnerimaan barang
+$penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, pb.merk, pb.tanggal_terima, 
+                        d.nama_departemen, pb.jumlah, pb.satuan, pb.sumber_penerimaan 
+                        FROM penerimaan_barang pb
+                        JOIN departemen d ON pb.id_departemen = d.id_departemen 
+                        WHERE pb.id_penerimaan NOT IN (
+                        SELECT id_penerimaan FROM inventaris WHERE id_penerimaan IS NOT NULL)
+                        ORDER BY pb.id_penerimaan ASC";
+
 // Function untuk generate kode inventaris
 function generateKodeInventaris($conn, $departemen_kode, $kategori_kode)
 {
@@ -143,7 +152,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_inventaris = $_POST['id_inventaris'];
     $id_ruangan = $_POST['id_ruangan'];
     $id_kategori = $_POST['id_kategori'];
-    
+
     // Cek sumber inventaris
     $check_query = "SELECT sumber_inventaris FROM inventaris WHERE id_inventaris = $id_inventaris";
     $check_result = mysqli_query($conn, $check_query);

@@ -246,6 +246,7 @@ if (isset($_POST['tambahPerpindahan'])) {
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_perpindahan_barang = $_POST['id_perpindahan_barang'];
     $id_ruangan = $_POST['id_ruangan'];
+    $keterangan = $_POST['keterangan'];
 
     // 1. Get data perpindahan barang dan inventaris terkait
     $query = "SELECT pb.*, i.id_inventaris as id_inventaris_baru 
