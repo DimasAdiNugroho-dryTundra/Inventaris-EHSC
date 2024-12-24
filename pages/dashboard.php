@@ -168,7 +168,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <p class="mb-0">Kerusakan Belum Dilaporkan</p>
                                     </div>
                                     <div class="card-icon">
-                                        <span class="badge bg-label-danger rounded p-2">
+                                        <span class="badge bg-label-warning rounded p-2">
                                             <i class="ti ti-alert-octagon ti-26px"></i>
                                         </span>
                                     </div>
@@ -185,7 +185,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <p class="mb-0">Perpindahan Belum Dilaporkan</p>
                                     </div>
                                     <div class="card-icon">
-                                        <span class="badge bg-label-warning rounded p-2">
+                                        <span class="badge bg-label-info rounded p-2">
                                             <i class="ti ti-arrows-exchange ti-26px"></i>
                                         </span>
                                     </div>
@@ -203,7 +203,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     </div>
                                     <div class="card-icon">
                                         <span class="badge bg-label-danger rounded p-2">
-                                            <i class="ti ti-alert-circle ti-26px"></i>
+                                            <n class="ti ti-folder-question ti-26px"></i>
                                         </span>
                                     </div>
                                 </div>
@@ -219,19 +219,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             <?php echo $tahun_sekarang; ?>
                                         </p>
                                     </div>
-                                    <!-- <div class="dropdown">
-                                        <button
-                                            class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1"
-                                            type="button" id="inventoryReportsTabsId" data-bs-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            <i class="ti ti-dots-vertical ti-md text-muted"></i>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-end"
-                                            aria-labelledby="inventoryReportsTabsId">
-                                            <a class="dropdown-item" href="javascript:void(0);">Lihat Detail</a>
-                                            <a class="dropdown-item" href="javascript:void(0);">Cetak Laporan</a>
-                                        </div>
-                                    </div> -->
                                 </div>
                                 <div class="card-body">
                                     <ul class="nav nav-tabs widget-nav-tabs pb-8 gap-4 mx-1 d-flex flex-nowrap"
@@ -322,131 +309,131 @@ while ($row = mysqli_fetch_assoc($result)) {
             ?>
 
         <script>
-            // Konversi data PHP ke JavaScript
-            const dataKontrol = <?php echo json_encode($data_kontrol); ?>;
+        // Konversi data PHP ke JavaScript
+        const dataKontrol = <?php echo json_encode($data_kontrol); ?>;
 
-            // Fungsi untuk memformat data untuk grafik
-            function formatDataForChart(data, kondisi) {
-                return data.map(item => ({
-                    x: item.periode,
-                    y: parseInt(item[kondisi]) || 0
-                }));
-            }
+        // Fungsi untuk memformat data untuk grafik
+        function formatDataForChart(data, kondisi) {
+            return data.map(item => ({
+                x: item.periode,
+                y: parseInt(item[kondisi]) || 0
+            }));
+        }
 
-            // Fungsi untuk inisialisasi grafik
-            function initializeCharts() {
-                const commonOptions = {
-                    chart: {
-                        height: 350,
-                        type: 'bar',
-                        toolbar: {
-                            show: false
-                        }
+        // Fungsi untuk inisialisasi grafik
+        function initializeCharts() {
+            const commonOptions = {
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    toolbar: {
+                        show: false
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: [20, 20, 20, 20],
+                        columnWidth: '45%',
+                        distributed: true,
+                    }
+                },
+                colors: ['#696cff', '#03c3ec', '#71dd37'],
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return Math.round(val) || '0';
                     },
-                    plotOptions: {
-                        bar: {
-                            borderRadius: [20, 20, 20, 20],
-                            columnWidth: '45%',
-                            distributed: true,
-                        }
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ["#697a8d"]
+                    }
+                },
+                xaxis: {
+                    categories: ['Cawu 1', 'Cawu 2', 'Cawu 3'],
+                    axisBorder: {
+                        show: false
                     },
-                    colors: ['#696cff', '#03c3ec', '#71dd37'],
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function (val) {
-                            return Math.round(val) || '0';
-                        },
-                        offsetY: -20,
-                        style: {
-                            fontSize: '12px',
-                            colors: ["#697a8d"]
-                        }
+                    axisTicks: {
+                        show: false
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: 'Jumlah Barang'
                     },
-                    xaxis: {
-                        categories: ['Cawu 1', 'Cawu 2', 'Cawu 3'],
-                        axisBorder: {
-                            show: false
-                        },
-                        axisTicks: {
-                            show: false
-                        }
-                    },
-                    yaxis: {
-                        title: {
-                            text: 'Jumlah Barang'
-                        },
-                        labels: {
-                            formatter: function (value) {
-                                return Math.round(value);
-                            }
-                        }
-                    },
-                    grid: {
-                        borderColor: '#f0f0f0',
-                        padding: {
-                            top: 0,
-                            right: 0,
-                            bottom: 0,
-                            left: 0
+                    labels: {
+                        formatter: function(value) {
+                            return Math.round(value);
                         }
                     }
-                };
+                },
+                grid: {
+                    borderColor: '#f0f0f0',
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
+                    }
+                }
+            };
 
-                // Warna gradasi untuk setiap batang
-                const colorsBaik = ['#4caf50', '#81c784', '#a5d6a7'];
-                const colorsRusak = ['#ffeb3b', '#fff176', '#fff9c4'];
-                const colorsHilang = ['#f44336', '#e57373', '#ef9a9a'];
-                const colorsPindah = ['#2196f3', '#64b5f6', '#bbdefb'];
+            // Warna gradasi untuk setiap batang
+            const colorsBaik = ['#4caf50', '#81c784', '#a5d6a7'];
+            const colorsRusak = ['#ffeb3b', '#fff176', '#fff9c4'];
+            const colorsHilang = ['#f44336', '#e57373', '#ef9a9a'];
+            const colorsPindah = ['#2196f3', '#64b5f6', '#bbdefb'];
 
-                // Inisialisasi grafik untuk kondisi baik
-                const chartKondisiBaik = new ApexCharts(document.querySelector("#chartKondisiBaik"), {
-                    ...commonOptions,
-                    colors: colorsBaik,
-                    series: [{
-                        name: 'Baik',
-                        data: formatDataForChart(dataKontrol, 'baik')
-                    }]
-                });
-
-                // Inisialisasi grafik untuk kondisi rusak
-                const chartKondisiRusak = new ApexCharts(document.querySelector("#chartKondisiRusak"), {
-                    ...commonOptions,
-                    colors: colorsRusak,
-                    series: [{
-                        name: 'Rusak',
-                        data: formatDataForChart(dataKontrol, 'rusak')
-                    }]
-                });
-
-                // Inisialisasi grafik untuk kondisi hilang
-                const chartKondisiHilang = new ApexCharts(document.querySelector("#chartKondisiHilang"), {
-                    ...commonOptions,
-                    colors: colorsHilang,
-                    series: [{
-                        name: 'Hilang',
-                        data: formatDataForChart(dataKontrol, 'hilang')
-                    }]
-                });
-
-                // Inisialisasi grafik untuk kondisi pindah
-                const chartKondisiPindah = new ApexCharts(document.querySelector("#chartKondisiPindah"), {
-                    ...commonOptions,
-                    colors: colorsPindah,
-                    series: [{
-                        name: 'Pindah',
-                        data: formatDataForChart(dataKontrol, 'pindah')
-                    }]
-                });
-
-                // Render semua grafik
-                chartKondisiBaik.render();
-                chartKondisiRusak.render();
-                chartKondisiHilang.render();
-                chartKondisiPindah.render();
-            }
-
-            // Panggil fungsi saat dokumen siap
-            document.addEventListener('DOMContentLoaded', function () {
-                initializeCharts();
+            // Inisialisasi grafik untuk kondisi baik
+            const chartKondisiBaik = new ApexCharts(document.querySelector("#chartKondisiBaik"), {
+                ...commonOptions,
+                colors: colorsBaik,
+                series: [{
+                    name: 'Baik',
+                    data: formatDataForChart(dataKontrol, 'baik')
+                }]
             });
+
+            // Inisialisasi grafik untuk kondisi rusak
+            const chartKondisiRusak = new ApexCharts(document.querySelector("#chartKondisiRusak"), {
+                ...commonOptions,
+                colors: colorsRusak,
+                series: [{
+                    name: 'Rusak',
+                    data: formatDataForChart(dataKontrol, 'rusak')
+                }]
+            });
+
+            // Inisialisasi grafik untuk kondisi hilang
+            const chartKondisiHilang = new ApexCharts(document.querySelector("#chartKondisiHilang"), {
+                ...commonOptions,
+                colors: colorsHilang,
+                series: [{
+                    name: 'Hilang',
+                    data: formatDataForChart(dataKontrol, 'hilang')
+                }]
+            });
+
+            // Inisialisasi grafik untuk kondisi pindah
+            const chartKondisiPindah = new ApexCharts(document.querySelector("#chartKondisiPindah"), {
+                ...commonOptions,
+                colors: colorsPindah,
+                series: [{
+                    name: 'Pindah',
+                    data: formatDataForChart(dataKontrol, 'pindah')
+                }]
+            });
+
+            // Render semua grafik
+            chartKondisiBaik.render();
+            chartKondisiRusak.render();
+            chartKondisiHilang.render();
+            chartKondisiPindah.render();
+        }
+
+        // Panggil fungsi saat dokumen siap
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
         </script>

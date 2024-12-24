@@ -1,20 +1,13 @@
 <?php
-// File: server/printQRCode.php
-
-// Mencegah output sebelum generasi PDF untuk menghindari error
 ob_start();
 
-// Import library yang dibutuhkan
-require('../lib/phpqrcode/qrlib.php');    // Library untuk generate QR Code
-require('../lib/TCPDF/tcpdf.php');        // Library untuk generate PDF
-require('../server/configDB.php');                   // Konfigurasi database
+require('../server/sessionHandler.php');
+require_once('../server/configDB.php');
+require('../lib/phpqrcode/qrlib.php');
+require('../lib/TCPDF/tcpdf.php');
 
-// Mengambil ID inventaris dari parameter URL
-$id_inventaris = $_GET['id'] ?? '';
+$id_inventaris = $_GET['id'];
 
-// Query untuk mengambil data inventaris
-// Menggunakan JOIN untuk mendapatkan nama departemen dan kategori
-// Menggunakan LEFT JOIN dengan tabel penerimaan_barang untuk mendapatkan nama barang alternatif
 $query = "SELECT i.*, d.nama_departemen, k.nama_kategori, 
           CASE 
               WHEN pb.nama_barang IS NOT NULL THEN pb.nama_barang 
@@ -26,141 +19,147 @@ $query = "SELECT i.*, d.nama_departemen, k.nama_kategori,
           LEFT JOIN penerimaan_barang pb ON i.id_penerimaan = pb.id_penerimaan
           WHERE i.id_inventaris = '$id_inventaris'";
 
-// Eksekusi query langsung
-$result = mysqli_query($conn, $query);
-$inventaris = mysqli_fetch_assoc($result);
+$result = $conn->query($query);
 
-// Cek apakah data inventaris ditemukan
-if (!$inventaris) {
-    die('Data inventaris tidak ditemukan');
+class MYPDF extends TCPDF
+{
+    public function Header()
+    {
+        $this->SetY(15);
+        $this->SetFont('helvetica', 'B', 12);
+        $this->Cell(0, 10, 'QR Code Inventaris', 0, true, 'C');
+    }
+
+    public function Footer()
+    {
+    }
 }
 
-// Membuat direktori temporary untuk menyimpan file QR Code
 $tempDir = __DIR__ . '/../temp/';
 if (!file_exists($tempDir)) {
     mkdir($tempDir, 0777, true);
 }
 
-// Generate nama file QR Code unik menggunakan MD5 dari kode inventaris
-$qrFile = $tempDir . 'qr_' . md5($inventaris['kode_inventaris']) . '.png';
-
-// Generate QR Code
 try {
-    QRcode::png($inventaris['kode_inventaris'], $qrFile, QR_ECLEVEL_L, 10);
-} catch (Exception $e) {
-    die('Gagal membuat QR Code: ' . $e->getMessage());
-}
+    $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
-// Pastikan file QR Code berhasil dibuat
-if (!file_exists($qrFile)) {
-    die('Gagal membuat file gambar QR Code');
-}
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('PT. Buana Karya Bhakti');
+    $pdf->SetTitle('QR Codes Inventaris');
 
-// Kelas turunan TCPDF untuk kustomisasi header
-class MYPDF extends TCPDF
-{
-    private $headerTitle;
+    $pdf->SetMargins(5, 35, 5);
+    $pdf->SetHeaderMargin(10);
+    $pdf->SetFooterMargin(0);
+    $pdf->setPrintFooter(false);
+    $pdf->SetAutoPageBreak(TRUE, 10);
 
-    // Method untuk mengatur judul header
-    public function setHeaderTitle($title)
-    {
-        $this->headerTitle = $title;
-    }
+    $pdf->AddPage();
 
-    // Override method header bawaan TCPDF
-    public function Header()
-    {
-        $this->SetFont('helvetica', 'B', 12);
-        $this->Cell(0, 10, $this->headerTitle, 0, true, 'C');
-    }
-}
+    if ($result->num_rows > 0) {
+        $inventaris = $result->fetch_assoc();
 
-// Konfigurasi ukuran dalam millimeter
-$qrSizeMM = 20;      // Ukuran QR Code (20mm = 2cm)
-$spacingMM = 30;     // Jarak antar QR Code
-$textHeightMM = 15;  // Tinggi area teks di bawah QR Code
+        $qrFile = $tempDir . 'qr_' . md5($inventaris['kode_inventaris']) . '.png';
+        QRcode::png($inventaris['kode_inventaris'], $qrFile, QR_ECLEVEL_L, 10);
 
-// Inisialisasi PDF
-$pdf = new MYPDF(PDF_PAGE_ORIENTATION, 'mm', PDF_PAGE_FORMAT, true, 'UTF-8', false);
-$pdf->setHeaderTitle('QR Code ' . $inventaris['nama_barang']);
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('PT. Buana Karya Bhakti');
-$pdf->SetTitle('QR Codes - ' . $inventaris['kode_inventaris']);
+        $qrcode_base64 = base64_encode(file_get_contents($qrFile));
+        $namaBarang = $inventaris['nama_barang'] . ' - ' . $inventaris['merk'];
+        $totalCodes = $inventaris['jumlah_awal'];
 
-// Atur margin PDF (dalam mm)
-$pdf->SetMargins(15, 15, 15);
-$pdf->SetAutoPageBreak(TRUE, 15);
+        $html = '<style>
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin: 0;
+                padding: 0;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            td {
+                text-align: center;
+                vertical-align: middle;
+                height: 120px;
+                width: 50%;
+                padding: 15px;
+            }
+            .qr-cell {
+                border-top: 1px dashed #000;
+                border-right: 1px dashed #000;
+                border-bottom: 1px dashed #000;
+                border-left: 1px dashed #000;
+            }
+            .qr-info {
+                font-size: 7.5pt;
+                margin-top: 5px;
+                line-height: 1.3;
+            }
+            .qr-wrapper {
+                display: inline-block;
+                padding: 5px;
+            }
+            .empty-cell {
+                border: none;
+            }
+            img {
+                display: block;
+                margin: 0 auto;
+            }
+        </style>';
 
-$pdf->AddPage();
+        $html .= '<table>';
 
-// Hitung posisi QR Code
-$codesPerRow = 2;                    // Jumlah QR Code per baris
-$totalCodes = $inventaris['jumlah']; // Total QR Code yang akan dibuat
-$pageWidth = $pdf->getPageWidth();   // Lebar halaman
-$pageHeight = $pdf->getPageHeight(); // Tinggi halaman
-$marginLeft = 5;                     // Margin kiri
-$marginTop = 25;                     // Margin atas (termasuk header)
-
-$currentX = $marginLeft;
-$currentY = $marginTop;
-$counter = 0;
-
-// Hitung jarak antar QR Code
-$totalWidth = ($qrSizeMM * $codesPerRow) + ($spacingMM * ($codesPerRow - 1));
-$startX = ($pageWidth - $totalWidth) / 2;
-
-// Jarak vertikal antar baris
-$rowSpacing = 10;
-
-// Loop untuk membuat QR Code sesuai jumlah
-for ($i = 0; $i < $totalCodes; $i++) {
-    // Cek apakah perlu pindah baris
-    if ($counter >= $codesPerRow) {
-        $currentY += $qrSizeMM + $textHeightMM + $rowSpacing;
-        $counter = 0;
-
-        // Cek apakah perlu halaman baru
-        if ($currentY + $qrSizeMM + $textHeightMM > $pageHeight - 15) {
-            $pdf->AddPage();
-            $currentY = $marginTop;
+        for ($i = 0; $i < $totalCodes; $i += 2) {
+            $html .= '<tr>';
+            
+            // First QR code of the row
+            $html .= '<td class="qr-cell">
+                <div class="qr-wrapper">
+                    <img src="@' . $qrcode_base64 . '" width="65" height="65">
+                    <div class="qr-info">
+                        ' . $namaBarang . '<br>
+                        ' . $inventaris['nama_departemen'] . '<br>
+                        ' . $inventaris['kode_inventaris'] . '
+                    </div>
+                </div>
+            </td>';
+            
+            // Second QR code of the row (if exists)
+            if ($i + 1 < $totalCodes) {
+                $html .= '<td class="qr-cell">
+                    <div class="qr-wrapper">
+                        <img src="@' . $qrcode_base64 . '" width="65" height="65">
+                        <div class="qr-info">
+                            ' . $namaBarang . '<br>
+                            ' . $inventaris['nama_departemen'] . '<br>
+                            ' . $inventaris['kode_inventaris'] . '
+                        </div>
+                    </div>
+                </td>';
+            } else {
+                $html .= '<td class="empty-cell"></td>';
+            }
+            
+            $html .= '</tr>';
         }
+
+        $html .= '</table>';
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+    } else {
+        $pdf->Cell(0, 10, 'Data tidak ditemukan', 0, 1, 'C');
     }
 
-    // Hitung posisi X untuk QR Code saat ini
-    $x = $startX + ($counter * ($qrSizeMM + $spacingMM));
-
-    // Tambahkan QR Code ke PDF
     if (file_exists($qrFile)) {
-        $pdf->Image($qrFile, $x, $currentY, $qrSizeMM, $qrSizeMM);
+        unlink($qrFile);
     }
 
-    // Tambahkan teks di bawah QR Code
-    $pdf->SetTextColor(0, 0, 0); // Warna teks hitam
+    ob_end_clean();
+    $pdf->Output('QRCodes_' . $id_inventaris . '.pdf', 'I');
 
-    // Nama Barang
-    $pdf->SetXY($x, $currentY + $qrSizeMM + 2);
-    $pdf->SetFont('helvetica', '', 8);
-    $pdf->Cell($qrSizeMM, 4, 'Nama: ' . $inventaris['nama_barang'], 0, 1, 'C');
-
-    // Departemen
-    $pdf->SetXY($x, $currentY + $qrSizeMM + 6);
-    $pdf->Cell($qrSizeMM, 4, 'Dept: ' . $inventaris['nama_departemen'], 0, 1, 'C');
-
-    // Kode Inventaris
-    $pdf->SetXY($x, $currentY + $qrSizeMM + 10);
-    $pdf->Cell($qrSizeMM, 4, 'Kode: ' . $inventaris['kode_inventaris'], 0, 1, 'C');
-
-    $counter++;
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
 }
-
-// Hapus file QR Code temporary
-if (file_exists($qrFile)) {
-    @unlink($qrFile);
-}
-
-ob_end_clean();
-
-// Output PDF untuk didownload
-$pdf->Output('QRCodes_' . $inventaris['kode_inventaris'] . '.pdf', 'D');
-exit;
 ?>

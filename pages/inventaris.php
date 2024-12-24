@@ -5,6 +5,39 @@ require('../server/crudInventaris.php');
 require('../layouts/header.php');
 ?>
 
+<style>
+.w-30px {
+    width: 30px !important;
+}
+
+.w-50px {
+    width: 50px !important;
+}
+
+.w-70px {
+    width: 70px !important;
+}
+
+.w-80px {
+    width: 80px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.3rem !important;
+    font-size: 0.85rem !important;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+</style>
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <?php require('../layouts/sidePanel.php'); ?>
@@ -103,20 +136,20 @@ require('../layouts/header.php');
                                 <table class="table table-hover table-sm">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="text-center align-middle">No</th>
-                                            <th class="text-center align-middle">Kode Inventaris</th>
-                                            <th class="text-center align-middle">Tanggal Perolehan</th>
-                                            <th class="text-center align-middle">Departemen</th>
-                                            <th class="text-center align-middle">Ruangan</th>
-                                            <th class="text-center align-middle">Kategori</th>
-                                            <th class="text-center align-middle">Nama Barang</th>
-                                            <th class="text-center align-middle">Merk</th>
-                                            <th class="text-center align-middle">Jumlah Awal</th>
-                                            <th class="text-center align-middle">Jumlah Akhir</th>
-                                            <th class="text-center align-middle">Satuan</th>
-                                            <th class="text-center align-middle">Sumber Inventaris</th>
+                                            <th class="text-center align-middle w-30px">No</th>
+                                            <th class="text-center align-middle w-80px">Kode Inventaris</th>
+                                            <th class="text-center align-middle w-80px">Tanggal Perolehan</th>
+                                            <th class="text-center align-middle w-80px">Departemen</th>
+                                            <th class="text-center align-middle w-70px">Ruangan</th>
+                                            <th class="text-center align-middle w-70px">Kategori</th>
+                                            <th class="text-center align-middle w-80px">Nama Barang</th>
+                                            <th class="text-center align-middle w-70px">Merk</th>
+                                            <th class="text-center align-middle w-50px">Jumlah Awal</th>
+                                            <th class="text-center align-middle w-50px">Jumlah Akhir</th>
+                                            <th class="text-center align-middle w-50px">Satuan</th>
+                                            <th class="text-center align-middle w-70px">Sumber Inventaris</th>
                                             <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
-                                            <th class="text-center align-middle">Aksi</th>
+                                            <th class="text-center align-middle w-100px">Aksi</th>
                                             <?php endif; ?>
                                         </tr>
                                     </thead>

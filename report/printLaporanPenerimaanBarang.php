@@ -69,6 +69,10 @@ try {
                 <td>' . $data['merk'] . '</td>
             </tr>
             <tr>
+                <td><strong>Tanggal Penerimaan</strong></td>
+                <td>' . date('d/m/Y', strtotime($data['tanggal_terima'])) . '</td>
+            </tr>
+            <tr>
                 <td><strong>Sumber</strong></td>
                 <td>' . $data['sumber_penerimaan'] . '</td>
             </tr>

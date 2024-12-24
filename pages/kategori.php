@@ -6,6 +6,30 @@ require('../server/crudKategori.php');
 require('../layouts/header.php');
 ?>
 
+<style>
+.w-50px {
+    width: 50px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.w-150px {
+    width: 150px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.4rem !important;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+</style>
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <?php require('../layouts/sidePanel.php'); ?>
@@ -86,13 +110,13 @@ require('../layouts/header.php');
                         </div>
 
                         <div class="table-responsive text-nowrap">
-                            <table class="table table-hover table-sm">
+                            <table class="table table-hover table-sm small">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="text-center align-middle">No</th>
-                                        <th class="text-center align-middle">Kode Kategori</th>
-                                        <th class="text-center align-middle">Nama Kategori</th>
-                                        <th class="text-center align-middle">Aksi</th>
+                                        <th class="text-center align-middle w-50px">No</th>
+                                        <th class="text-center align-middle w-150px">Kode Kategori</th>
+                                        <th class="text-center align-middle w-150px">Nama Kategori</th>
+                                        <th class="text-center align-middle w-150px">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>

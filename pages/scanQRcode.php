@@ -12,7 +12,6 @@ if (isset($_GET['action'])) {
     }
 
     if ($_GET['action'] == 'getDataKontrol') {
-        // Ambil id_inventaris dari kode
         $detail = getDetailInventaris($_GET['kode']);
         if ($detail['success']) {
             $kontrolData = getDataKontrol($detail['data']['id_inventaris']);
@@ -31,8 +30,6 @@ if (isset($_GET['action'])) {
 }
 
 require('../layouts/header.php');
-
-// Fungsi untuk mendapatkan detail inventaris
 function getDetailInventaris($kode)
 {
     global $conn;
@@ -120,7 +117,6 @@ function getDataKontrol($id_inventaris)
             <?php require('../layouts/navbar.php'); ?>
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
-                    <!-- Breadcrumb -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="mb-1">Scan QR Code</h2>
                         <nav aria-label="breadcrumb">
@@ -262,7 +258,6 @@ const html5QrcodeScanner = new Html5QrcodeScanner(
 let scanning = false;
 
 function onScanSuccess(decodedText, decodedResult) {
-    // Update scan result dengan format yang lebih rapi
     document.getElementById('scanResult').innerHTML = `
         <div class="table-responsive">
             <div class="alert alert-success mb-3">
@@ -271,8 +266,8 @@ function onScanSuccess(decodedText, decodedResult) {
             </div>
             <table class="table table-borderless">
                 <tr>
-                    <th width="200">Nama Barang</th>
-                    <td>: <span id="namaBarang">Memuat...</span></td>
+                    <th width="200">Barang</th>
+                    <td>: <span id="namaBarang">Memuat...</span> - <span id="merkBarang">Memuat...</span></td>
                 </tr>
                 <tr>
                     <th>Departemen</th>
@@ -306,7 +301,6 @@ function onScanSuccess(decodedText, decodedResult) {
         </div>
     `;
 
-    // Fetch inventory details
     fetch(`scanQRcode.php?action=getDetails&kode=${encodeURIComponent(decodedText)}`)
         .then(response => {
             if (!response.ok) {
@@ -316,7 +310,6 @@ function onScanSuccess(decodedText, decodedResult) {
         })
         .then(data => {
             if (data.success) {
-                // Format tanggal
                 const tanggalPerolehan = new Date(data.data.tanggal_perolehan);
                 const formattedDate = tanggalPerolehan.toLocaleDateString('id-ID', {
                     day: 'numeric',
@@ -324,8 +317,8 @@ function onScanSuccess(decodedText, decodedResult) {
                     year: 'numeric'
                 });
 
-                // Update nilai-nilai dalam tabel
                 document.getElementById('namaBarang').textContent = data.data.nama_barang;
+                document.getElementById('merkBarang').textContent = data.data.merk;
                 document.getElementById('departemen').textContent = data.data.nama_departemen;
                 document.getElementById('kategori').textContent = data.data.nama_kategori;
                 document.getElementById('ruangan').textContent = data.data.nama_ruangan;
@@ -335,7 +328,6 @@ function onScanSuccess(decodedText, decodedResult) {
                 document.getElementById('jumlahAkhir').textContent =
                     `${data.data.jumlah_akhir} ${data.data.satuan}`;
 
-                // Fetch and display control data
                 fetch(`scanQRcode.php?action=getDataKontrol&kode=${encodeURIComponent(decodedText)}`)
                     .then(response => response.json())
                     .then(controlData => {
@@ -447,12 +439,8 @@ function updateTabelKontrolData(controlData) {
     document.getElementById('DetailInventaris').style.display = 'block';
 }
 
-function onScanFailure(error) {
-    // handle scan failure, usually better to ignore and keep scanning.
-    // console.warn(`Code scan error = ${error}`);
-}
+function onScanFailure(error) {}
 
-// Buttons event listeners
 document.getElementById('startButton').addEventListener('click', () => {
     if (!scanning) {
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -470,7 +458,6 @@ document.getElementById('stopButton').addEventListener('click', () => {
     }
 });
 
-// Start scanner when page loads
 document.addEventListener('DOMContentLoaded', () => {
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     scanning = true;

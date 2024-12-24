@@ -117,7 +117,6 @@ try {
         <thead>
             <tr class="header-main">
                 <th rowspan="2">No</th>
-                <th rowspan="2">Petugas</th>
                 <th rowspan="2">Barang</th>
                 <th rowspan="2">Kode Barang</th>
                 <th rowspan="2">Ruangan</th>
@@ -171,7 +170,6 @@ try {
 
                 $html .= '<tr>';
                 $html .= '<td style="text-align: center;">' . $no++ . '</td>';
-                $html .= '<td style="text-align: left;">' . ($row['nama_petugas_cawu_tiga'] ?: ($row['nama_petugas_cawu_dua'] ?: ($row['nama_petugas_cawu_satu'] ?: '-'))) . '</td>';
                 $html .= '<td style="text-align: left;">' . $row['nama_barang'] . ' - ' . $row['merk'] . '</td>';
                 $html .= '<td style="text-align: center;">' . $row['kode_inventaris'] . '</td>';
                 $html .= '<td style="text-align: center;">' . $row['nama_ruangan'] . '</td>';
@@ -209,7 +207,7 @@ try {
                     $html .= '<td colspan="4" class="cawu3" style="text-align: center;">Tidak ada kontrol</td>';
                 }
 
-                $html .= '<td style="text-align: center;">' . $row['jumlah_akhir'] . (($row['jumlah_baik_cawu_tiga'] > 0) ? ' (Cawu 3)' : (($row['jumlah_baik_cawu_dua'] > 0) ? ' (Cawu 2)' : (($row['jumlah_baik_cawu_satu'] > 0) ? ' (Cawu 1)' : ''))) . '</td>';
+                $html .= '<td style="text-align: center;">' . $row['jumlah_akhir'] . '</td>';
                 $html .= '</tr>';
             }
         }
@@ -255,17 +253,17 @@ try {
             <td style="width: 33.33%; text-align: center; border: none;">
                 <p>Petugas Kontrol Cawu 1</p>
                 <div style="height: 80px;"></div>
-                <p>(........................)</p>
+                <p>' . $row['nama_petugas_cawu_satu'] . '</p>
             </td>
             <td style="width: 33.33%; text-align: center; border: none;">
                 <p>Petugas Kontrol Cawu 2</p>
                 <div style="height: 80px;"></div>
-                <p>(........................)</p>
+                <p>' . $row['nama_petugas_cawu_dua'] . '</p>
             </td>
             <td style="width: 33.33%; text-align: center; border: none;">
                 <p>Petugas Kontrol Cawu 3</p>
                 <div style="height: 80px;"></div>
-                <p>(........................)</p>
+                <p>' . $row['nama_petugas_cawu_tiga'] . '</p>
             </td>
         </tr>
     </table>

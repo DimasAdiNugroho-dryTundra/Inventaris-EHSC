@@ -78,18 +78,18 @@ $penerimaan_query = "SELECT pb.id_penerimaan, pb.nama_barang, pb.merk, pb.tangga
                         ORDER BY pb.id_penerimaan ASC";
 
 // Function untuk generate kode inventaris
-function generateKodeInventaris($conn, $departemen_kode, $kategori_kode)
+function generateKodeInventaris($conn, $departemen_kode, $ruangan_kode, $kategori_kode)
 {
-    $year = date('Y');
+    $tahun = date('Y');
 
-    $query = "SELECT MAX(CAST(SUBSTRING_INDEX(kode_inventaris, '/', -1) AS UNSIGNED)) as last_number 
+    $query = "SELECT MAX(CAST(SUBSTRING_INDEX(kode_inventaris, '/', -1) AS UNSIGNED)) as angka_terakhir 
               FROM inventaris 
-              WHERE kode_inventaris LIKE '$departemen_kode/$kategori_kode/$year/%'";
+              WHERE kode_inventaris LIKE '$departemen_kode/$ruangan_kode/$kategori_kode/$tahun/%'";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
 
-    $next_number = ($row['last_number'] ?? 0) + 1;
-    return sprintf("%s/%s/%s/%03d", $departemen_kode, $kategori_kode, $year, $next_number);
+    $angka_berikutnya = ($row['angka_terakhir'] ?? 0) + 1;
+    return sprintf("%s/%s/%s/%s/%03d", $departemen_kode, $ruangan_kode, $kategori_kode, $tahun, $angka_berikutnya);
 }
 
 // Handling Create
@@ -110,6 +110,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
             // Ambil kode departemen dan kategori
             $query_dept = "SELECT kode_departemen FROM departemen WHERE id_departemen = $id_departemen";
             $query_kat = "SELECT kode_kategori FROM kategori WHERE id_kategori = $id_kategori";
+            $query_ruang = "SELECT kode_ruangan FROM ruangan WHERE id_ruangan = $id_ruangan";
+
 
             $result_dept = mysqli_query($conn, $query_dept);
             $dept = mysqli_fetch_assoc($result_dept);
@@ -117,8 +119,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
             $result_kat = mysqli_query($conn, $query_kat);
             $kat = mysqli_fetch_assoc($result_kat);
 
+            $result_ruang = mysqli_query($conn, $query_ruang);
+            $ruang = mysqli_fetch_assoc($result_ruang);
+
             if ($dept && $kat) {
-                $kode_inventaris = generateKodeInventaris($conn, $dept['kode_departemen'], $kat['kode_kategori']);
+                $kode_inventaris = generateKodeInventaris($conn, $dept['kode_departemen'], $ruang['kode_ruangan'], $kat['kode_kategori']);
 
                 // Query untuk insert
                 $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, merk, id_penerimaan,
@@ -189,6 +194,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     // Ambil kode departemen dan kategori
     $query_dept = "SELECT kode_departemen FROM departemen WHERE id_departemen = {$inventaris['id_departemen']}";
     $query_kat = "SELECT kode_kategori FROM kategori WHERE id_kategori = $id_kategori";
+    $query_ruang = "SELECT kode_ruangan FROM ruangan WHERE id_ruangan = $id_ruangan";
 
     $result_dept = mysqli_query($conn, $query_dept);
     $dept = mysqli_fetch_assoc($result_dept);
@@ -196,8 +202,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $result_kat = mysqli_query($conn, $query_kat);
     $kat = mysqli_fetch_assoc($result_kat);
 
+    $result_ruang = mysqli_query($conn, $query_ruang);
+    $ruang = mysqli_fetch_assoc($result_ruang);
+
     // Generate kode inventaris baru
-    $kode_inventaris_baru = generateKodeInventaris($conn, $dept['kode_departemen'], $kat['kode_kategori']);
+    $kode_inventaris_baru = generateKodeInventaris($conn, $dept['kode_departemen'], $ruang['kode_ruangan'], $kat['kode_kategori']);
 
     // Query untuk update
     $query = "UPDATE inventaris SET

@@ -40,35 +40,50 @@ if (isset($_POST['tambahKategori'])) {
 // Process editing category
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kategori = $_POST['id_kategori'];
-    $kode_kategori = $_POST['kode_kategori'];
-    $nama_kategori = $_POST['nama_kategori'];
 
-    // Start update query
-    $query = "UPDATE kategori SET kode_kategori = '$kode_kategori', nama_kategori = '$nama_kategori' WHERE id_kategori = '$id_kategori'";
+    // Cek apakah kategori sudah digunakan di tabel inventaris
+    $checkQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_kategori = $id_kategori";
+    $checkResult = mysqli_query($conn, $checkQuery);
+    $checkRow = mysqli_fetch_assoc($checkResult);
 
-    if (!mysqli_query($conn, $query)) {
-        $_SESSION['error_message'] = "Gagal mengubah kategori: " . mysqli_error($conn);
+    if ($checkRow['count'] > 0) {
+        $_SESSION['error_message'] = "Data kategori tidak dapat diubah karena sudah digunakan pada data inventaris!";
     } else {
-        $_SESSION['success_message'] = "Kategori berhasil diubah!";
-    }
+        $kode_kategori = $_POST['kode_kategori'];
+        $nama_kategori = $_POST['nama_kategori'];
 
+        $query = "UPDATE kategori SET kode_kategori = '$kode_kategori', nama_kategori = '$nama_kategori' WHERE id_kategori = '$id_kategori'";
+
+        if (!mysqli_query($conn, $query)) {
+            $_SESSION['error_message'] = "Gagal mengubah kategori: " . mysqli_error($conn);
+        } else {
+            $_SESSION['success_message'] = "Kategori berhasil diubah!";
+        }
+    }
     header("Location: kategori.php");
-    exit(); // Ensure no further execution
+    exit();
 }
 
 // Process deleting category
 if (isset($_GET['delete'])) {
     $id_kategori = $_GET['delete'];
 
-    // Delete category data from database
-    $query = "DELETE FROM kategori WHERE id_kategori='$id_kategori'";
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['success_message'] = "Kategori berhasil dihapus!";
-    } else {
-        $_SESSION['error_message'] = "Gagal menghapus kategori: " . mysqli_error($conn);
-    }
+    // Cek apakah kategori sudah digunakan di tabel inventaris
+    $checkQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_kategori = $id_kategori";
+    $checkResult = mysqli_query($conn, $checkQuery);
+    $checkRow = mysqli_fetch_assoc($checkResult);
 
+    if ($checkRow['count'] > 0) {
+        $_SESSION['error_message'] = "Data kategori tidak dapat dihapus karena sudah digunakan pada data inventaris!";
+    } else {
+        $query = "DELETE FROM kategori WHERE id_kategori='$id_kategori'";
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['success_message'] = "Kategori berhasil dihapus!";
+        } else {
+            $_SESSION['error_message'] = "Gagal menghapus kategori: " . mysqli_error($conn);
+        }
+    }
     header("Location: kategori.php");
-    exit(); // Ensure no further execution
+    exit();
 }
 ?>

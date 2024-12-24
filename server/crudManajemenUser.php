@@ -22,22 +22,19 @@ function validasiFoto($file)
     $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     $maxSize = 2097152;
 
-    // Cek apakah ada file yang diupload
     if ($file['error'] !== UPLOAD_ERR_OK) {
         return "Tidak ada file yang diupload.";
     }
 
-    // Cek ukuran file
     if ($file['size'] > $maxSize) {
         return "Ukuran file foto tidak boleh lebih dari 2MB.";
     }
 
-    // Cek tipe file
     if (!in_array($file['type'], $allowedTypes)) {
         return "Tipe file tidak valid. Harus berupa JPG, JPEG, atau PNG.";
     }
 
-    return true; // Validasi berhasil
+    return true;
 }
 
 // Proses penambahan user
@@ -49,28 +46,29 @@ if (isset($_POST['tambahUser'])) {
     $jabatan = $_POST['jabatan'];
     $hak_akses = $_POST['hak_akses'];
 
-    // Cek apakah username sudah ada
+    // Cek username yang sudah ada
     $checkUsername = "SELECT * FROM user WHERE username='$username'";
     $checkResult = mysqli_query($conn, $checkUsername);
+
     if (mysqli_num_rows($checkResult) > 0) {
         $_SESSION['error_message'] = "Username sudah ada, silakan gunakan username lain.";
     } else {
         $uploadDir = '../upload/user/';
         $foto = $_FILES['foto'];
 
-        // Validasi gambar
         $validationResult = validasiFoto($foto);
         if ($validationResult !== true) {
             $_SESSION['error_message'] = $validationResult;
         } else {
-            $fotoName = basename($foto['name']);
+            // Tambahkan timestamp ke nama file
+            $fotoName = time() . '_' . basename($foto['name']);
             $fotoTmp = $foto['tmp_name'];
             $fotoPath = $uploadDir . $fotoName;
 
-            // Pindahkan file yang diupload
             if (move_uploaded_file($fotoTmp, $fotoPath)) {
                 $query = "INSERT INTO user (nama, username, password, email, jabatan, foto, hak_akses)
                           VALUES ('$nama', '$username', '$password', '$email', '$jabatan', '$fotoName', '$hak_akses')";
+
                 if (mysqli_query($conn, $query)) {
                     $_SESSION['success_message'] = "User berhasil ditambahkan!";
                 } else {
@@ -82,7 +80,7 @@ if (isset($_POST['tambahUser'])) {
         }
     }
     header("Location: manajemenUser.php");
-    exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
+    exit();
 }
 
 // Proses pengeditan user
@@ -96,44 +94,50 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $password = !empty($_POST['password']) ? md5($_POST['password']) : null;
 
     // Mulai query update
-    $query = "UPDATE user SET nama = '$nama', username = '$username', email = '$email', jabatan = '$jabatan', hak_akses = '$hak_akses'";
+    $query = "UPDATE user SET 
+              nama = '$nama', 
+              username = '$username', 
+              email = '$email', 
+              jabatan = '$jabatan', 
+              hak_akses = '$hak_akses'";
+
     // Tambahkan password jika ada
     if ($password) {
         $query .= ", password = '$password'";
     }
 
     // Proses upload foto jika ada
-    $fotoUploaded = false; // Flag untuk menandakan apakah foto berhasil diupload
+    $fotoUploaded = false;
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
         $uploadDir = '../upload/user/';
         $foto = $_FILES['foto'];
 
-        // Validasi gambar
+        // Validasi foto
         $validationResult = validasiFoto($foto);
         if ($validationResult !== true) {
             $_SESSION['error_message'] = $validationResult;
         } else {
-            $fotoName = basename($foto['name']);
+            // Tambahkan timestamp ke nama file
+            $fotoName = time() . '_' . basename($foto['name']);
             $fotoTmp = $foto['tmp_name'];
             $fotoPath = $uploadDir . $fotoName;
 
-            // Ambil nama foto lama dari database
+            // Ambil dan hapus foto lama
             $queryOld = "SELECT foto FROM user WHERE id_user='$id_user'";
             $resultOld = mysqli_query($conn, $queryOld);
 
             if ($user = mysqli_fetch_assoc($resultOld)) {
                 $oldFotoPath = $uploadDir . $user['foto'];
-
-                // Hapus foto lama dari server jika ada
+                // Hapus foto lama jika ada
                 if (file_exists($oldFotoPath)) {
                     unlink($oldFotoPath);
                 }
             }
 
-            // Pindahkan file foto baru
+            // Upload foto baru
             if (move_uploaded_file($fotoTmp, $fotoPath)) {
                 $query .= ", foto = '$fotoName'";
-                $fotoUploaded = true; // Set flag true jika foto berhasil diupload
+                $fotoUploaded = true;
             } else {
                 $_SESSION['error_message'] = "Gagal mengupload foto baru.";
             }
@@ -142,8 +146,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 
     // Akhiri query dengan kondisi WHERE
     $query .= " WHERE id_user = '$id_user'";
-
-    // Eksekusi query hanya jika tidak ada kesalahan
     if (empty($_SESSION['error_message'])) {
         if (!mysqli_query($conn, $query)) {
             $_SESSION['error_message'] = "Gagal mengubah user: " . mysqli_error($conn);
@@ -153,20 +155,17 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     }
 
     header("Location: manajemenUser.php");
-    exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
+    exit();
 }
-
 
 // Proses penghapusan user
 if (isset($_GET['delete'])) {
     $id_user = $_GET['delete'];
 
-    // Ambil nama foto dari database
     $query = "SELECT foto FROM user WHERE id_user='$id_user'";
     $result = mysqli_query($conn, $query);
     $user = mysqli_fetch_assoc($result);
 
-    // Hapus foto dari server
     if ($user && !empty($user['foto'])) {
         $fotoPath = '../upload/user/' . $user['foto'];
         if (file_exists($fotoPath)) {

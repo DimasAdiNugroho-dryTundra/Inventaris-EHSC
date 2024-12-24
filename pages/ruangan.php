@@ -5,6 +5,31 @@ require('../server/crudRuangan.php');
 require('../layouts/header.php');
 ?>
 
+<style>
+.w-50px {
+    width: 50px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.w-150px {
+    width: 150px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.4rem !important;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+</style>
+
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <?php require('../layouts/sidePanel.php'); ?>
@@ -80,21 +105,24 @@ require('../layouts/header.php');
                             </div>
 
                             <div class="table-responsive text-nowrap" style="max-height: 340px;">
-                                <table class="table table-hover">
+                                <table class="table table-hover table-sm small">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="text-center align-middle">No</th>
-                                            <th class="text-center align-middle">Nama Ruangan</th>
-                                            <th class="text-center align-middle">Aksi</th>
+                                            <th class="text-center align-middle w-50px">No</th>
+                                            <th class="text-center align-middle w-150px">Kode Ruangan</th>
+                                            <th class="text-center align-middle w-150px">Nama Ruangan</th>
+                                            <th class="text-center align-middle w-150px">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
-                                    $no = 1;
-                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        $no = $offset + 1;
+                                        while ($row = mysqli_fetch_assoc($result)) {
                                         ?>
                                         <tr>
                                             <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                            <td class="text-center align-middle"><?php echo $row['kode_ruangan']; ?>
+                                            </td>
                                             <td class="text-center align-middle"><?php echo $row['nama_ruangan']; ?>
                                             </td>
                                             <td class="text-center align-middle">
@@ -121,6 +149,13 @@ require('../layouts/header.php');
                                                             <input type="hidden" name="action" value="update">
                                                             <input type="hidden" name="id_ruangan"
                                                                 value="<?php echo $row['id_ruangan']; ?>">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Kode Ruangan</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="kode_ruangan"
+                                                                    value="<?php echo $row['kode_ruangan']; ?>"
+                                                                    required>
+                                                            </div>
                                                             <div class="mb-3">
                                                                 <label class="form-label">Nama Ruangan</label>
                                                                 <input type="text" class="form-control"
@@ -172,7 +207,7 @@ require('../layouts/header.php');
 
                             <!-- Modal Tambah Ruangan -->
                             <div class="modal fade" id="tambahRuanganModal" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title">Tambah Ruangan</h5>
@@ -181,6 +216,11 @@ require('../layouts/header.php');
                                         </div>
                                         <div class="modal-body">
                                             <form method="POST" action="ruangan.php">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Kode Ruangan</label>
+                                                    <input type="text" name="kode_ruangan" class="form-control"
+                                                        required>
+                                                </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Nama Ruangan</label>
                                                     <input type="text" name="nama_ruangan" class="form-control"
@@ -244,9 +284,10 @@ require('../layouts/header.php');
 
         const pesanKhusus = {
             'nama ruangan': 'Kolom nama ruangan wajib diisi!',
+            'kode ruangan': 'Kolom kode ruangan wajib diisi!'
         };
 
-        return pesanKhus[labelText] || (jenisInput === 'select' ? `Mohon pilih ${labelText}` :
+        return pesanKhusus[labelText] || (jenisInput === 'select' ? `Mohon pilih ${labelText}` :
             `Mohon masukkan ${labelText}`);
     }
 

@@ -10,6 +10,7 @@ $id_kehilangan_barang = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 $query = "SELECT kb.*, 
             i.nama_barang, 
+            i.satuan, 
             i.kode_inventaris, 
             i.merk,
             r.nama_ruangan,
@@ -81,16 +82,20 @@ try {
                 <td>' . $row['merk'] . '</td>
             </tr>
             <tr>
+                <td><strong>Ruangan</strong></td>
+                <td>' . $row['nama_ruangan'] . '</td>
+            </tr>
+            <tr>
                 <td><strong>Tanggal Kehilangan</strong></td>
                 <td>' . $row['tanggal_kehilangan'] . '</td>
             </tr>
             <tr>
-                <td><strong>Jumlah Kehilangan</strong></td>
-                <td>' . $row['jumlah_kehilangan'] . ' ' . $row['satuan'] . '</td>
-            </tr>
-            <tr>
                 <td><strong>Cawu</strong></td>
                 <td>' . $row['cawu'] . '</td>
+            </tr>
+            <tr>
+                <td><strong>Jumlah Kehilangan</strong></td>
+                <td>' . $row['jumlah_kehilangan'] . ' ' . $row['satuan'] . '</td>
             </tr>
             <tr>
                 <td><strong>Sumber Inventaris</strong></td>

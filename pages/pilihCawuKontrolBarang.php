@@ -37,7 +37,7 @@ require('../layouts/header.php');
                     <div class="row row-cols-1 row-cols-md-3 g-6 mb-12">
                         <div class="col">
                             <div class="card h-100 text-center">
-                                <img class="card-img-top" src="../upload/user/1.png" alt="Card image cap" />
+                                <img class="card-img-top" src="../lib/assets/img/1.png" alt="Card image cap" />
                                 <div class="card-body">
                                     <h5 class="card-title">Caturwulan Ke-1</h5>
                                     <p class="card-text">
@@ -49,7 +49,7 @@ require('../layouts/header.php');
                         </div>
                         <div class="col">
                             <div class="card h-100 text-center">
-                                <img class="card-img-top" src="../upload/user/1.png" alt="Card image cap" />
+                                <img class="card-img-top" src="../lib/assets/img/2.png" alt="Card image cap" />
                                 <div class="card-body">
                                     <h5 class="card-title">Caturwulan Ke-2</h5>
                                     <p class="card-text">
@@ -61,7 +61,7 @@ require('../layouts/header.php');
                         </div>
                         <div class="col">
                             <div class="card h-100 text-center">
-                                <img class="card-img-top" src="../upload/user/1.png" alt="Card image cap" />
+                                <img class="card-img-top" src="../lib/assets/img/3.png" alt="Card image cap" />
                                 <div class="card-body">
                                     <h5 class="card-title">Caturwulan Ke-3</h5>
                                     <p class="card-text">

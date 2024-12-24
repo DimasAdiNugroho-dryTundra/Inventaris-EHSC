@@ -9,6 +9,7 @@ $id_kerusakan_barang = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 $query = "SELECT kb.*, 
             i.nama_barang, 
+            i.satuan, 
             i.kode_inventaris, 
             i.merk,
             r.nama_ruangan,

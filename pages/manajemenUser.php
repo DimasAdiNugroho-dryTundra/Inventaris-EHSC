@@ -58,10 +58,8 @@ require('../layouts/header.php');
             <?php require('../layouts/sidePanel.php'); ?>
 
             <div class="layout-page">
-                <!-- navbar -->
-
+                <?php require('../layouts/navbar.php'); ?>
                 <div class="content-wrapper">
-                    <?php require('../layouts/navbar.php'); ?>
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
@@ -152,8 +150,9 @@ require('../layouts/header.php');
                                     </thead>
                                     <tbody>
                                         <?php
-            $no = $offset + 1;
-            while ($row = mysqli_fetch_assoc($result)) { ?>
+                                        $no = $offset + 1;
+                                        while ($row = mysqli_fetch_assoc($result)) { 
+                                        ?>
                                         <tr>
                                             <td class="text-center align-middle"><?php echo $no++; ?></td>
                                             <td class="text-center align-middle"><?php echo $row['nama']; ?></td>
@@ -281,6 +280,15 @@ require('../layouts/header.php');
                                                                     PNG)</label>
                                                                 <input type="file" name="foto" class="form-control"
                                                                     accept="image/*">
+                                                                <?php if ($row['foto']) { ?>
+                                                                <div class="mt-2 text-center">
+                                                                    <div class="card"
+                                                                        style="display: inline-block; width: 200px;">
+                                                                        <img src="../upload/user/<?php echo $row['foto']; ?>"
+                                                                            class="card-img-top" alt="Foto User">
+                                                                    </div>
+                                                                </div>
+                                                                <?php } ?>
                                                             </div>
 
                                                             <div class="modal-footer">

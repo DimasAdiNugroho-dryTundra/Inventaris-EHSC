@@ -31,6 +31,11 @@ require('../layouts/header.php');
 .table-sm th {
     padding: 0.4rem !important;
 }
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
 </style>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -118,8 +123,7 @@ require('../layouts/header.php');
                                     <tr>
                                         <th class="text-center align-middle w-50px">No</th>
                                         <th class="text-center align-middle w-100px">Kode</th>
-                                        <th class="text-center align-middle w-150px">Nama Barang</th>
-                                        <th class="text-center align-middle w-100px">Merk</th>
+                                        <th class="text-center align-middle w-150px">Barang</th>
                                         <th class="text-center align-middle w-120px">Ruangan</th>
                                         <th class="text-center align-middle w-120px">Tanggal</th>
                                         <th class="text-center align-middle w-80px">Cawu</th>
@@ -138,8 +142,9 @@ require('../layouts/header.php');
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['merk']; ?></td>
+                                        <td class="text-center align-middle">
+                                            <?php echo $row['nama_barang'] . " - " . $row['merk']; ?>
+                                        </td>
                                         <td class="text-center align-middle"><?php echo $row['nama_ruangan']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['tanggal_kehilangan']; ?>
                                         </td>

@@ -6,6 +6,38 @@ require('../server/crudPermintaanBarang.php'); // Adjust this file accordingly
 require('../layouts/header.php');
 ?>
 
+<style>
+.w-50px {
+    width: 50px !important;
+}
+
+.w-80px {
+    width: 80px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.w-120px {
+    width: 120px !important;
+}
+
+.w-150px {
+    width: 150px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.4rem !important;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+</style>
+
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <?php require('../layouts/sidePanel.php'); ?>
@@ -86,19 +118,19 @@ require('../layouts/header.php');
                         </div>
 
                         <div class="table-responsive text-nowrap" style="max-height: 340px;">
-                            <table class="table table-hover table-sm">
+                            <table class="table table-hover table-sm small">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="text-center align-middle">No</th>
-                                        <th class="text-center align-middle">Departemen</th>
-                                        <th class="text-center align-middle">Barang</th>
-                                        <th class="text-center align-middle">Merk</th>
-                                        <th class="text-center align-middle">Tanggal</th>
-                                        <th class="text-center align-middle">Spesifikasi</th>
-                                        <th class="text-center align-middle">Kebutuhan Qty</th>
-                                        <th class="text-center align-middle">Satuan</th>
-                                        <th class="text-center align-middle">Status</th>
-                                        <th class="text-center align-middle">Aksi</th>
+                                        <th class="text-center align-middle w-50px">No</th>
+                                        <th class="text-center align-middle w-120px">Departemen</th>
+                                        <th class="text-center align-middle w-120px">Barang</th>
+                                        <th class="text-center align-middle w-100px">Merk</th>
+                                        <th class="text-center align-middle w-100px">Tanggal</th>
+                                        <th class="text-center align-middle w-150px">Spesifikasi</th>
+                                        <th class="text-center align-middle w-100px">Jumlah Kebutuhan</th>
+                                        <th class="text-center align-middle w-80px">Satuan</th>
+                                        <th class="text-center align-middle w-100px">Status</th>
+                                        <th class="text-center align-middle w-150px">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -108,31 +140,27 @@ require('../layouts/header.php');
                                         $status_text = $row['status'] == 1 ? 'Disetujui' : ($row['status'] == 2 ? 'Tidak Disetujui' : 'Menunggu');
                                         $warna_status = $row['status'] == 1 ? 'text-success' : ($row['status'] == 2 ? 'text-danger' : 'text-warning');
                                     ?>
-                                    <tr>
-                                        <td class="text-center align-middle"><?php echo $no++; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['merk']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['tanggal_permintaan']; ?>
-                                        </td>
-                                        <td class="text-center align-middle"><?php echo $row['spesifikasi']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['jumlah_kebutuhan']; ?>
-                                        </td>
-                                        <td class="text-center align-middle"><?php echo $row['satuan']; ?></td>
-                                        <td class="text-center align-middle">
-                                            <span
-                                                class="<?php echo $warna_status; ?>"><?php echo $status_text; ?></span>
-                                        </td>
-                                        <td class="text-center align-middle">
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
-                                            <button class="btn btn-info btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Hapus</button>
-                                            <?php endif; ?>
-                                            <a href="../report/printLaporanPermintaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
-                                                class="btn btn-primary btn-sm">Cetak</a>
-                                        </td>
+                                    <td class="text-center align-middle"><?php echo $no++; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['nama_departemen']; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['merk']; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['tanggal_permintaan']; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['spesifikasi']; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['jumlah_kebutuhan']; ?></td>
+                                    <td class="text-center align-middle"><?php echo $row['satuan']; ?></td>
+                                    <td class="text-center align-middle">
+                                        <span class="<?php echo $warna_status; ?>"><?php echo $status_text; ?></span>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Hapus</button>
+                                        <?php endif; ?>
+                                        <a href="../report/printLaporanPermintaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
+                                            class="btn btn-primary btn-sm">Cetak</a>
+                                    </td>
                                     </tr>
                                     <!-- modal edit -->
                                     <div class='modal fade' id='modal-update-<?php echo $row['id_permintaan']; ?>'
@@ -394,7 +422,7 @@ function getPesanValidasi(labelText, jenisInput) {
         'merk': 'Kolom merk wajib diisi!',
         'tanggal': 'Kolom tanggal wajib diisi!',
         'spesifikasi': 'Kolom spesifikasi wajib diisi!',
-        'kebutuhan qty': 'Kolom kebutuhan qty wajib diisi!',
+        'jumlah kebutuhan': 'Kolom jumlah kebutuhan wajib diisi!',
         'satuan': 'Kolom satuan wajib diisi!',
         'status': 'Kolom status wajib diisi!'
     };

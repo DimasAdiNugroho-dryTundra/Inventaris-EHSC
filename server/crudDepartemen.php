@@ -40,35 +40,51 @@ if (isset($_POST['tambahDepartemen'])) {
 // Proses pengeditan departemen
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_departemen = $_POST['id_departemen'];
-    $kode_departemen = $_POST['kode_departemen'];
-    $nama_departemen = $_POST['nama_departemen'];
 
-    // Mulai query update
-    $query = "UPDATE departemen SET kode_departemen = '$kode_departemen', nama_departemen = '$nama_departemen' WHERE id_departemen = '$id_departemen'";
+    // Cek apakah departemen sudah digunakan di tabel inventaris
+    $checkQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_departemen = $id_departemen";
+    $checkResult = mysqli_query($conn, $checkQuery);
+    $checkRow = mysqli_fetch_assoc($checkResult);
 
-    if (!mysqli_query($conn, $query)) {
-        $_SESSION['error_message'] = "Gagal mengubah departemen: " . mysqli_error($conn);
+    if ($checkRow['count'] > 0) {
+        $_SESSION['error_message'] = "Data departemen tidak dapat diubah karena sudah digunakan pada data inventaris!";
     } else {
-        $_SESSION['success_message'] = "Departemen berhasil diubah!";
-    }
+        $kode_departemen = $_POST['kode_departemen'];
+        $nama_departemen = $_POST['nama_departemen'];
 
+        $query = "UPDATE departemen SET kode_departemen = '$kode_departemen', nama_departemen = '$nama_departemen' WHERE id_departemen = '$id_departemen'";
+
+        if (!mysqli_query($conn, $query)) {
+            $_SESSION['error_message'] = "Gagal mengubah departemen: " . mysqli_error($conn);
+        } else {
+            $_SESSION['success_message'] = "Departemen berhasil diubah!";
+        }
+    }
     header("Location: departemen.php");
-    exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
+    exit();
 }
 
 // Proses penghapusan departemen
 if (isset($_GET['delete'])) {
     $id_departemen = $_GET['delete'];
 
-    // Hapus data departemen dari database
-    $query = "DELETE FROM departemen WHERE id_departemen='$id_departemen'";
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['success_message'] = "Departemen berhasil dihapus!";
-    } else {
-        $_SESSION['error_message'] = "Gagal menghapus departemen: " . mysqli_error($conn);
-    }
+    // Cek apakah departemen sudah digunakan di tabel inventaris
+    $checkQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_departemen = $id_departemen";
+    $checkResult = mysqli_query($conn, $checkQuery);
+    $checkRow = mysqli_fetch_assoc($checkResult);
 
+    if ($checkRow['count'] > 0) {
+        $_SESSION['error_message'] = "Data departemen tidak dapat dihapus karena sudah digunakan pada data inventaris!";
+    } else {
+        // Hapus data departemen dari database
+        $query = "DELETE FROM departemen WHERE id_departemen='$id_departemen'";
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['success_message'] = "Departemen berhasil dihapus!";
+        } else {
+            $_SESSION['error_message'] = "Gagal menghapus departemen: " . mysqli_error($conn);
+        }
+    }
     header("Location: departemen.php");
-    exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
+    exit();
 }
 ?>

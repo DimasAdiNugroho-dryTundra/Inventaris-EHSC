@@ -35,6 +35,11 @@ require('../layouts/header.php');
 .table thead th {
     border: 1px solid #e9ecef;
 }
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
 </style>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -122,8 +127,7 @@ require('../layouts/header.php');
                                     <tr>
                                         <th class="text-center align-middle w-50px" rowspan="2">No</th>
                                         <th class="text-center align-middle w-150px" colspan="2">Kode Inventaris</th>
-                                        <th class="text-center align-middle w-100px" rowspan="2">Merk</th>
-                                        <th class="text-center align-middle w-150px" rowspan="2">Nama Barang</th>
+                                        <th class="text-center align-middle w-150px" rowspan="2">Barang</th>
                                         <th class="text-center align-middle w-150px" colspan="2">Ruangan</th>
                                         <th class="text-center align-middle w-100px" rowspan="2">Tanggal</th>
                                         <th class="text-center align-middle w-80px" rowspan="2">Cawu</th>
@@ -142,17 +146,18 @@ require('../layouts/header.php');
                                 </thead>
                                 <tbody>
                                     <?php
-           $no = $offset + 1;
-           while ($row = mysqli_fetch_assoc($result)) {
-           ?>
+                                    $no = $offset + 1;
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                    ?>
                                     <tr>
                                         <td class="text-center align-middle"><?php echo $no++; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris_asal']; ?>
                                         </td>
                                         <td class="text-center align-middle"><?php echo $row['kode_inventaris_baru']; ?>
                                         </td>
-                                        <td class="text-center align-middle"><?php echo $row['merk']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['nama_barang']; ?></td>
+                                        <td class="text-center align-middle">
+                                            <?php echo $row['nama_barang'] . " - " . $row['merk']; ?>
+                                        </td>
                                         <td class="text-center align-middle"><?php echo $row['ruangan_asal']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['ruangan_tujuan']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['tanggal_perpindahan']; ?>

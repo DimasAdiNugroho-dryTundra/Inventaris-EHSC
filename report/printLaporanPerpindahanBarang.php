@@ -79,12 +79,8 @@ try {
         <h3>Inventaris Asal</h3>
         <table border="1" cellpadding="5">
             <tr style="background-color: #f2f2f2;">
-                <td><strong>Kode Barang</strong></td>
-                <td>' . $row['kode_inventaris_asal'] . '</td>
-            </tr>
-            <tr>
-                <td><strong>Nama Barang & Merk</strong></td>
-                <td>' . $row['nama_barang_asal'] . ' - ' . $row['merk_asal'] . '</td>
+                <td><strong>Kode Inventaris & Nama Barang</strong></td>
+                <td>' . $row['kode_inventaris_asal'] . ' - ' . $row['nama_barang_asal'] . ' - ' . $row['merk_asal'] . '</td>
             </tr>
             <tr>
                 <td><strong>Ruangan</strong></td>
@@ -103,12 +99,8 @@ try {
         <h3>Inventaris yang Sudah Dipindahkan</h3>
         <table border="1" cellpadding="5">
             <tr style="background-color: #f2f2f2;">
-                <td><strong>Kode Barang</strong></td>
-                <td>' . $row['kode_inventaris_baru'] . '</td>
-            </tr>
-            <tr>
-                <td><strong>Nama Barang & Merk</strong></td>
-                <td>' . $row['nama_barang_baru'] . ' - ' . $row['merk_baru'] . '</td>
+                <td><strong>Kode Inventaris & Nama Barang</strong></td>
+                <td>' . $row['kode_inventaris_baru'] . ' - ' . $row['nama_barang_baru'] . ' - ' . $row['merk_baru'] . '</td>
             </tr>
             <tr>
                 <td><strong>Ruangan Tujuan</strong></td>
@@ -119,12 +111,16 @@ try {
                 <td>' . $row['tanggal_perpindahan'] . '</td>
             </tr>
             <tr>
+                <td><strong>Cawu</strong></td>
+                <td>' . $row['cawu'] . '</td>
+            </tr>
+            <tr>
                 <td><strong>Jumlah Pindah</strong></td>
                 <td>' . $row['jumlah_perpindahan'] . ' ' . $row['satuan_baru'] . '</td>
             </tr>
             <tr>
-                <td><strong>Cawu</strong></td>
-                <td>' . $row['cawu'] . '</td>
+                <td><strong>Petugas Kontrol</strong></td>
+                <td>' . $row['nama_petugas'] . '</td>
             </tr>
             <tr style="background-color: #f2f2f2;">
                 <td><strong>Keterangan</strong></td>

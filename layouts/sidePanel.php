@@ -66,19 +66,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </li>
         <?php endif; ?>
 
-        <?php if ($jabatan === 'operator' || $jabatan === 'staff' || $jabatan === 'administrasi' || $jabatan === 'petugas kontrol'): ?>
-        <li class="menu-item <?php echo ($current_page == 'rangkumanInventaris.php') ? 'active' : ''; ?>">
-            <a href="rangkumanInventaris.php" class="menu-link">
-                <i class="menu-icon tf-icons ti ti-list"></i>
-                Rangkuman Inventaris
-            </a>
-        </li>
-        <?php endif; ?>
         <?php if ($jabatan === 'operator' || $jabatan === 'petugas kontrol'): ?>
         <li class="menu-item <?php echo ($current_page == 'pilihCawuKontrolBarang.php') ? 'active' : ''; ?>">
             <a href="pilihCawuKontrolBarang.php" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-checkbox"></i>
                 Kontrol Barang
+            </a>
+        </li>
+        <?php endif; ?>
+
+        <?php if ($jabatan === 'operator' || $jabatan === 'staff' || $jabatan === 'administrasi' || $jabatan === 'petugas kontrol'): ?>
+        <li class="menu-item <?php echo ($current_page == 'hasilKontrolBarang.php') ? 'active' : ''; ?>">
+            <a href="hasilKontrolBarang.php" class="menu-link">
+                <i class="menu-icon tf-icons ti ti-list"></i>
+                Hasil Kontrol Barang
             </a>
         </li>
         <?php endif; ?>
@@ -102,16 +103,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 Kehilangan Barang
             </a>
         </li>
-        <?php endif; ?>
-
-        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi' || $jabatan === 'petugas kontrol'): ?>
-        <!-- <li class="menu-item">
-                <a class="btn d-block gap-2 col-lg-10 mx-auto btn-danger waves-effect waves-light"
-                    href="../server/sessionDestroy.php">
-                    Keluar
-                    <span class="ti-xs ti ti-logout"></span>
-                </a>
-            </li> -->
         <?php endif; ?>
     </ul>
 </aside>

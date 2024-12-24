@@ -4,11 +4,48 @@ require_once('../server/configDB.php');
 require('../server/crudKontrolBarangCawuDua.php');
 require('../layouts/header.php');
 
-// Ambil tahun dari POST atau session
 $tahun = isset($_GET['year']) ? (int) $_GET['year'] : date('Y');
 $tahunSekarang = date('Y');
 $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
 ?>
+
+<style>
+.w-30px {
+    width: 30px !important;
+}
+
+.w-50px {
+    width: 50px !important;
+}
+
+.w-70px {
+    width: 70px !important;
+}
+
+.w-80px {
+    width: 80px !important;
+}
+
+.w-100px {
+    width: 100px !important;
+}
+
+.table-sm td,
+.table-sm th {
+    padding: 0.25rem !important;
+    font-size: 0.8rem !important;
+}
+
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+
+.status-cell {
+    width: 35px !important;
+    padding: 0.2rem !important;
+}
+</style>
 
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
@@ -136,7 +173,6 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                         </form>
                                     </div>
                                 </div>
-                                <!-- Tampilkan informasi cawu dan tahun yang dipilih -->
                                 <div class="row p-3">
                                     <div class="col-md-12">
                                         <div class="alert alert-secondary" role="alert">
@@ -149,19 +185,19 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                     <table class="table table-hover table-sm">
                                         <thead class="table-light">
                                             <tr>
-                                                <th rowspan="2" class="text-center align-middle">No</th>
-                                                <th rowspan="2" class="text-center align-middle">Kode Inventaris</th>
-                                                <th rowspan="2" class="text-center align-middle">Barang</th>
-                                                <th rowspan="2" class="text-center align-middle">Tanggal</th>
-                                                <th colspan="4" class="text-center align-middle">Jumlah</th>
-                                                <th rowspan="2" class="text-center align-middle">Petugas</th>
-                                                <th rowspan="2" class="text-center align-middle">Aksi</th>
+                                                <th rowspan="2" class="text-center align-middle w-30px">No</th>
+                                                <th rowspan="2" class="text-center align-middle w-80px">Kode</th>
+                                                <th rowspan="2" class="text-center align-middle w-100px">Barang</th>
+                                                <th rowspan="2" class="text-center align-middle w-70px">Tanggal</th>
+                                                <th colspan="4" class="text-center align-middle w-140px">Jumlah</th>
+                                                <th rowspan="2" class="text-center align-middle w-80px">Petugas</th>
+                                                <th rowspan="2" class="text-center align-middle w-100px">Aksi</th>
                                             </tr>
                                             <tr>
-                                                <th class="text-center align-middle">Baik</th>
-                                                <th class="text-center align-middle">Rusak</th>
-                                                <th class="text-center align-middle">Pindah</th>
-                                                <th class="text-center align-middle">Hilang</th>
+                                                <th class="text-center align-middle status-cell">B</th>
+                                                <th class="text-center align-middle status-cell">R</th>
+                                                <th class="text-center align-middle status-cell">P</th>
+                                                <th class="text-center align-middle status-cell">H</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -400,7 +436,8 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                     } else {
                                     ?>
                                             <tr>
-                                                <td colspan="9" class="text-center">Tidak ada data kontrol barang cawu 2
+                                                <td colspan="10" class="text-center">Tidak ada data kontrol barang cawu
+                                                    2
                                                     untuk
                                                     tahun <?php echo $tahun; ?>.</td>
                                             </tr>
