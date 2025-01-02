@@ -6,9 +6,11 @@ $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
-$query = "SELECT pb.*, d.nama_departemen FROM permintaan_barang pb 
+$query = "SELECT pb.*, d.nama_departemen 
+          FROM permintaan_barang pb 
           JOIN departemen d ON pb.id_departemen = d.id_departemen 
-          WHERE pb.nama_barang LIKE '%$search%' 
+          WHERE pb.nama_barang LIKE '%$search%'
+          ORDER BY pb.id_permintaan DESC 
           LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 
@@ -27,7 +29,7 @@ if (isset($_POST['tambahPermintaan'])) {
     $spesifikasi = $_POST['spesifikasi'];
     $jumlah_kebutuhan = $_POST['jumlah_kebutuhan'];
     $satuan = $_POST['satuan'];
-    $status = $_POST['status'];
+    $status = 0;
 
     $query = "INSERT INTO permintaan_barang (id_departemen, nama_barang, merk, tanggal_permintaan, spesifikasi, jumlah_kebutuhan, satuan, status) 
     VALUES ('$id_departemen', '$nama_barang', '$merk', '$tanggal_permintaan', '$spesifikasi', '$jumlah_kebutuhan', '$satuan', '$status')";
@@ -81,7 +83,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     header("Location: permintaanBarang.php");
     exit();
 }
- 
+
 // Hapus data 
 if (isset($_GET['delete'])) {
     $id_permintaan = $_GET['delete'];

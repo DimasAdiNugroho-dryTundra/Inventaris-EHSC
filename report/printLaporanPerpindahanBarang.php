@@ -127,11 +127,10 @@ try {
                 <td>' . nl2br($row['keterangan']) . '</td>
             </tr>
         </table>
-        
-        <br>
+
         <p>Demikian laporan ini kami sampaikan. Atas perhatian dan kerjasamanya, kami ucapkan terima kasih.</p>
         
-        <br><br>
+        <br>
         <table cellpadding="5">
             <tr>
                 <td width="33%" style="text-align: center;">Mengetahui,</td>

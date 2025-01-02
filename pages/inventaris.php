@@ -86,10 +86,10 @@ require('../layouts/header.php');
 
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Inventaris
-                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                            <?php if ($jabatan === 'administrasi'): ?>
                             <div>
                                 <a href="scanQRcode.php" class="btn btn-primary me-2">
-                                    <i class="ti ti-qrcode"></i> Scan QR Code
+                                    Scan QR Code
                                 </a>
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambahInventarisModal">
@@ -127,7 +127,7 @@ require('../layouts/header.php');
                             <div class="row p-3">
                                 <div class="col-12 d-flex justify-content-start align-items-center">
                                     <a href="../report/printLaporanInventarisTersedia.php" class="btn btn-success">
-                                        <i class="ti ti-printer"></i> Cetak Laporan
+                                        Cetak Laporan
                                     </a>
                                 </div>
                             </div>
@@ -148,7 +148,7 @@ require('../layouts/header.php');
                                             <th class="text-center align-middle w-50px">Jumlah Akhir</th>
                                             <th class="text-center align-middle w-50px">Satuan</th>
                                             <th class="text-center align-middle w-70px">Sumber Inventaris</th>
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                            <?php if ($jabatan === 'administrasi'): ?>
                                             <th class="text-center align-middle w-100px">Aksi</th>
                                             <?php endif; ?>
                                         </tr>
@@ -180,7 +180,7 @@ require('../layouts/header.php');
                                             <td class="text-center align-middle">
                                                 <?php echo $row['sumber_inventaris']; ?>
                                             </td>
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                            <?php if ($jabatan === 'administrasi'): ?>
                                             <td class="text-center align-middle">
                                                 <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#modal-update-<?php echo $row['id_inventaris']; ?>">Edit</button>
@@ -395,7 +395,7 @@ require('../layouts/header.php');
                             <div class="row p-3">
                                 <div class="col-12 d-flex justify-content-start align-items-center">
                                     <a href="../report/printLaporanInventarisTidakTersedia.php" class="btn btn-success">
-                                        <i class="ti ti-printer"></i> Cetak Laporan
+                                        Cetak Laporan
                                     </a>
                                 </div>
                             </div>
@@ -414,7 +414,7 @@ require('../layouts/header.php');
                                             <th class="text-center align-middle">Jumlah Akhir</th>
                                             <th class="text-center align-middle">Satuan</th>
                                             <th class="text-center align-middle">Sumber Inventaris</th>
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                            <?php if ($jabatan === 'administrasi'): ?>
                                             <th class="text-center align-middle">Aksi</th>
                                             <?php endif; ?>
                                         </tr>
@@ -452,7 +452,7 @@ require('../layouts/header.php');
                                             <td class="text-center align-middle">
                                                 <?php echo $row_zero['sumber_inventaris']; ?>
                                             </td>
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                            <?php if ($jabatan === 'administrasi'): ?>
                                             <td class="text-center align-middle">
                                                 <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#modal-update-zero-<?php echo $row_zero['id_inventaris']; ?>">Edit</button>

@@ -27,7 +27,6 @@ $totalPages = ceil($totalRow['total'] / $limit);
 if (isset($_POST['tambahPenerimaan'])) {
     $jenis_input = $_POST['jenis_input'];
     $tanggal_terima = $_POST['tanggal_terima'];
-    $status = $_POST['status'];
     $satuan = $_POST['satuan'];
 
     if ($jenis_input === 'permintaan') {
@@ -49,8 +48,8 @@ if (isset($_POST['tambahPenerimaan'])) {
         $satuan = $permintaan_data['satuan'];
         $sumber_penerimaan = 'Permintaan';
 
-        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, status, sumber_penerimaan) 
-                  VALUES ('$id_permintaan', '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$status', '$sumber_penerimaan')";
+        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, sumber_penerimaan) 
+                  VALUES ('$id_permintaan', '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$sumber_penerimaan')";
     } else {
         // Input manual
         $nama_barang = $_POST['nama_barang'];
@@ -59,8 +58,8 @@ if (isset($_POST['tambahPenerimaan'])) {
         $jumlah = $_POST['jumlah'];
         $sumber_penerimaan = 'Pengadaan Kantor';
 
-        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, status, sumber_penerimaan) 
-                  VALUES (NULL, '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$status', '$sumber_penerimaan')";
+        $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, sumber_penerimaan) 
+                  VALUES (NULL, '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$sumber_penerimaan')";
     }
 
     mysqli_query($conn, $query);
@@ -75,7 +74,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_penerimaan = $_POST['id_penerimaan'];
     $tanggal_terima = $_POST['tanggal_terima'];
     $satuan = $_POST['satuan'];
-    $status = $_POST['status'];
 
     // Tidak bisa diedit jika sudah ada di daftar inventaris
     $checkInventarisQuery = "SELECT COUNT(*) as count FROM inventaris WHERE id_penerimaan = $id_penerimaan";
@@ -94,8 +92,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
             // Edit untuk data dari permintaan
             $query = "UPDATE penerimaan_barang SET 
                       tanggal_terima = '$tanggal_terima',
-                      satuan = '$satuan',
-                      status = '$status'
+                      satuan = '$satuan'
                       WHERE id_penerimaan = $id_penerimaan";
         } else {
             // Edit untuk input manual
@@ -110,8 +107,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
                       id_departemen = $id_departemen,
                       tanggal_terima = '$tanggal_terima',
                       jumlah = $jumlah,
-                      satuan = '$satuan',
-                      status = '$status'
+                      satuan = '$satuan'
                       WHERE id_penerimaan = $id_penerimaan";
         }
 

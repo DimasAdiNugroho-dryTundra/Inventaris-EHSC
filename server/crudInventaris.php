@@ -250,7 +250,6 @@ if (isset($_GET['delete'])) {
     $checkResult = mysqli_query($conn, $checkKontrolQuery);
     $kontrolData = mysqli_fetch_assoc($checkResult);
 
-    // Keterangan berdasarkan hasil pengecekan
     if ($kontrolData['total_kontrol'] > 0) {
         $_SESSION['error_message'] = "Data inventaris tidak dapat dihapus karena masih memiliki data kontrol terkait!";
         header("Location: inventaris.php");

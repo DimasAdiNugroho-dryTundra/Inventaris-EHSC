@@ -93,30 +93,43 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $hak_akses = $_POST['hak_akses'];
     $password = !empty($_POST['password']) ? md5($_POST['password']) : null;
 
-    // Mulai query update
-    $query = "UPDATE user SET 
-              nama = '$nama', 
-              username = '$username', 
-              email = '$email', 
-              jabatan = '$jabatan', 
-              hak_akses = '$hak_akses'";
+    $hasError = false;
 
-    // Tambahkan password jika ada
-    if ($password) {
-        $query .= ", password = '$password'";
+    // Cek ukuran file sebelum proses upload
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
+        // Cek jika ada error pada upload
+        if ($_FILES['foto']['error'] == UPLOAD_ERR_INI_SIZE || $_FILES['foto']['error'] == UPLOAD_ERR_FORM_SIZE) {
+            $_SESSION['error_message'] = "Ukuran file foto tidak boleh lebih dari 2MB.";
+            $hasError = true;
+        } else {
+            // Jika tidak ada error upload, lakukan validasi
+            $validationResult = validasiFoto($_FILES['foto']);
+            if ($validationResult !== true) {
+                $_SESSION['error_message'] = $validationResult;
+                $hasError = true;
+            }
+        }
     }
 
-    // Proses upload foto jika ada
-    $fotoUploaded = false;
-    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
-        $uploadDir = '../upload/user/';
-        $foto = $_FILES['foto'];
+    // Mulai query update jika tidak ada error
+    if (!$hasError) {
+        $query = "UPDATE user SET 
+                  nama = '$nama', 
+                  username = '$username', 
+                  email = '$email', 
+                  jabatan = '$jabatan', 
+                  hak_akses = '$hak_akses'";
 
-        // Validasi foto
-        $validationResult = validasiFoto($foto);
-        if ($validationResult !== true) {
-            $_SESSION['error_message'] = $validationResult;
-        } else {
+        // Tambahkan password jika ada
+        if ($password) {
+            $query .= ", password = '$password'";
+        }
+
+        // Proses upload foto jika ada dan tidak ada error
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
+            $uploadDir = '../upload/user/';
+            $foto = $_FILES['foto'];
+
             // Tambahkan timestamp ke nama file
             $fotoName = time() . '_' . basename($foto['name']);
             $fotoTmp = $foto['tmp_name'];
@@ -137,20 +150,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
             // Upload foto baru
             if (move_uploaded_file($fotoTmp, $fotoPath)) {
                 $query .= ", foto = '$fotoName'";
-                $fotoUploaded = true;
             } else {
                 $_SESSION['error_message'] = "Gagal mengupload foto baru.";
+                $hasError = true;
             }
         }
-    }
 
-    // Akhiri query dengan kondisi WHERE
-    $query .= " WHERE id_user = '$id_user'";
-    if (empty($_SESSION['error_message'])) {
-        if (!mysqli_query($conn, $query)) {
-            $_SESSION['error_message'] = "Gagal mengubah user: " . mysqli_error($conn);
-        } else {
-            $_SESSION['success_message'] = "User berhasil diubah!";
+        // Eksekusi query jika tidak ada error
+        if (!$hasError) {
+            $query .= " WHERE id_user = '$id_user'";
+            if (!mysqli_query($conn, $query)) {
+                $_SESSION['error_message'] = "Gagal mengubah user: " . mysqli_error($conn);
+            } else {
+                $_SESSION['success_message'] = "User berhasil diubah!";
+            }
         }
     }
 

@@ -282,7 +282,6 @@ foreach ($cawu_queries as $query) {
                                             </tbody>
                                         </table>
                                     </div>
-
                                 </div>
                             </div>
                         </div>

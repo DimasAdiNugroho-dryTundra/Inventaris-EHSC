@@ -262,7 +262,7 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Edit Kontrol Barang Cawu 1</h5>
+                                                            <h5 class="modal-title">Edit Kontrol Barang Catuwulan 1</h5>
                                                             <button type="button" class="btn-close"
                                                                 data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
@@ -277,7 +277,8 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                                                     <li>Periksa kembali tanggal kontrol</li>
                                                                     <li>Pastikan status dan jumlah barang sudah benar
                                                                     </li>
-                                                                    <li>Data yang sudah disimpan tidak dapat dibatalkan
+                                                                    <li>Data yang sudah disimpan tidak dapat dibatalkan,
+                                                                        jika ada data kontrol selanjutnya
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -493,7 +494,7 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Tambah Kontrol Barang Cawu 1</h5>
+                                            <h5 class="modal-title">Tambah Kontrol Barang Catuwulan 1</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
@@ -507,7 +508,8 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                                     <li>Pastikan jumlah barang sesuai dengan perhitungan fisik</li>
                                                     <li>Periksa kembali tanggal kontrol</li>
                                                     <li>Minimal pilih satu status kondisi barang</li>
-                                                    <li>Data yang sudah disimpan tidak dapat dibatalkan</li>
+                                                    <li>Data yang sudah disimpan tidak dapat dibatalkan,
+                                                        jika ada data kontrol selanjutnya</li>
                                                 </ul>
                                             </div>
                                             <form method="POST" id="tambahKontrolForm">
@@ -717,8 +719,33 @@ function validasiFormManual() {
     }
 }
 
-// Validasi form tambah kontrol
+function tampilAlertStatus(modalElement, message) {
+    const existingAlert = modalElement.querySelector('.alert-status');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
+    // Buat elemen alert baru
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible d-flex align-items-center mb-3 alert-status';
+    alertDiv.setAttribute('role', 'alert');
+
+    // Tambahkan ikon dan pesan
+    alertDiv.innerHTML = `
+        <span class="alert-icon rounded me-2">
+            <i class="ti ti-alert-circle"></i>
+        </span>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    const form = modalElement.querySelector('form');
+    form.insertBefore(alertDiv, form.firstChild);
+}
+
+// Validasi form tambah kontrol 
 document.getElementById('tambahKontrolForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
     const statusBaik = document.getElementById('status_inputBaik').value;
     const statusRusak = document.getElementById('status_inputRusak').value;
     const statusPindah = document.getElementById('status_inputPindah').value;
@@ -728,34 +755,63 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
 
     if (statusBaik === '0' && statusRusak === '0' && statusPindah === '0' && statusHilang === '0') {
         valid = false;
-        alert('Minimal pilih satu status kondisi barang!');
+        const modalElement = document.getElementById('tambahKontrolModal');
+        tampilAlertStatus(modalElement, 'Minimal pilih satu status kondisi barang!');
     }
 
     if (statusBaik === '1' && !document.getElementById('inputBaik').value) {
         valid = false;
-        document.getElementById('inputBaik').setCustomValidity(getPesanValidasi('baik', 'input'));
+        const inputBaik = document.getElementById('inputBaik');
+        inputBaik.setCustomValidity(getPesanValidasi('baik', 'input'));
+        inputBaik.reportValidity(); // Menampilkan pesan validasi segera
+        inputBaik.addEventListener('input', function() {
+            if (this.value && this.value.trim() !== '') {
+                this.setCustomValidity('');
+                this.reportValidity();
+            }
+        });
     }
 
     if (statusRusak === '1' && !document.getElementById('inputRusak').value) {
         valid = false;
-        document.getElementById('inputRusak').setCustomValidity(getPesanValidasi('rusak', 'input'));
+        const inputRusak = document.getElementById('inputRusak');
+        inputRusak.setCustomValidity(getPesanValidasi('rusak', 'input'));
+        inputRusak.reportValidity(); // Menampilkan pesan validasi segera
+        inputRusak.addEventListener('input', function() {
+            if (this.value && this.value.trim() !== '') {
+                this.setCustomValidity('');
+                this.reportValidity();
+            }
+        });
     }
 
     if (statusPindah === '1' && !document.getElementById('inputPindah').value) {
         valid = false;
-        document.getElementById('inputPindah').setCustomValidity(getPesanValidasi('pindah', 'input'));
+        const inputPindah = document.getElementById('inputPindah');
+        inputPindah.setCustomValidity(getPesanValidasi('pindah', 'input'));
+        inputPindah.reportValidity(); // Menampilkan pesan validasi segera
+        inputPindah.addEventListener('input', function() {
+            if (this.value && this.value.trim() !== '') {
+                this.setCustomValidity('');
+                this.reportValidity();
+            }
+        });
     }
 
     if (statusHilang === '1' && !document.getElementById('inputHilang').value) {
         valid = false;
-        document.getElementById('inputHilang').setCustomValidity(getPesanValidasi('hilang', 'input'));
+        const inputHilang = document.getElementById('inputHilang');
+        inputHilang.setCustomValidity(getPesanValidasi('hilang', 'input'));
+        inputHilang.reportValidity(); // Menampilkan pesan validasi segera
+        inputHilang.addEventListener('input', function() {
+            if (this.value && this.value.trim() !== '') {
+                this.setCustomValidity('');
+                this.reportValidity();
+            }
+        });
     }
 
-    if (!valid) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-
+    // Validasi input wajib lainnya
     const elemenWajib = this.querySelectorAll('input[required], select[required], textarea[required]');
 
     elemenWajib.forEach(elemen => {
@@ -764,20 +820,22 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
             const labelTeks = labelElemen ? labelElemen.textContent : '';
             const jenisInput = elemen.tagName.toLowerCase();
             elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+            elemen.reportValidity(); // Menampilkan pesan validasi segera
         } else {
             elemen.setCustomValidity('');
         }
     });
 
-    if (!this.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
+    if (valid && this.checkValidity()) {
+        this.submit(); // Submit form hanya jika semua validasi berhasil
     }
-}, false);
+});
 
 // Validasi form edit kontrol
 document.querySelectorAll('[id^="editModal"]').forEach(modal => {
     modal.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
         const modalId = modal.id.replace('editModal', '');
 
         const statusBaikEdit = document.getElementById(`status_inputBaikEdit${modalId}`).value;
@@ -790,38 +848,62 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
         if (statusBaikEdit === '0' && statusRusakEdit === '0' && statusPindahEdit === '0' &&
             statusHilangEdit === '0') {
             valid = false;
-            alert('Minimal pilih satu status kondisi barang!');
+            tampilAlertStatus(modal, 'Minimal pilih satu status kondisi barang!');
         }
 
         if (statusBaikEdit === '1' && !document.getElementById(`inputBaikEdit${modalId}`).value) {
             valid = false;
-            document.getElementById(`inputBaikEdit${modalId}`).setCustomValidity(getPesanValidasi(
-                'baik', 'input'));
+            const inputBaikEdit = document.getElementById(`inputBaikEdit${modalId}`);
+            inputBaikEdit.setCustomValidity(getPesanValidasi('baik', 'input'));
+            inputBaikEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputBaikEdit.addEventListener('input', function() {
+                if (this.value && this.value.trim() !== '') {
+                    this.setCustomValidity('');
+                    this.reportValidity();
+                }
+            });
         }
 
         if (statusRusakEdit === '1' && !document.getElementById(`inputRusakEdit${modalId}`).value) {
             valid = false;
-            document.getElementById(`inputRusakEdit${modalId}`).setCustomValidity(getPesanValidasi(
-                'rusak', 'input'));
+            const inputRusakEdit = document.getElementById(`inputRusakEdit${modalId}`);
+            inputRusakEdit.setCustomValidity(getPesanValidasi('rusak', 'input'));
+            inputRusakEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputRusakEdit.addEventListener('input', function() {
+                if (this.value && this.value.trim() !== '') {
+                    this.setCustomValidity('');
+                    this.reportValidity();
+                }
+            });
         }
 
         if (statusPindahEdit === '1' && !document.getElementById(`inputPindahEdit${modalId}`).value) {
             valid = false;
-            document.getElementById(`inputPindahEdit${modalId}`).setCustomValidity(getPesanValidasi(
-                'pindah', 'input'));
+            const inputPindahEdit = document.getElementById(`inputPindahEdit${modalId}`);
+            inputPindahEdit.setCustomValidity(getPesanValidasi('pindah', 'input'));
+            inputPindahEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputPindahEdit.addEventListener('input', function() {
+                if (this.value && this.value.trim() !== '') {
+                    this.setCustomValidity('');
+                    this.reportValidity();
+                }
+            });
         }
 
         if (statusHilangEdit === '1' && !document.getElementById(`inputHilangEdit${modalId}`).value) {
             valid = false;
-            document.getElementById(`inputHilangEdit${modalId}`).setCustomValidity(getPesanValidasi(
-                'hilang', 'input'));
+            const inputHilangEdit = document.getElementById(`inputHilangEdit${modalId}`);
+            inputHilangEdit.setCustomValidity(getPesanValidasi('hilang', 'input'));
+            inputHilangEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputHilangEdit.addEventListener('input', function() {
+                if (this.value && this.value.trim() !== '') {
+                    this.setCustomValidity('');
+                    this.reportValidity();
+                }
+            });
         }
 
-        if (!valid) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-
+        // Validasi input wajib lainnya
         const elemenWajib = this.querySelectorAll(
             'input[required], select[required], textarea[required]');
 
@@ -831,14 +913,14 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
                 const labelTeks = labelElemen ? labelElemen.textContent : '';
                 const jenisInput = elemen.tagName.toLowerCase();
                 elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
+                elemen.reportValidity(); // Menampilkan pesan validasi segera
             } else {
                 elemen.setCustomValidity('');
             }
         });
 
-        if (!this.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
+        if (valid && this.checkValidity()) {
+            this.submit(); // Submit form hanya jika semua validasi berhasil
         }
     });
 });

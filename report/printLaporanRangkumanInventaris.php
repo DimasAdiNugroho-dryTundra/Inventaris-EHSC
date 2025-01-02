@@ -21,6 +21,24 @@ if (!is_numeric($tahunTerpilih) || $tahunTerpilih < 2000) {
     die('Tahun tidak valid.');
 }
 
+$queryPetugas = "SELECT DISTINCT
+    MAX(u1.nama) AS nama_petugas_cawu_satu,
+    MAX(u2.nama) AS nama_petugas_cawu_dua,
+    MAX(u3.nama) AS nama_petugas_cawu_tiga
+FROM inventaris i
+LEFT JOIN kontrol_barang_cawu_satu kbc1 ON i.id_inventaris = kbc1.id_inventaris AND kbc1.tahun_kontrol = $tahunTerpilih
+LEFT JOIN kontrol_barang_cawu_dua kbc2 ON i.id_inventaris = kbc2.id_inventaris AND kbc2.tahun_kontrol = $tahunTerpilih
+LEFT JOIN kontrol_barang_cawu_tiga kbc3 ON i.id_inventaris = kbc3.id_inventaris AND kbc3.tahun_kontrol = $tahunTerpilih
+LEFT JOIN user u1 ON kbc1.id_user = u1.id_user
+LEFT JOIN user u2 ON kbc2.id_user = u2.id_user
+LEFT JOIN user u3 ON kbc3.id_user = u3.id_user
+WHERE kbc1.id_kontrol_barang_cawu_satu IS NOT NULL 
+   OR kbc2.id_kontrol_barang_cawu_dua IS NOT NULL 
+   OR kbc3.id_kontrol_barang_cawu_tiga IS NOT NULL";
+
+$hasilQueryPetugas = mysqli_query($conn, $queryPetugas);
+$dataPetugas = mysqli_fetch_assoc($hasilQueryPetugas);
+
 $query = "SELECT 
             i.nama_barang, 
             i.merk,
@@ -89,7 +107,7 @@ try {
     $pdf->AddPage('L', 'A4');
 
     $html = '
-    <h3 style="text-align: center;">LAPORAN HASIL KONTROL INVENTARIS<br>TAHUN ' . $tahunTerpilih . '</h3>
+    <h3 style="text-align: center;">LAPORAN HASIL KONTROL BARANG INVENTARIS<br>TAHUN ' . $tahunTerpilih . '</h3>
     <style>
         table {
             border-collapse: collapse;
@@ -222,7 +240,6 @@ try {
     $html .= '
         </tbody>
     </table>
-    <br><br>
     <table cellpadding="1" style="width: 100%;">
         <tr>
             <td style="border: none; text-align: left; padding: 2px; font-size: 5pt;"><strong>Keterangan :</strong></td>
@@ -232,38 +249,36 @@ try {
         <tr><td style="border: none; text-align: left; padding: 2px; font-size: 5pt;">P = Pindah</td></tr>
         <tr><td style="border: none; text-align: left; padding: 2px; font-size: 5pt;">H = Hilang</td></tr>
     </table>
-    <br><br>
-    <table style="width: 100%; border: none;" cellpadding="10">
+    <table style="width: 100%; border: none;" cellpadding="5">
         <tr>
             <td style="width: 50%; text-align: center; border: none;">
-                <p>Staff ' . $row['kode_departemen'] . '</p>
-                <div style="height: 80px;"></div>
-                <p>(........................)</p>
+                <p style="font-size: 5pt; margin: 0;">Staff ' . $row['kode_departemen'] . '</p>
+                <div style="height: 40px;"></div>
+                <p style="font-size: 5pt; margin: 0;">(........................)</p>
             </td>
             <td style="width: 50%; text-align: center; border: none;">
-                <p>Admin ' . $row['kode_departemen'] . '</p>
-                <div style="height: 80px;"></div>
-                <p>(........................)</p>
+                <p style="font-size: 5pt; margin: 0;">Admin ' . $row['kode_departemen'] . '</p>
+                <div style="height: 40px;"></div>
+                <p style="font-size: 5pt; margin: 0;">(........................)</p>
             </td>
         </tr>
     </table>
-    <br><br>
-    <table style="width: 100%; border: none;" cellpadding="10">
+    <table style="width: 100%; border: none;" cellpadding="5">
         <tr>
             <td style="width: 33.33%; text-align: center; border: none;">
-                <p>Petugas Kontrol Cawu 1</p>
-                <div style="height: 80px;"></div>
-                <p>' . $row['nama_petugas_cawu_satu'] . '</p>
+                <p style="font-size: 5pt; margin: 0;">Petugas Kontrol Cawu 1</p>
+                <div style="height: 40px;"></div>
+                <p style="font-size: 5pt; margin: 0;">' . $dataPetugas['nama_petugas_cawu_satu'] . '</p>
             </td>
             <td style="width: 33.33%; text-align: center; border: none;">
-                <p>Petugas Kontrol Cawu 2</p>
-                <div style="height: 80px;"></div>
-                <p>' . $row['nama_petugas_cawu_dua'] . '</p>
+                <p style="font-size: 5pt; margin: 0;">Petugas Kontrol Cawu 2</p>
+                <div style="height: 40px;"></div>
+                <p style="font-size: 5pt; margin: 0;">' . $dataPetugas['nama_petugas_cawu_dua'] . '</p>
             </td>
             <td style="width: 33.33%; text-align: center; border: none;">
-                <p>Petugas Kontrol Cawu 3</p>
-                <div style="height: 80px;"></div>
-                <p>' . $row['nama_petugas_cawu_tiga'] . '</p>
+                <p style="font-size: 5pt; margin: 0;">Petugas Kontrol Cawu 3</p>
+                <div style="height: 40px;"></div>
+                <p style="font-size: 5pt; margin: 0;">' . $dataPetugas['nama_petugas_cawu_tiga'] . '</p>
             </td>
         </tr>
     </table>
@@ -278,7 +293,7 @@ try {
     ob_end_clean();
 
     $pdf->writeHTML($html, true, false, true, false, '');
-    $pdf->Output('Laporan_Hasil_Kontrol_Inventaris_' . $tahunTerpilih . '.pdf', 'I');
+    $pdf->Output('Laporan_Hasil_Kontrol_Barang_Inventaris_' . $tahunTerpilih . '.pdf', 'I');
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }

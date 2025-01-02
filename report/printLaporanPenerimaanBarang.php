@@ -84,10 +84,6 @@ try {
                 <td><strong>Satuan</strong></td>
                 <td>' . $data['satuan'] . '</td>
             </tr>
-            <tr>
-                <td><strong>Status</strong></td>
-                <td>' . $data['status'] . '</td>
-            </tr>
         </table>
         
         <br>

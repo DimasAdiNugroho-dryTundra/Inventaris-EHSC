@@ -92,7 +92,7 @@ require('../layouts/header.php');
 
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Perpindahan Barang
-                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                            <?php if ($jabatan === 'administrasi'): ?>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#tambahPerpindahanModal">Tambah Perpindahan</button>
                             <?php endif; ?>
@@ -170,7 +170,7 @@ require('../layouts/header.php');
                                         <td class="text-center align-middle"><?php echo $row['nama_petugas']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['keterangan']; ?></td>
                                         <td class="text-center align-middle">
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                            <?php if ($jabatan === 'administrasi'): ?>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_perpindahan_barang']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"

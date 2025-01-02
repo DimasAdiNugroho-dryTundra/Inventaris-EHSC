@@ -47,7 +47,14 @@ try {
     if ($result->num_rows > 0) {
         $data = $result->fetch_assoc();
 
-        $status_keterangan = ($data['status'] == 1) ? 'Disetujui' : 'Tidak Disetujui';
+        $status_keterangan = '';
+        if ($data['status'] == 0) {
+            $status_keterangan = 'Menunggu';
+        } elseif ($data['status'] == 1) {
+            $status_keterangan = 'Disetujui';
+        } else {
+            $status_keterangan = 'Tidak Disetujui';
+        }
 
         $html = '
         <h1 style="text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px;">LAPORAN PERMINTAAN BARANG</h1>

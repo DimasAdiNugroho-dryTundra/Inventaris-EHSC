@@ -36,6 +36,11 @@ require('../layouts/header.php');
     border-radius: 4px;
 }
 
+.btn-sm {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+
 .table-sm .img-thumbnail {
     padding: 0.25rem;
     border-radius: 0.25rem;

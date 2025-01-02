@@ -86,7 +86,7 @@ require('../layouts/header.php');
                         <?php unset($_SESSION['success_message']); ?>
                         <?php endif; ?>
 
-                        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                        <?php if ($jabatan === 'administrasi'): ?>
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Permintaan Barang
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -152,14 +152,17 @@ require('../layouts/header.php');
                                         <span class="<?php echo $warna_status; ?>"><?php echo $status_text; ?></span>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                        <?php if ($jabatan === 'administrasi' || $jabatan === 'staff'): ?>
                                         <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modal-update-<?php echo $row['id_permintaan']; ?>">Edit</button>
+                                        <?php endif; ?>
+                                        <?php if ($jabatan === 'administrasi'): ?>
                                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modal-delete-<?php echo $row['id_permintaan']; ?>">Hapus</button>
                                         <?php endif; ?>
                                         <a href="../report/printLaporanPermintaanBarang.php?id=<?php echo $row['id_permintaan']; ?>"
-                                            class="btn btn-primary btn-sm">Cetak</a>
+                                            class="btn btn-primary btn-sm <?php echo ($row['status'] == 1) ? '' : 'disabled'; ?>"
+                                            <?php echo ($row['status'] == 1) ? '' : 'onclick="return false;"'; ?>>Cetak</a>
                                     </td>
                                     </tr>
                                     <!-- modal edit -->
@@ -178,6 +181,7 @@ require('../layouts/header.php');
                                                         <input type='hidden' name='action' value='update'>
                                                         <input type='hidden' name='id_permintaan'
                                                             value='<?php echo $row['id_permintaan']; ?>'>
+                                                        <?php if ($jabatan === 'administrasi'): ?>
                                                         <div class='mb-3'>
                                                             <label for='id_departemen'
                                                                 class='form-label'>Departemen</label>
@@ -236,19 +240,95 @@ require('../layouts/header.php');
                                                             <input type="text" name="satuan" class="form-control"
                                                                 value="<?php echo $row['satuan']; ?>" required>
                                                         </div>
+                                                        <?php endif; ?>
 
+                                                        <?php if ($jabatan === 'staff'): ?>
+                                                        <input type='hidden' name='id_departemen'
+                                                            value='<?php echo $row['id_departemen']; ?>'>
+                                                        <input type='hidden' name='nama_barang'
+                                                            value='<?php echo $row['nama_barang']; ?>'>
+                                                        <input type='hidden' name='merk'
+                                                            value='<?php echo $row['merk']; ?>'>
+                                                        <input type='hidden' name='tanggal'
+                                                            value='<?php echo date('Y-m-d', strtotime($row['tanggal_permintaan'])); ?>'>
+                                                        <input type='hidden' name='spesifikasi'
+                                                            value='<?php echo $row['spesifikasi']; ?>'>
+                                                        <input type='hidden' name='jumlah_kebutuhan'
+                                                            value='<?php echo $row['jumlah_kebutuhan']; ?>'>
+                                                        <input type='hidden' name='satuan'
+                                                            value='<?php echo $row['satuan']; ?>'>
+
+                                                        <div class='mb-3'>
+                                                            <label for='id_departemen'
+                                                                class='form-label'>Departemen</label>
+                                                            <input type='text' class='form-control bg-light'
+                                                                value='<?php echo $row['nama_departemen']; ?>' readonly>
+                                                        </div>
+
+                                                        <div class='mb-3'>
+                                                            <label for='nama_barang' class='form-label'>Nama
+                                                                Barang</label>
+                                                            <input type='text' class='form-control bg-light'
+                                                                value='<?php echo $row['nama_barang']; ?>' readonly>
+                                                        </div>
+
+                                                        <div class='mb-3'>
+                                                            <label for='merk' class='form-label'>Merk</label>
+                                                            <input type='text' class='form-control bg-light'
+                                                                value='<?php echo $row['merk']; ?>' readonly>
+                                                        </div>
+
+                                                        <div class='mb-3'>
+                                                            <label for='tanggal_permintaan'
+                                                                class='form-label'>Tanggal</label>
+                                                            <input type='text' class='form-control bg-light'
+                                                                value='<?php echo $row['tanggal_permintaan']; ?>'
+                                                                readonly>
+                                                        </div>
+
+                                                        <div class='mb-3'>
+                                                            <label for='spesifikasi'
+                                                                class='form-label'>Spesifikasi</label>
+                                                            <textarea class='form-control bg-light'
+                                                                readonly><?php echo $row['spesifikasi']; ?></textarea>
+                                                        </div>
+
+                                                        <div class='mb-3'>
+                                                            <label for='jumlah_kebutuhan' class='form-label'>Jml
+                                                                Kebutuhan</label>
+                                                            <input type='text' class='form-control bg-light'
+                                                                value='<?php echo $row['jumlah_kebutuhan']; ?>'
+                                                                readonly>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Satuan</label>
+                                                            <input type="text" class="form-control bg-light"
+                                                                value="<?php echo $row['satuan']; ?>" readonly>
+                                                        </div>
+                                                        <?php endif; ?>
+
+                                                        <?php if ($jabatan === 'staff'): ?>
                                                         <div class='mb-3'>
                                                             <label for='status' class='form-label'>Status</label>
                                                             <select class='form-select' name='status' required>
                                                                 <option value="">Pilih Status</option>
-                                                                <option value='0'
-                                                                    <?php echo ($row['status'] == 1 ? 'selected' : ''); ?>>
-                                                                    Disetujui</option>
-                                                                <option value='1'
-                                                                    <?php echo ($row['status'] == 0 ? 'selected' : ''); ?>>
-                                                                    Tidak Disetujui</option>
+                                                                <?php
+                                                                $status_sekarang = $row['status'];
+                                                                $opsi_status = [
+                                                                    '0' => 'Menunggu',
+                                                                    '1' => 'Disetujui',
+                                                                    '2' => 'Tidak Disetujui'
+                                                                ];
+                                                                
+                                                                foreach ($opsi_status as $value => $label) {
+                                                                    $selected = ($value == $status_sekarang) ? 'selected' : '';
+                                                                    echo "<option value='$value' $selected>$label</option>";
+                                                                }
+                                                                ?>
                                                             </select>
                                                         </div>
+                                                        <?php endif; ?>
 
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
@@ -377,13 +457,6 @@ require('../layouts/header.php');
                                             <input type="text" name="satuan" class="form-control" required>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Status</label>
-                                            <select name="status" class="form-select" required>
-                                                <option value="1">Disetujui</option>
-                                                <option value="2">Tidak Disetujui</option>
-                                            </select>
-                                        </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>

@@ -125,7 +125,7 @@ $result = mysqli_query($conn, $query);
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
-                            <h2 class="mb-1">Hasil Kontrol Barang</h2>
+                            <h2 class="mb-1">Hasil Kontrol Barang Inventaris</h2>
                         </div>
                         <div class="mt-3">
                             <nav aria-label="breadcrumb">
@@ -133,7 +133,7 @@ $result = mysqli_query($conn, $query);
                                     <li class="breadcrumb-item">
                                         <a href="dashboard.php">Dashboard</a>
                                     </li>
-                                    <li class="breadcrumb-item active">Hasil Kontrol Barang</li>
+                                    <li class="breadcrumb-item active">Hasil Kontrol Barang Inventaris</li>
                                 </ol>
                             </nav>
                         </div>

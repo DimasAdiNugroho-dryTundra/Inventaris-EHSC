@@ -141,9 +141,9 @@ require('../layouts/header.php');
                         </div>
 
                         <?php
-mysqli_data_seek($result, 0);
-while ($row = mysqli_fetch_assoc($result)) { 
-?>
+                        mysqli_data_seek($result, 0);
+                        while ($row = mysqli_fetch_assoc($result)) { 
+                        ?>
                         <!-- Modal Edit/Update -->
                         <div class="modal fade" id="modal-update-<?php echo $row['id_departemen']; ?>" tabindex="-1"
                             aria-labelledby="modalUpdateLabel" aria-hidden="true">
@@ -209,7 +209,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                         <!-- Modal Tambah Departemen -->
                         <div class="modal fade" id="tambahDepartemenModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Tambah Departemen</h5>

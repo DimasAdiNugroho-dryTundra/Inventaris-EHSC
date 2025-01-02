@@ -84,7 +84,7 @@ require('../layouts/header.php');
                         <?php unset($_SESSION['success_message']); ?>
                         <?php endif; ?>
 
-                        <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                        <?php if ($jabatan === 'administrasi'): ?>
                         <h4 class="card-header d-flex justify-content-between align-items-center">
                             Data Penerimaan Barang
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -126,7 +126,6 @@ require('../layouts/header.php');
                                         <th class="text-center align-middle w-100px">Tanggal Terima</th>
                                         <th class="text-center align-middle w-80px">Jumlah</th>
                                         <th class="text-center align-middle w-80px">Satuan</th>
-                                        <th class="text-center align-middle w-100px">Status</th>
                                         <th class="text-center align-middle w-100px">Sumber</th>
                                         <th class="text-center align-middle w-150px">Aksi</th>
                                     </tr>
@@ -144,11 +143,10 @@ require('../layouts/header.php');
                                         <td class="text-center align-middle"><?php echo $row['tanggal_terima']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['jumlah']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['satuan']; ?></td>
-                                        <td class="text-center align-middle"><?php echo $row['status']; ?></td>
                                         <td class="text-center align-middle"><?php echo $row['sumber_penerimaan']; ?>
                                         </td>
                                         <td class="text-center align-middle">
-                                            <?php if ($jabatan === 'operator' || $jabatan === 'administrasi'): ?>
+                                            <?php if ($jabatan === 'administrasi'): ?>
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modal-update-<?php echo $row['id_penerimaan']; ?>">Edit</button>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
@@ -223,17 +221,6 @@ require('../layouts/header.php');
                                                                 class="form-control"
                                                                 value="<?php echo $row['tanggal_terima']; ?>" required>
                                                         </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Status</label>
-                                                            <select name="status" class="form-select" required>
-                                                                <option value="Diterima"
-                                                                    <?php echo ($row['status'] == 'Diterima') ? 'selected' : ''; ?>>
-                                                                    Diterima</option>
-                                                                <option value="Ditolak"
-                                                                    <?php echo ($row['status'] == 'Ditolak') ? 'selected' : ''; ?>>
-                                                                    Ditolak</option>
-                                                            </select>
-                                                        </div>
                                                         <?php else: ?>
                                                         <!-- Form untuk pengadaan kantor-->
                                                         <div class="mb-3">
@@ -276,17 +263,6 @@ require('../layouts/header.php');
                                                             <label class="form-label">Satuan</label>
                                                             <input type="text" name="satuan" class="form-control"
                                                                 value="<?php echo $row['satuan']; ?>" required>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Status</label>
-                                                            <select name="status" class="form-select" required>
-                                                                <option value="Diterima"
-                                                                    <?php echo ($row['status'] == 'Diterima') ? 'selected' : ''; ?>>
-                                                                    Diterima</option>
-                                                                <option value="Ditolak"
-                                                                    <?php echo ($row['status'] == 'Ditolak') ? 'selected' : ''; ?>>
-                                                                    Ditolak</option>
-                                                            </select>
                                                         </div>
                                                         <?php endif; ?>
 
@@ -456,15 +432,6 @@ require('../layouts/header.php');
                                             <input type="date" name="tanggal_terima" class="form-control" required>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Status</label>
-                                            <select name="status" class="form-select" required>
-                                                <option value="">Pilih status</option>
-                                                <option value="Diterima">Diterima</option>
-                                                <option value="Ditolak">Ditolak</option>
-                                            </select>
-                                        </div>
-
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
@@ -565,8 +532,7 @@ function getPesanValidasi(labelText, jenisInput) {
         'departemen': 'Kolom departemen wajib diisi!',
         'jumlah': 'Kolom jumlah barang wajib diisi!',
         'satuan': 'Mohon masukkan satuan barang',
-        'tanggal terima': 'Mohon masukkan tanggal terima',
-        'status': 'Mohon pilih status barang'
+        'tanggal terima': 'Mohon masukkan tanggal terima'
     };
 
     return pesanKhusus[labelText] ||
