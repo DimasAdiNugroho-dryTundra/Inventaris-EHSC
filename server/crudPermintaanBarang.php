@@ -30,7 +30,8 @@ if (isset($_POST['tambahPermintaan'])) {
     $jumlah_kebutuhan = $_POST['jumlah_kebutuhan'];
     $satuan = $_POST['satuan'];
     $status = 0;
-
+    
+    // Query tambah
     $query = "INSERT INTO permintaan_barang (id_departemen, nama_barang, merk, tanggal_permintaan, spesifikasi, jumlah_kebutuhan, satuan, status) 
     VALUES ('$id_departemen', '$nama_barang', '$merk', '$tanggal_permintaan', '$spesifikasi', '$jumlah_kebutuhan', '$satuan', '$status')";
     if (mysqli_query($conn, $query)) {
@@ -42,7 +43,7 @@ if (isset($_POST['tambahPermintaan'])) {
     exit();
 }
 
-// Proses edit
+// Proses pengeditan permintaan barang
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_permintaan = $_POST['id_permintaan'];
 
@@ -63,6 +64,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $satuan = $_POST['satuan'];
         $status = $_POST['status'];
 
+        // Query edit
         $query = "UPDATE permintaan_barang SET 
                   id_departemen = '$id_departemen', 
                   nama_barang = '$nama_barang', 
@@ -84,11 +86,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Hapus data 
+// Proses penghapusan permintaan barang
 if (isset($_GET['delete'])) {
     $id_permintaan = $_GET['delete'];
 
-    // Cek apakah permintaan sudah memiliki penerimaan
+    // Cek apakah permintaan diterima, jika sudah tidak dapat dihapus
     $checkQuery = "SELECT COUNT(*) as count FROM penerimaan_barang WHERE id_permintaan = $id_permintaan";
     $checkResult = mysqli_query($conn, $checkQuery);
     $checkRow = mysqli_fetch_assoc($checkResult);
@@ -96,7 +98,7 @@ if (isset($_GET['delete'])) {
     if ($checkRow['count'] > 0) {
         $_SESSION['error_message'] = "Data permintaan barang tidak dapat dihapus karena sudah diproses menjadi penerimaan!";
     } else {
-        // Query untuk menghapus permintaan barang
+        // Query hapus
         $deleteQuery = "DELETE FROM permintaan_barang WHERE id_permintaan = $id_permintaan";
         if (mysqli_query($conn, $deleteQuery)) {
             $_SESSION['success_message'] = "Data Permintaan barang berhasil dihapus!";

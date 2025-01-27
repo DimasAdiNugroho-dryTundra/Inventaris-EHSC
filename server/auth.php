@@ -15,18 +15,17 @@ function login($username, $password)
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
         if (md5($password) === $user['password']) {
-            // Verifikasi berhasil, buat sesi
             $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['nama'] = $user['nama'];
             $_SESSION['jabatan'] = $user['jabatan'];
-            $_SESSION['hak_akses'] = $user['hak_akses']; // Menyimpan hak akses
+            $_SESSION['hak_akses'] = $user['hak_akses'];
 
-            return true; // Login sukses
+            return true;
         } else {
-            return "Password salah."; // Password salah
+            return "Password salah."; 
         }
     } else {
-        return "Username tidak ditemukan."; // Username tidak ditemukan
+        return "Username tidak ditemukan.";
     }
 }
 
@@ -36,16 +35,13 @@ if (isset($_POST['login'])) {
 
     $login_result = login($username, $password);
     if ($login_result === true) {
-        // Cek status aktif
         if ($_SESSION['hak_akses'] == 0) {
             $error_message = "Akun Anda belum aktif. Silakan hubungi operator.";
         } else {
-            // Redirect ke dashboard
             header("Location: pages/dashboard.php");
             exit();
         }
     } else {
-        // Tampilkan pesan kesalahan
         $error_message = $login_result;
     }
 }

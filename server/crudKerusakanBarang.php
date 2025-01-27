@@ -4,8 +4,10 @@ $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Penanganan pencarian
+// Pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
+
+// Query tampil data kerusakan barang
 $query = "SELECT kb.*, 
           i.nama_barang, 
           i.kode_inventaris, 
@@ -26,6 +28,7 @@ $query = "SELECT kb.*,
           LEFT JOIN user u3 ON k3.id_user = u3.id_user
           WHERE (i.nama_barang LIKE '%$search%' 
           OR i.kode_inventaris LIKE '%$search%')
+          GROUP BY kb.id_kerusakan_barang
           ORDER BY kb.tanggal_kerusakan DESC
           LIMIT $limit OFFSET $offset";
 
@@ -146,22 +149,19 @@ function validasiFoto($file)
     $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']; // Tipe file yang diperbolehkan
     $maxSize = 2097152;
 
-    // Cek apakah ada kesalahan saat upload
     if ($file['error'] !== UPLOAD_ERR_OK) {
         return "Tidak ada file yang diupload.";
     }
 
-    // Cek ukuran file
     if ($file['size'] > $maxSize) {
         return "Ukuran file tidak boleh lebih dari 2MB.";
     }
 
-    // Cek tipe file
     if (!in_array($file['type'], $allowedTypes)) {
         return "Tipe file tidak valid. Harus berupa JPG, JPEG, atau PNG.";
     }
 
-    return true; // Validasi berhasil
+    return true;
 }
 
 // Proses penambahan kerusakan barang
@@ -192,6 +192,7 @@ if (isset($_POST['tambahKerusakan'])) {
         exit();
     }
 
+    // Query tambah
     $query = "INSERT INTO kerusakan_barang (id_inventaris, tanggal_kerusakan, cawu, jumlah_kerusakan, foto_kerusakan, keterangan)
               VALUES ('$id_inventaris', '$tanggal_kerusakan', '$cawu', 
               '$jumlah_kerusakan', '$fotoName', '$keterangan')";
@@ -217,6 +218,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $rowFoto = mysqli_fetch_assoc($resultFoto);
     $fotoLama = $rowFoto['foto_kerusakan'];
 
+    // Query edit
     $query = "UPDATE kerusakan_barang SET 
               keterangan = '$keterangan'
               WHERE id_kerusakan_barang = $id_kerusakan_barang";
@@ -238,11 +240,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
             $fotoName = time() . '_' . basename($foto['name']);
 
             if (move_uploaded_file($foto['tmp_name'], $uploadDir . $fotoName)) {
-                // Update foto di database
+                // Query update foto
                 $queryFotoUpdate = "UPDATE kerusakan_barang SET foto_kerusakan = '$fotoName' WHERE id_kerusakan_barang = $id_kerusakan_barang";
                 mysqli_query($conn, $queryFotoUpdate);
 
-                // Hapus foto lama dari server
+                // Hapus foto lama
                 if ($fotoLama && file_exists($uploadDir . $fotoLama)) {
                     unlink($uploadDir . $fotoLama);
                 }
@@ -258,7 +260,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Proses delete kerusakan barang
+// Proses penghapusan kerusakan barang
 if (isset($_GET['delete'])) {
     $id_kerusakan_barang = $_GET['delete'];
 
@@ -275,7 +277,7 @@ if (isset($_GET['delete'])) {
         }
     }
 
-    // Hapus data dari database
+    // Query hapus 
     $query = "DELETE FROM kerusakan_barang WHERE id_kerusakan_barang = $id_kerusakan_barang";
 
     if (mysqli_query($conn, $query)) {
@@ -289,9 +291,9 @@ if (isset($_GET['delete'])) {
 }
 
 // Fungsi untuk mendapatkan detail barang berdasarkan ID
-function getDetailBarang($conn, $id_inventaris)
-{
-    $query = "SELECT * FROM inventaris WHERE id_inventaris = $id_inventaris";
-    return mysqli_query($conn, $query);
-}
+// function getDetailBarang($conn, $id_inventaris)
+// {
+//     $query = "SELECT * FROM inventaris WHERE id_inventaris = $id_inventaris";
+//     return mysqli_query($conn, $query);
+// }
 ?>

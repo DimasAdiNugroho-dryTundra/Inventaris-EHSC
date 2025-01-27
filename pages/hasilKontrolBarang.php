@@ -72,6 +72,8 @@ if (!empty($search)) {
                      OR u3.nama LIKE '%$search%')";
 }
 
+$query .= " ORDER BY i.tanggal_perolehan ASC";
+
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -165,7 +167,7 @@ $result = mysqli_query($conn, $query);
                                 </div>
                                 <div class="row p-3">
                                     <div class="col-12 d-flex justify-content-start align-items-center">
-                                        <a href="../report/printLaporanRangkumanInventaris.php?year=<?php echo $tahunTerpilih; ?>"
+                                        <a href="../report/printLaporanHasilKontrolBarangInventaris.php?year=<?php echo $tahunTerpilih; ?>"
                                             class="btn btn-success"> Cetak Laporan
                                         </a>
                                     </div>

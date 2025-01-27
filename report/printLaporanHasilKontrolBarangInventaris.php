@@ -89,6 +89,8 @@ $query = "SELECT
         LEFT JOIN user u3 ON kbc3.id_user = u3.id_user
         WHERE 1=1";
 
+$query .= " ORDER BY i.tanggal_perolehan ASC";
+
 $result = mysqli_query($conn, $query);
 
 try {

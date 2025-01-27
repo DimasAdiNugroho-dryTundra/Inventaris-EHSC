@@ -132,7 +132,7 @@ require('../layouts/header.php');
                                 </div>
                             </div>
 
-                            <div class="table-responsive text-nowrap">
+                            <div class="table-responsive text-nowrap" style="max-height: 400px;">
                                 <table class="table table-hover table-sm">
                                     <thead class="table-light">
                                         <tr>
@@ -399,7 +399,7 @@ require('../layouts/header.php');
                                     </a>
                                 </div>
                             </div>
-                            <div class="table-responsive text-nowrap">
+                            <div class="table-responsive text-nowrap" style="max-height: 400px;">
                                 <table class="table table-hover table-sm">
                                     <thead class="table-light">
                                         <tr>

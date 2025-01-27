@@ -1,5 +1,5 @@
 <?php
-// Handling Pencarian dan Pagination untuk Barang Tersedia
+// Pencarian dan Pagination untuk Barang Tersedia
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -24,7 +24,7 @@ if (!empty($search)) {
 
 $query .= " ORDER BY i.id_inventaris DESC";
 
-// Hitung total data untuk pagination
+// Pagination
 $total_records_query = mysqli_query($conn, $query);
 $total_records = mysqli_num_rows($total_records_query);
 $totalPages = ceil($total_records / $limit);
@@ -34,7 +34,7 @@ $query .= " LIMIT $offset, $limit";
 $result = mysqli_query($conn, $query);
 
 
-// Handling Pencarian dan Pagination untuk Barang Tidak Tersedia
+// Pencarian dan Pagination untuk Barang Tidak Tersedia
 $search_zero = isset($_POST['search_zero']) ? $_POST['search_zero'] : '';
 $limit_zero = isset($_GET['limit_zero']) ? (int) $_GET['limit_zero'] : 5;
 $page_zero = isset($_GET['page_zero']) ? (int) $_GET['page_zero'] : 1;
@@ -59,7 +59,7 @@ if (!empty($search_zero)) {
 
 $query_zero .= " ORDER BY i.id_inventaris DESC";
 
-// Hitung total data untuk pagination
+// Pagination
 $total_records_zero_query = mysqli_query($conn, $query_zero);
 $total_records_zero = mysqli_num_rows($total_records_zero_query);
 $totalPages_zero = ceil($total_records_zero / $limit_zero);
@@ -92,7 +92,7 @@ function generateKodeInventaris($conn, $departemen_kode, $ruangan_kode, $kategor
     return sprintf("%s/%s/%s/%s/%03d", $departemen_kode, $ruangan_kode, $kategori_kode, $tahun, $angka_berikutnya);
 }
 
-// Handling Create
+// Proses penambahan inventaris
 if (isset($_POST['action']) && $_POST['action'] == 'create') {
     // Validasi input dari penerimaan
     if (!empty($_POST['id_penerimaan'])) {
@@ -125,7 +125,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
             if ($dept && $kat) {
                 $kode_inventaris = generateKodeInventaris($conn, $dept['kode_departemen'], $ruang['kode_ruangan'], $kat['kode_kategori']);
 
-                // Query untuk insert
+                // Query tambah
                 $query = "INSERT INTO inventaris (kode_inventaris, nama_barang, merk, id_penerimaan,
                          id_departemen, id_ruangan, id_kategori, tanggal_perolehan, jumlah_awal,
                          jumlah_akhir, satuan, sumber_inventaris)
@@ -152,25 +152,24 @@ if (isset($_POST['action']) && $_POST['action'] == 'create') {
     exit();
 }
 
-// Handling Update
+// Proses pengeditan inventaris
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_inventaris = $_POST['id_inventaris'];
     $id_ruangan = $_POST['id_ruangan'];
     $id_kategori = $_POST['id_kategori'];
 
-    // Cek sumber inventaris
+    // Cek sumber inventaris, Jika sumber barang inventaris adalah "Pindah Barang" tidak dapat diedit
     $check_query = "SELECT sumber_inventaris FROM inventaris WHERE id_inventaris = $id_inventaris";
     $check_result = mysqli_query($conn, $check_query);
     $inventaris_data = mysqli_fetch_assoc($check_result);
-
-    // Jika sumber inventaris adalah "Pindah Barang"
+    
     if ($inventaris_data['sumber_inventaris'] == 'Pindah Barang') {
         $_SESSION['error_message'] = "Data inventaris dari sumber Pindah Barang tidak dapat diedit!";
         header("Location: inventaris.php");
         exit();
     }
 
-    // Cek apakah ada data kontrol untuk inventaris ini
+    // Cek apakah ada data kontrol untuk barang inventaris, Jika ada maka tidak dapat diedit
     $checkKontrolQuery = "SELECT 
                             (SELECT COUNT(*) FROM kontrol_barang_cawu_satu WHERE id_inventaris = $id_inventaris) +
                             (SELECT COUNT(*) FROM kontrol_barang_cawu_dua WHERE id_inventaris = $id_inventaris) +
@@ -178,8 +177,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 
     $checkResult = mysqli_query($conn, $checkKontrolQuery);
     $kontrolData = mysqli_fetch_assoc($checkResult);
-
-    // Keterangan berdasarkan hasil pengecekan
+    
     if ($kontrolData['total_kontrol'] > 0) {
         $_SESSION['error_message'] = "Data inventaris tidak dapat diedit karena masih memiliki data kontrol terkait!";
         header("Location: inventaris.php");
@@ -205,10 +203,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $result_ruang = mysqli_query($conn, $query_ruang);
     $ruang = mysqli_fetch_assoc($result_ruang);
 
-    // Generate kode inventaris baru
+    // Generate kode inventaris baru jika departemen, ruangan, atau kategori berubah :)
     $kode_inventaris_baru = generateKodeInventaris($conn, $dept['kode_departemen'], $ruang['kode_ruangan'], $kat['kode_kategori']);
 
-    // Query untuk update
+    // Query edit
     $query = "UPDATE inventaris SET
               kode_inventaris = '$kode_inventaris_baru',
               id_kategori = $id_kategori,
@@ -225,23 +223,22 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Handling Delete
+// Proses penghapusan inventaris
 if (isset($_GET['delete'])) {
     $id_inventaris = $_GET['delete'];
 
-    // Cek sumber inventaris
+    // Cek sumber inventaris, ika sumber inventaris adalah "Pindah Barang" tidak dapat dihapus
     $check_query = "SELECT sumber_inventaris FROM inventaris WHERE id_inventaris = $id_inventaris";
     $check_result = mysqli_query($conn, $check_query);
     $inventaris_data = mysqli_fetch_assoc($check_result);
 
-    // Jika sumber inventaris adalah "Pindah Barang"
     if ($inventaris_data['sumber_inventaris'] == 'Pindah Barang') {
         $_SESSION['error_message'] = "Data inventaris dari sumber Pindah Barang tidak dapat dihapus!";
         header("Location: inventaris.php");
         exit();
     }
 
-    // Cek apakah ada data kontrol untuk inventaris ini
+    // Cek apakah ada data kontrol untuk inventaris ini, jika ada tidak dapat dihapus
     $checkKontrolQuery = "SELECT 
                             (SELECT COUNT(*) FROM kontrol_barang_cawu_satu WHERE id_inventaris = $id_inventaris) +
                             (SELECT COUNT(*) FROM kontrol_barang_cawu_dua WHERE id_inventaris = $id_inventaris) +
@@ -256,7 +253,7 @@ if (isset($_GET['delete'])) {
         exit();
     }
 
-    // Hapus data dari tabel inventaris
+    // Query hapus
     $query = "DELETE FROM inventaris WHERE id_inventaris = $id_inventaris";
 
     if (mysqli_query($conn, $query)) {

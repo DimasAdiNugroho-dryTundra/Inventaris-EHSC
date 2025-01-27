@@ -1,6 +1,4 @@
 <?php
-// crudkontrolBarangCawuDuaCawuSatu.php
-
 // Pengaturan untuk pagination
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -10,7 +8,7 @@ $offset = ($page - 1) * $limit;
 $tahun = isset($_POST['year']) ? (int) $_POST['year'] : date('Y');
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 
-// Tentukan tabel dan rentang tanggal berdasarkan cawu
+// Mentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_dua';
 $idKolom = 'id_kontrol_barang_cawu_dua';
 $tanggalMulai = "$tahun-05-01";
@@ -51,7 +49,9 @@ $totalRow = mysqli_fetch_assoc($totalResult);
 $totalRows = $totalRow['total'];
 $totalPages = ceil($totalRows / $limit);
 
-function getAvailableInventaris($conn, $tahun, $table)
+
+// Ambil data barang inventaris tersedia daru bulan januari sampai agustus
+function getInventarisTersedia($conn, $tahun, $table)
 {
     $query = "SELECT 
                 i.id_inventaris, 
@@ -159,7 +159,7 @@ if (isset($_POST['tambahKontrol'])) {
         exit();
     }
 
-    // Proses insert data
+    // Query tambah
     $query = "INSERT INTO $table (id_inventaris, id_user, tanggal_kontrol, tahun_kontrol, 
               jumlah_baik, jumlah_rusak, jumlah_pindah, jumlah_hilang) 
               VALUES ('$id_inventaris', '{$_SESSION['id_user']}', '$tanggal_kontrol', '$tahun',
@@ -175,12 +175,12 @@ if (isset($_POST['tambahKontrol'])) {
     exit();
 }
 
-// Proses pembaruan kontrol barang
+// Proses pengeditan kontrol barang
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kontrol = (int) $_POST['id_kontrol'];
     $tanggal_kontrol = isset($_POST['tanggal']) ? $_POST['tanggal'] : '';
 
-    // Ambil data kontrol yang akan diupdate
+    // Ambil data kontrol yang akan diedit 
     $query_kontrol = "SELECT kb.*, i.id_inventaris 
                      FROM kontrol_barang_cawu_dua kb
                      JOIN inventaris i ON kb.id_inventaris = i.id_inventaris
@@ -191,7 +191,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 
     $tahun = date('Y', strtotime($tanggal_kontrol));
 
-    // Cek apakah ada data di cawu tiga
+    // Cek apakah barang inventaris sudah dikontrol di kontrol barang cawu 3, jika sudah maka tidak dapat diubah
     $query_cek = "SELECT COUNT(*) as total 
                    FROM kontrol_barang_cawu_tiga 
                    WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
@@ -263,7 +263,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         exit();
     }
 
-    // Proses update data setelah semua validasi berhasil
+    // Query edit jika semua berhasil
     $query = "UPDATE $table SET 
               tanggal_kontrol = '$tanggal_kontrol',
               tahun_kontrol = '$tahun',
@@ -283,7 +283,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Proses delete kontrol barang
+// Proses penghapusan kontrol barang
 if (isset($_GET['delete'])) {
     $id_kontrol = (int) $_GET['delete'];
 
@@ -302,7 +302,7 @@ if (isset($_GET['delete'])) {
         exit();
     }
 
-    // Jika tidak ada data di cawu tiga, lanjutkan proses delete
+    // Jika tidak ada data di cawu tiga, lanjutkan proses hapus
     $query = "DELETE FROM kontrol_barang_cawu_dua WHERE id_kontrol_barang_cawu_dua = '$id_kontrol'";
 
     if (mysqli_query($conn, $query)) {

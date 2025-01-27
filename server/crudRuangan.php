@@ -1,23 +1,21 @@
 <?php
-require_once('../server/configDB.php');
-
-// Pagination settings
+// Pengaturan untuk pagination
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Search handling
+// Pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 $query = "SELECT * FROM ruangan WHERE nama_ruangan LIKE '%$search%' OR kode_ruangan LIKE '%$search%' LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 
-// Count total data for pagination
+// Hitung data untuk Pagination
 $totalQuery = "SELECT COUNT(*) as total FROM ruangan WHERE nama_ruangan LIKE '%$search%' OR kode_ruangan LIKE '%$search%'";
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalPages = ceil($totalRow['total'] / $limit);
 
-// Process adding ruangan
+// Proses penambahan ruangan
 if (isset($_POST['tambahRuangan'])) {
     $kode_ruangan = $_POST['kode_ruangan'];
     $nama_ruangan = $_POST['nama_ruangan'];
@@ -32,7 +30,7 @@ if (isset($_POST['tambahRuangan'])) {
     exit();
 }
 
-// Process editing ruangan
+// Proses pengeditan ruangan
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_ruangan = $_POST['id_ruangan'];
     
@@ -58,7 +56,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Process deleting ruangan
+// Proses penghapusan ruangan
 if (isset($_GET['delete'])) {
     $id_ruangan = $_GET['delete'];
 

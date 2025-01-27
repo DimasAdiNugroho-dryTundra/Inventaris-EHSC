@@ -2,7 +2,7 @@
 // File: kerusakanBarang.php
 require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
-require('../server/crudKerusakanBarang.php'); // Ganti dengan file CRUD yang sesuai
+require('../server/crudKerusakanBarang.php');
 require('../layouts/header.php');
 ?>
 
@@ -286,7 +286,8 @@ require('../layouts/header.php');
                                                     value="<?php echo $row['jumlah_kerusakan']; ?>" readonly>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Foto Kerusakan</label>
+                                                <label class="form-label">Foto Kerusakan (max 2MB - JPG, JPEG,
+                                                    PNG)</label>
                                                 <input type="file" class="form-control" name="foto_kerusakan"
                                                     accept="image/*">
                                                 <?php if ($row['foto_kerusakan']) { ?>
@@ -423,7 +424,8 @@ require('../layouts/header.php');
                                                     name="jumlah_kerusakan" id="jumlah_kerusakan" required readonly>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Foto Kerusakan</label>
+                                                <label class="form-label">Foto Kerusakan (max 2MB - JPG, JPEG,
+                                                    PNG)</label>
                                                 <input type="file" class="form-control" name="foto_kerusakan"
                                                     accept="image/*" required>
                                             </div>

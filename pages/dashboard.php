@@ -2,7 +2,7 @@
 require('../server/sessionHandler.php');
 require('../layouts/header.php');
 
-// Ambil data pengguna berdasarkan session
+// Ambil data user berdasarkan session
 $queryUser = "SELECT * FROM user WHERE id_user = '$id_user'";
 $resultUser = mysqli_query($conn, $queryUser);
 $user = mysqli_fetch_assoc($resultUser);
@@ -19,10 +19,10 @@ $jam = date('H');
 // Query untuk menghitung jumlah kerusakan barang yang belum dilaporkan
 $queryKerusakan = "SELECT 
                     (
-                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_satu WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
-                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_dua WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
-                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_tiga WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) -
-                        COALESCE((SELECT SUM(jumlah_kerusakan) FROM kerusakan_barang WHERE YEAR(tanggal_kerusakan) = $tahun_sekarang), 0)
+                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_satu), 0) +
+                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_dua), 0) +
+                        COALESCE((SELECT SUM(jumlah_rusak) FROM kontrol_barang_cawu_tiga), 0) -
+                        COALESCE((SELECT SUM(jumlah_kerusakan) FROM kerusakan_barang), 0)
                     ) as total_belum_dilaporkan";
 $resultKerusakan = mysqli_query($conn, $queryKerusakan);
 $rowKerusakan = mysqli_fetch_assoc($resultKerusakan);
@@ -31,10 +31,10 @@ $totalKerusakanBelumDilaporkan = $rowKerusakan['total_belum_dilaporkan'];
 // Query untuk menghitung jumlah perpindahan barang yang belum dilaporkan
 $queryPerpindahan = "SELECT 
                     (
-                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_satu WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
-                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_dua WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
-                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_tiga WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) -
-                        COALESCE((SELECT SUM(jumlah_perpindahan) FROM perpindahan_barang WHERE YEAR(tanggal_perpindahan) = $tahun_sekarang), 0)
+                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_satu), 0) +
+                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_dua), 0) +
+                        COALESCE((SELECT SUM(jumlah_pindah) FROM kontrol_barang_cawu_tiga), 0) -
+                        COALESCE((SELECT SUM(jumlah_perpindahan) FROM perpindahan_barang), 0)
                     ) as total_belum_dilaporkan";
 $resultPerpindahan = mysqli_query($conn, $queryPerpindahan);
 $rowPerpindahan = mysqli_fetch_assoc($resultPerpindahan);
@@ -43,44 +43,44 @@ $totalPerpindahanBelumDilaporkan = $rowPerpindahan['total_belum_dilaporkan'];
 // Query untuk menghitung jumlah kehilangan barang yang belum dilaporkan
 $queryKehilangan = "SELECT 
                     (
-                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_satu WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
-                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_dua WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) +
-                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_tiga WHERE YEAR(tanggal_kontrol) = $tahun_sekarang), 0) -
-                        COALESCE((SELECT SUM(jumlah_kehilangan) FROM kehilangan_barang WHERE YEAR(tanggal_kehilangan) = $tahun_sekarang), 0)
+                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_satu), 0) +
+                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_dua), 0) +
+                        COALESCE((SELECT SUM(jumlah_hilang) FROM kontrol_barang_cawu_tiga), 0) -
+                        COALESCE((SELECT SUM(jumlah_kehilangan) FROM kehilangan_barang), 0)
                     ) as total_belum_dilaporkan";
 $resultKehilangan = mysqli_query($conn, $queryKehilangan);
 $rowKehilangan = mysqli_fetch_assoc($resultKehilangan);
 $totalKehilanganBelumDilaporkan = $rowKehilangan['total_belum_dilaporkan'];
 
-$query_kontrol = "
-    (SELECT 
-        'Cawu 1' as periode,
-        SUM(jumlah_baik) as baik,
-        SUM(jumlah_rusak) as rusak,
-        SUM(jumlah_hilang) as hilang,
-        SUM(jumlah_pindah) as pindah
-    FROM kontrol_barang_cawu_satu 
-    WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
-    UNION ALL
-    (SELECT 
-        'Cawu 2' as periode,
-        SUM(jumlah_baik) as baik,
-        SUM(jumlah_rusak) as rusak,
-        SUM(jumlah_hilang) as hilang,
-        SUM(jumlah_pindah) as pindah
-    FROM kontrol_barang_cawu_dua
-    WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
-    UNION ALL
-    (SELECT 
-        'Cawu 3' as periode,
-        SUM(jumlah_baik) as baik,
-        SUM(jumlah_rusak) as rusak,
-        SUM(jumlah_hilang) as hilang,
-        SUM(jumlah_pindah) as pindah
-    FROM kontrol_barang_cawu_tiga
-    WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
-    ORDER BY periode
-";
+// Query untuk menampilkan grafik
+$query_kontrol = "(SELECT 
+                    'Cawu 1' as periode,
+                    SUM(jumlah_baik) as baik,
+                    SUM(jumlah_rusak) as rusak,
+                    SUM(jumlah_hilang) as hilang,
+                    SUM(jumlah_pindah) as pindah
+                FROM kontrol_barang_cawu_satu 
+                WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
+                UNION ALL
+                (SELECT 
+                    'Cawu 2' as periode,
+                    SUM(jumlah_baik) as baik,
+                    SUM(jumlah_rusak) as rusak,
+                    SUM(jumlah_hilang) as hilang,
+                    SUM(jumlah_pindah) as pindah
+                FROM kontrol_barang_cawu_dua
+                WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
+                UNION ALL
+                (SELECT 
+                    'Cawu 3' as periode,
+                    SUM(jumlah_baik) as baik,
+                    SUM(jumlah_rusak) as rusak,
+                    SUM(jumlah_hilang) as hilang,
+                    SUM(jumlah_pindah) as pindah
+                FROM kontrol_barang_cawu_tiga
+                WHERE YEAR(tanggal_kontrol) = $tahun_sekarang)
+                ORDER BY periode
+            ";
 
 $result = mysqli_query($conn, $query_kontrol);
 $data_kontrol = array();
@@ -128,12 +128,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         ?>
                                         <div class="welcome-message text-center">
                                             <p class="mb-0"><?php echo $ucapan; ?> dan selamat bekerja!</p>
-                                            <!-- <p class="text-muted mt-2">
-                                                    "Sistem Informasi Inventaris siap membantu Anda mengelola dan
-                                                    memantau
-                                                    aset dengan lebih efisien. Jika ada pertanyaan atau masalah,
-                                                    jangan ragu untuk menghubungi admin."
-                                                </p> -->
                                         </div>
                                     </div>
                                 </div>
@@ -285,24 +279,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 </div>
                             </div>
                         </div>
-
                         <div class="content-backdrop fade"></div>
                     </div>
-                    <!-- Content wrapper -->
                 </div>
-                <?php
-                require('../layouts/footer.php');
-                ?>
-                <!-- / Layout page -->
+                <?php require('../layouts/footer.php');?>
             </div>
-
-            <!-- Overlay -->
             <div class="layout-overlay layout-menu-toggle"></div>
-
-            <!-- Drag Target Area To SlideIn Menu On Small Screens -->
             <div class="drag-target"></div>
         </div>
-        <!-- / Layout wrapper -->
 
         <?php
         require('../layouts/assetsFooter.php')
@@ -385,7 +369,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             const colorsHilang = ['#f44336', '#e57373', '#ef9a9a'];
             const colorsPindah = ['#2196f3', '#64b5f6', '#bbdefb'];
 
-            // Inisialisasi grafik untuk kondisi baik
+            // Inisialisasi grafik untuk semua kondisi
             const chartKondisiBaik = new ApexCharts(document.querySelector("#chartKondisiBaik"), {
                 ...commonOptions,
                 colors: colorsBaik,
@@ -395,7 +379,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                 }]
             });
 
-            // Inisialisasi grafik untuk kondisi rusak
             const chartKondisiRusak = new ApexCharts(document.querySelector("#chartKondisiRusak"), {
                 ...commonOptions,
                 colors: colorsRusak,
@@ -405,7 +388,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                 }]
             });
 
-            // Inisialisasi grafik untuk kondisi hilang
             const chartKondisiHilang = new ApexCharts(document.querySelector("#chartKondisiHilang"), {
                 ...commonOptions,
                 colors: colorsHilang,
@@ -415,7 +397,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                 }]
             });
 
-            // Inisialisasi grafik untuk kondisi pindah
             const chartKondisiPindah = new ApexCharts(document.querySelector("#chartKondisiPindah"), {
                 ...commonOptions,
                 colors: colorsPindah,

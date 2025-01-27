@@ -517,7 +517,7 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                                     <select name="id_inventaris" class="form-select" required>
                                                         <option value="">Pilih Barang</option>
                                                         <?php
-                                                        $result = getAvailableInventaris($conn, $tahun, 'kontrol_barang_cawu_tiga');
+                                                        $result = getInventarisTersedia($conn, $tahun, 'kontrol_barang_cawu_tiga');
                                                         while ($row = mysqli_fetch_assoc($result)) {
                                                             $tampil_nama_merk_ruangan = $row['nama_barang'] . ' - ' . $row['merk'] . ' - Ruang ' . $row['nama_ruangan'];
                                                                 echo "<option value=\"{$row['id_inventaris']}\">{$tampil_nama_merk_ruangan} (Kode: {$row['kode_inventaris']}, Jumlah: {$row['jumlah']})</option>";

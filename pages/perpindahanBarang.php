@@ -362,7 +362,7 @@ require('../layouts/header.php');
                                                                 data-tanggal='{$row['tanggal_kontrol']}'
                                                                 data-jumlah='{$row['jumlah_pindah']}'
                                                                 data-nama-petugas='{$row['nama_petugas']}'> 
-                                                                {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['merk']} - Ruang {$row['nama_ruangan']} - {$row['cawu']} - {$row['jumlah_pindah']} {$row['satuan']}
+                                                                {$row['kode_inventaris']} - {$row['nama_barang']} - {$row['merk']} - Ruang {$row['nama_ruangan']} - {$row['cawu']} -  " . date('Y', strtotime($row['tanggal_kontrol'])) . "  - {$row['jumlah_pindah']} {$row['satuan']}
                                                             </option>";
                                                     }
                                                     ?>

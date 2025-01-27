@@ -51,7 +51,7 @@ $totalRow = mysqli_fetch_assoc($totalResult);
 $totalRows = $totalRow['total'];
 $totalPages = ceil($totalRows / $limit);
 
-function getAvailableInventaris($conn, $tahun, $table)
+function getInventarisTersedia($conn, $tahun, $table)
 {
     $query = "SELECT 
                 i.id_inventaris, 

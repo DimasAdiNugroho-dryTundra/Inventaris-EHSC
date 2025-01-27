@@ -1,15 +1,15 @@
 <?php
 // Pengaturan untuk pagination
-$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5; // Default ke 5
+$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Penanganan pencarian
+// Pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 $query = "SELECT * FROM departemen WHERE nama_departemen LIKE '%$search%' LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 
-// Hitung total data untuk pagination
+// Hitung data untuk Pagination
 $totalQuery = "SELECT COUNT(*) as total FROM departemen WHERE nama_departemen LIKE '%$search%'";
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
@@ -34,7 +34,7 @@ if (isset($_POST['tambahDepartemen'])) {
         }
     }
     header("Location: departemen.php");
-    exit(); // Tambahkan exit agar tidak melanjutkan eksekusi
+    exit(); 
 }
 
 // Proses pengeditan departemen
@@ -76,8 +76,9 @@ if (isset($_GET['delete'])) {
     if ($checkRow['count'] > 0) {
         $_SESSION['error_message'] = "Data departemen tidak dapat dihapus karena sudah digunakan pada data inventaris!";
     } else {
-        // Hapus data departemen dari database
+
         $query = "DELETE FROM departemen WHERE id_departemen='$id_departemen'";
+        
         if (mysqli_query($conn, $query)) {
             $_SESSION['success_message'] = "Departemen berhasil dihapus!";
         } else {

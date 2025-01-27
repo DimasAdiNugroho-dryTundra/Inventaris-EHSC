@@ -51,7 +51,7 @@ if (isset($_POST['tambahPenerimaan'])) {
         $query = "INSERT INTO penerimaan_barang (id_permintaan, id_departemen, nama_barang, merk, tanggal_terima, jumlah, satuan, sumber_penerimaan) 
                   VALUES ('$id_permintaan', '$id_departemen', '$nama_barang', '$merk', '$tanggal_terima', '$jumlah', '$satuan', '$sumber_penerimaan')";
     } else {
-        // Input manual
+        // Input manual dari pengadaan kantor
         $nama_barang = $_POST['nama_barang'];
         $merk = $_POST['merk'];
         $id_departemen = $_POST['id_departemen'];
@@ -95,7 +95,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
                       satuan = '$satuan'
                       WHERE id_penerimaan = $id_penerimaan";
         } else {
-            // Edit untuk input manual
+            // Edit untuk input manual dari pengadaan kantor
             $nama_barang = $_POST['nama_barang'];
             $merk = $_POST['merk'];
             $id_departemen = $_POST['id_departemen'];
@@ -120,7 +120,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Fungsi hapus
+// Proses penghapusan penerimaan barang
 if (isset($_GET['delete'])) {
     $id_penerimaan = $_GET['delete'];
 
@@ -132,7 +132,7 @@ if (isset($_GET['delete'])) {
     if ($checkInventarisRow['count'] > 0) {
         $_SESSION['error_message'] = "Data penerimaan barang tidak dapat dihapus karena sudah ada di inventaris!";
     } else {
-        // Hapus dari penerimaan_barang
+        // Hapus dari penerimaan_barang jika tidak ada data di inventaris
         $deleteQuery = "DELETE FROM penerimaan_barang WHERE id_penerimaan = $id_penerimaan";
         if (mysqli_query($conn, $deleteQuery)) {
             $_SESSION['success_message'] = "Penerimaan barang berhasil dihapus!";

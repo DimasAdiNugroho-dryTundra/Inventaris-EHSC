@@ -6,6 +6,8 @@ $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
+
+// Query tampil data perpindahan barang
 $query = "SELECT pb.*, 
             i.nama_barang, 
             i.kode_inventaris AS kode_inventaris_asal, 
@@ -15,22 +17,23 @@ $query = "SELECT pb.*,
             i.sumber_inventaris,
             d.nama_departemen,
             COALESCE(u1.nama, u2.nama, u3.nama) AS nama_petugas
-        FROM perpindahan_barang pb
-        JOIN inventaris i ON pb.id_inventaris = i.id_inventaris
-        JOIN ruangan r_asal ON i.id_ruangan = r_asal.id_ruangan
-        JOIN inventaris i_baru ON pb.kode_inventaris_baru = i_baru.kode_inventaris
-        JOIN ruangan r_tujuan ON i_baru.id_ruangan = r_tujuan.id_ruangan
-        JOIN departemen d ON i.id_departemen = d.id_departemen  
-        LEFT JOIN kontrol_barang_cawu_satu k1 ON k1.id_inventaris = i.id_inventaris
-        LEFT JOIN kontrol_barang_cawu_dua k2 ON k2.id_inventaris = i.id_inventaris
-        LEFT JOIN kontrol_barang_cawu_tiga k3 ON k3.id_inventaris = i.id_inventaris
-        LEFT JOIN user u1 ON k1.id_user = u1.id_user
-        LEFT JOIN user u2 ON k2.id_user = u2.id_user
-        LEFT JOIN user u3 ON k3.id_user = u3.id_user
-        WHERE (i.nama_barang LIKE '%$search%' 
-        OR i.kode_inventaris LIKE '%$search%')
-        ORDER BY pb.tanggal_perpindahan DESC
-        LIMIT $limit OFFSET $offset";
+            FROM perpindahan_barang pb
+            JOIN inventaris i ON pb.id_inventaris = i.id_inventaris
+            JOIN ruangan r_asal ON i.id_ruangan = r_asal.id_ruangan
+            JOIN inventaris i_baru ON pb.kode_inventaris_baru = i_baru.kode_inventaris
+            JOIN ruangan r_tujuan ON i_baru.id_ruangan = r_tujuan.id_ruangan
+            JOIN departemen d ON i.id_departemen = d.id_departemen  
+            LEFT JOIN kontrol_barang_cawu_satu k1 ON k1.id_inventaris = i.id_inventaris
+            LEFT JOIN kontrol_barang_cawu_dua k2 ON k2.id_inventaris = i.id_inventaris
+            LEFT JOIN kontrol_barang_cawu_tiga k3 ON k3.id_inventaris = i.id_inventaris
+            LEFT JOIN user u1 ON k1.id_user = u1.id_user
+            LEFT JOIN user u2 ON k2.id_user = u2.id_user
+            LEFT JOIN user u3 ON k3.id_user = u3.id_user
+            WHERE (i.nama_barang LIKE '%$search%' 
+            OR i.kode_inventaris LIKE '%$search%')
+            GROUP BY pb.id_perpindahan_barang
+            ORDER BY pb.tanggal_perpindahan DESC
+            LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $query);
 
@@ -42,7 +45,7 @@ $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalPages = ceil($totalRow['total'] / $limit);
 
-// Fungsi untuk mendapatkan data perpindahan barang
+// Fungsi untuk mendapatkan data perpindahan barang daei semua cawu
 function getBarangPindah($conn)
 {
     $query = "SELECT 
@@ -146,8 +149,12 @@ function getBarangPindah($conn)
     return $result;
 }
 
-function generateKodeInventarisPindah($conn, $departemen_kode, $kategori_kode, $ruangan_kode, $year)
+// Fungsi untuk generate kode inventaris baru untuk barang yang pindah
+function generateKodeInventarisPindah($conn, $departemen_kode, $kategori_kode, $ruangan_kode, $tanggal_perolehan)
 {
+    // Ambil tahun dari tanggal perolehan
+    $year = date('Y', strtotime($tanggal_perolehan));
+
     $query = "SELECT MAX(CAST(SUBSTRING_INDEX(kode_inventaris, '/', -1) AS UNSIGNED)) as angka_terakhir 
               FROM inventaris 
               WHERE kode_inventaris LIKE '$departemen_kode/$kategori_kode/$ruangan_kode/$year/%'";
@@ -159,17 +166,15 @@ function generateKodeInventarisPindah($conn, $departemen_kode, $kategori_kode, $
     return sprintf(
         "%s/%s/%s/%s/%03d",
         $departemen_kode,
-        $kategori_kode,
         $ruangan_kode,
+        $kategori_kode,
         $year,
         $angka_berikutnya
     );
 }
 
-
 // Proses penambahan perpindahan barang
 if (isset($_POST['tambahPerpindahan'])) {
-    // Ambil data dari form
     $id_inventaris = $_POST['id_inventaris'];
     $id_ruangan = $_POST['id_ruangan'];
     $tanggal_perpindahan = $_POST['tanggal_perpindahan'];
@@ -193,10 +198,10 @@ if (isset($_POST['tambahPerpindahan'])) {
         $inventaris['kode_departemen'],
         $inventaris['kode_kategori'],
         $inventaris['kode_ruangan'],
-        date('Y') // Menggunakan tahun saat ini
+        $inventaris['tanggal_perolehan']
     );
 
-    // Insert ke tabel perpindahan_barang
+    // Query tambah ke tabel perpindahan barang
     $query = "INSERT INTO perpindahan_barang (id_inventaris, id_ruangan, kode_inventaris_baru, tanggal_perpindahan, 
               cawu, jumlah_perpindahan, keterangan)
               VALUES ('$id_inventaris', '$id_ruangan', '$kode_inventaris_baru', '$tanggal_perpindahan', 
@@ -204,7 +209,7 @@ if (isset($_POST['tambahPerpindahan'])) {
     $result = mysqli_query($conn, $query);
 
     if ($result) {
-        // Insert inventaris baru dengan ruangan yang baru
+        // Query tambah inventaris baru dengan ruangan yang baru ke tabel inventaris
         $query = "INSERT INTO inventaris (
                     kode_inventaris, 
                     nama_barang, 
@@ -224,7 +229,7 @@ if (isset($_POST['tambahPerpindahan'])) {
                     '{$inventaris['id_departemen']}',
                     '$id_ruangan',
                     '{$inventaris['id_kategori']}',
-                    '{$inventaris['tanggal_perolehan']}',
+                    '$tanggal_perpindahan',
                     '$jumlah_perpindahan',
                     '$jumlah_perpindahan',
                     '{$inventaris['satuan']}',
@@ -245,13 +250,13 @@ if (isset($_POST['tambahPerpindahan'])) {
     exit();
 }
 
-// Proses update perpindahan barang
+// Proses pengeditan perpindahan barang
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_perpindahan_barang = $_POST['id_perpindahan_barang'];
     $id_ruangan = $_POST['id_ruangan'];
     $keterangan = $_POST['keterangan'];
 
-    // 1. Get data perpindahan barang dan inventaris terkait
+    // Get data perpindahan barang dan inventaris terkait
     $query = "SELECT pb.*, i.id_inventaris as id_inventaris_baru,
               i_asal.id_departemen, d.kode_departemen, k.kode_kategori, r.kode_ruangan
               FROM perpindahan_barang pb
@@ -265,7 +270,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $perpindahan = mysqli_fetch_assoc($result);
 
     if ($perpindahan) {
-        // 2. Cek apakah ada data kontrol untuk inventaris baru
+        // Cek apakah barang pindah yang dicatat sebagai inventaris baru sudah dikontrol? jika sudah maka tidak dapat diubah
         $checkKontrolQuery = "SELECT COUNT(*) as total_kontrol 
                              FROM (
                                  SELECT id_inventaris FROM kontrol_barang_cawu_satu 
@@ -284,14 +289,15 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         if ($kontrolData['total_kontrol'] > 0) {
             $_SESSION['error_message'] = "Data perpindahan tidak dapat diubah karena inventaris baru telah memiliki data kontrol!";
         } else {
-            // 3. Update data perpindahan barang
+            // Jika tidak ada data kontrol maka akan dilanjurkan dengan query dibawah
+            // Query pengeditan data perpindahan barang
             $updatePerpindahan = "UPDATE perpindahan_barang SET 
                                     id_ruangan = '$id_ruangan',
                                     kode_inventaris_baru = '$kode_inventaris_baru',
                                     keterangan = '$keterangan'
                                     WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
 
-            // 4. Update data inventaris baru
+            // 4. Query pengeditan inventaris baru
             $updateInventaris = "UPDATE inventaris SET 
                                     kode_inventaris = '$kode_inventaris_baru',
                                     id_ruangan = '$id_ruangan'
@@ -308,11 +314,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Proses delete perpindahan barang
+// Proses penghapusan perpindahan barang
 if (isset($_GET['delete'])) {
     $id_perpindahan_barang = $_GET['delete'];
 
-    // 1. Get data perpindahan barang dan inventaris terkait
+    // Get data perpindahan barang dan inventaris terkait
     $query = "SELECT pb.*, i.id_inventaris as id_inventaris_baru 
               FROM perpindahan_barang pb
               JOIN inventaris i ON i.kode_inventaris = pb.kode_inventaris_baru 
@@ -321,7 +327,7 @@ if (isset($_GET['delete'])) {
     $perpindahan = mysqli_fetch_assoc($result);
 
     if ($perpindahan) {
-        // 2. Cek apakah ada data kontrol untuk inventaris baru
+        // Cek apakah barang pindah yang dicatat sebagai inventaris baru sudah dikontrol? jika sudah maka tidak dapat diubah
         $checkKontrolQuery = "SELECT COUNT(*) as total_kontrol 
                              FROM (
                                  SELECT id_inventaris FROM kontrol_barang_cawu_satu 
@@ -340,24 +346,22 @@ if (isset($_GET['delete'])) {
         if ($kontrolData['total_kontrol'] > 0) {
             $_SESSION['error_message'] = "Data perpindahan tidak dapat dihapus karena inventaris baru telah memiliki data kontrol!";
         } else {
-            // Begin transaction
+            // Jika tidak ada data kontrol maka akan dilanjurkan dengan query dibawah
             mysqli_begin_transaction($conn);
             try {
-                // 3. Hapus data inventaris baru
+                // Query hapus data inventaris baru
                 $deleteInventaris = "DELETE FROM inventaris 
                                    WHERE kode_inventaris = '{$perpindahan['kode_inventaris_baru']}'";
                 mysqli_query($conn, $deleteInventaris);
 
-                // 4. Hapus data perpindahan
+                // Query hapus data perpindahan
                 $deletePerpindahan = "DELETE FROM perpindahan_barang 
                                     WHERE id_perpindahan_barang = '$id_perpindahan_barang'";
                 mysqli_query($conn, $deletePerpindahan);
 
-                // Commit transaction
                 mysqli_commit($conn);
                 $_SESSION['success_message'] = "Data perpindahan barang berhasil dihapus!";
             } catch (Exception $e) {
-                // Rollback transaction on error
                 mysqli_rollback($conn);
                 $_SESSION['error_message'] = "Gagal menghapus data perpindahan barang!";
             }

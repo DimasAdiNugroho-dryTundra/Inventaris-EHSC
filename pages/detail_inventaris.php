@@ -1,11 +1,8 @@
 <?php
-// File: detail_inventaris.php
-
 require('../server/sessionHandler.php');
 require_once('../server/configDB.php');
 require('../layouts/header.php');
 
-// Get inventory ID from URL
 $id_inventaris = $_GET['id'] ?? '';
 
 // Query untuk mengambil data inventaris dan barang yang terkait

@@ -6,6 +6,8 @@ $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
+
+// Query tampil data kehilangan barang
 $query = "SELECT kb.*, 
           i.nama_barang, 
           i.kode_inventaris, 
@@ -39,7 +41,7 @@ $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalPages = ceil($totalRow['total'] / $limit);
 
-// Fungsi untuk mendapatkan data kehilangan barangfunction getBarangHilang($conn)
+// Fungsi untuk mendapatkan data kehilangan barang dari semua cawu
 function getBarangHilang($conn)
 {
     $query = "SELECT 
@@ -145,6 +147,7 @@ if (isset($_POST['tambahKehilangan'])) {
     $jumlah_kehilangan = $_POST['jumlah_kehilangan'];
     $keterangan = $_POST['keterangan'];
 
+    // Query tambah
     $query = "INSERT INTO kehilangan_barang (id_inventaris, tanggal_kehilangan, cawu, 
               jumlah_kehilangan, keterangan)
               VALUES ('$id_inventaris', '$tanggal_kehilangan', '$cawu', 
@@ -160,11 +163,12 @@ if (isset($_POST['tambahKehilangan'])) {
     exit();
 }
 
-// Proses update kehilangan barang
+// Proses pengeditan kehilangan barang
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kehilangan_barang = $_POST['id_kehilangan_barang'];
     $keterangan = $_POST['keterangan'];
 
+    // Query edit
     $query = "UPDATE kehilangan_barang SET 
               keterangan = '$keterangan'
               WHERE id_kehilangan_barang = $id_kehilangan_barang";
@@ -179,11 +183,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Proses delete kehilangan barang
+// Proses pengahapusan kehilangan barang
 if (isset($_GET['delete'])) {
     $id_kehilangan_barang = $_GET['delete'];
 
-    // Hapus data dari database
+    // Query hapus
     $query = "DELETE FROM kehilangan_barang WHERE id_kehilangan_barang = $id_kehilangan_barang";
 
     if (mysqli_query($conn, $query)) {

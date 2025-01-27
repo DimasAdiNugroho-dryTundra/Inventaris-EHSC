@@ -1,31 +1,32 @@
 <?php
-// Pagination settings
-$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5; // Default to 5
+// Pengaturan untuk pagination
+$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5; 
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Search handling
+// Pencarian
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 $query = "SELECT * FROM kategori WHERE nama_kategori LIKE '%$search%' LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 
-// Count total data for pagination
+// Hitung data untuk Pagination
 $totalQuery = "SELECT COUNT(*) as total FROM kategori WHERE nama_kategori LIKE '%$search%'";
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalPages = ceil($totalRow['total'] / $limit);
 
-// Process adding category
+// Proses penambahan kategori
 if (isset($_POST['tambahKategori'])) {
     $kode_kategori = $_POST['kode_kategori'];
     $nama_kategori = $_POST['nama_kategori'];
 
-    // Check if category code already exists
+    // Cek apakah kode kategori sudah ada
     $checkKode = "SELECT * FROM kategori WHERE kode_kategori='$kode_kategori'";
     $checkResult = mysqli_query($conn, $checkKode);
     if (mysqli_num_rows($checkResult) > 0) {
         $_SESSION['error_message'] = "Kode kategori sudah ada, silakan gunakan kode lain.";
     } else {
+        // Query tambah
         $query = "INSERT INTO kategori (kode_kategori, nama_kategori) VALUES ('$kode_kategori', '$nama_kategori')";
         if (mysqli_query($conn, $query)) {
             $_SESSION['success_message'] = "Kategori berhasil ditambahkan!";
@@ -34,10 +35,10 @@ if (isset($_POST['tambahKategori'])) {
         }
     }
     header("Location: kategori.php");
-    exit(); // Ensure no further execution
+    exit();
 }
 
-// Process editing category
+// Proses pengeditan kategori
 if (isset($_POST['action']) && $_POST['action'] == 'update') {
     $id_kategori = $_POST['id_kategori'];
 
@@ -52,6 +53,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
         $kode_kategori = $_POST['kode_kategori'];
         $nama_kategori = $_POST['nama_kategori'];
 
+        // Query edit
         $query = "UPDATE kategori SET kode_kategori = '$kode_kategori', nama_kategori = '$nama_kategori' WHERE id_kategori = '$id_kategori'";
 
         if (!mysqli_query($conn, $query)) {
@@ -64,7 +66,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
     exit();
 }
 
-// Process deleting category
+// Proses penghapusan kategori
 if (isset($_GET['delete'])) {
     $id_kategori = $_GET['delete'];
 
@@ -76,6 +78,7 @@ if (isset($_GET['delete'])) {
     if ($checkRow['count'] > 0) {
         $_SESSION['error_message'] = "Data kategori tidak dapat dihapus karena sudah digunakan pada data inventaris!";
     } else {
+        // Query hapus
         $query = "DELETE FROM kategori WHERE id_kategori='$id_kategori'";
         if (mysqli_query($conn, $query)) {
             $_SESSION['success_message'] = "Kategori berhasil dihapus!";
