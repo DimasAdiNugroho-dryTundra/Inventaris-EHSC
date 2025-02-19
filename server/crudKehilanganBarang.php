@@ -134,6 +134,7 @@ function getBarangHilang($conn)
                 user u ON k.id_user = u.id_user
             WHERE 
                 k.jumlah_hilang > 0 AND kb.id_inventaris IS NULL
+            ORDER BY tanggal_kontrol ASC
     ";
 
     return mysqli_query($conn, $query);

@@ -138,6 +138,7 @@ function getBarangPindah($conn)
                 perpindahan_barang pb ON k.id_inventaris = pb.id_inventaris AND k.tanggal_kontrol = pb.tanggal_perpindahan
             WHERE 
                 k.jumlah_pindah > 0 AND pb.id_inventaris IS NULL
+            ORDER BY tanggal_kontrol ASC    
     ";
 
     $result = mysqli_query($conn, $query);

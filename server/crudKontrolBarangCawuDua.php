@@ -5,8 +5,8 @@ $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Penanganan pencarian dan filter
-$tahun = isset($_POST['year']) ? (int) $_POST['year'] : date('Y');
-$search = isset($_POST['search']) ? $_POST['search'] : '';
+$tahun = isset($_POST['year']) ? (int) $_POST['year'] : (isset($_GET['year']) ? (int) $_GET['year'] : date('Y'));
+$search = isset($_POST['search']) ? $_POST['search'] : (isset($_GET['search']) ? $_GET['search'] : '');
 
 // Mentukan tabel dan rentang tanggal berdasarkan cawu
 $table = 'kontrol_barang_cawu_dua';
@@ -287,11 +287,26 @@ if (isset($_POST['action']) && $_POST['action'] == 'update') {
 if (isset($_GET['delete'])) {
     $id_kontrol = (int) $_GET['delete'];
 
+    // Ambil data kontrol yang akan dihapus
+    $query_kontrol = "SELECT kb.*, i.id_inventaris 
+                     FROM kontrol_barang_cawu_dua kb
+                     JOIN inventaris i ON kb.id_inventaris = i.id_inventaris
+                     WHERE kb.id_kontrol_barang_cawu_dua = '$id_kontrol'";
+
+    $result_kontrol = mysqli_query($conn, $query_kontrol);
+    $data_kontrol = mysqli_fetch_assoc($result_kontrol);
+
+    if (!$data_kontrol) {
+        $_SESSION['error_message'] = "Data kontrol tidak ditemukan!";
+        header("Location: kontrolBarangCawuDua.php");
+        exit();
+    }
+
     // Cek apakah ada data di cawu tiga
     $query_cek = "SELECT COUNT(*) as total 
-                   FROM kontrol_barang_cawu_tiga 
-                   WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
-                   AND tahun_kontrol = '{$data_kontrol['tahun_kontrol']}'";
+                  FROM kontrol_barang_cawu_tiga 
+                  WHERE id_inventaris = '{$data_kontrol['id_inventaris']}' 
+                  AND tahun_kontrol = '{$data_kontrol['tahun_kontrol']}'";
 
     $result_cek = mysqli_query($conn, $query_cek);
     $count = mysqli_fetch_assoc($result_cek)['total'];

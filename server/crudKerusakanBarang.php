@@ -132,6 +132,7 @@ function getBarangRusak($conn)
                 kerusakan_barang kb ON k.id_inventaris = kb.id_inventaris AND k.tanggal_kontrol = kb.tanggal_kerusakan
             WHERE 
                 k.jumlah_rusak > 0 AND kb.id_inventaris IS NULL
+            ORDER BY tanggal_kontrol ASC
     ";
 
     $result = mysqli_query($conn, $query);

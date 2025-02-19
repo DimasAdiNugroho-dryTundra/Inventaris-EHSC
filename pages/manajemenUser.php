@@ -398,8 +398,7 @@ require('../layouts/header.php');
                                                 <label class="form-label">Jabatan</label>
                                                 <select name="jabatan" class="form-select" required>
                                                     <option value="">Pilih Jabatan</option>
-                                                    <option value="operator">Operator</option>
-                                                    <option value="operator">Staff</option>
+                                                    <option value="staff">Staff</option>
                                                     <option value="administrasi">Administrasi</option>
                                                     <option value="petugas kontrol">Petugas Kontrol</option>
                                                 </select>

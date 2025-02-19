@@ -140,9 +140,9 @@ $tahunRange = range($tahunSekarang - 5, $tahunSekarang + 5);
                                     <div class="col-md-6">
                                         <form method="POST" class="d-flex">
                                             <div class="flex-grow-1 me-2">
-                                                <label for="search" class="form-label">Cari kode inventaris</label>
+                                                <label for="search" class="form-label">Cari barang terkontrol</label>
                                                 <input type="text" class="form-control" id="search" name="search"
-                                                    placeholder="Masukkan kode..."
+                                                    placeholder="Masukkan kode atau nama barang..."
                                                     value="<?php echo htmlspecialchars($search); ?>">
                                             </div>
                                             <input type="hidden" name="year" value="<?php echo $tahun; ?>">
@@ -682,8 +682,6 @@ function terapkanValidasi() {
                 e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
             }
         };
-
-        // Hapus pesan error saat mulai diisi
         hapusPesanError(elemen);
     });
 }
@@ -706,8 +704,6 @@ function validasiFormManual() {
                             e.target.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
                         }
                     };
-
-                    // Hapus pesan error saat mulai diisi
                     hapusPesanError(input);
                 }
             });
@@ -721,12 +717,12 @@ function tampilAlertStatus(modalElement, message) {
         existingAlert.remove();
     }
 
-    // Buat elemen alert baru
+    // alert
     const alertDiv = document.createElement('div');
     alertDiv.className = 'alert alert-danger alert-dismissible d-flex align-items-center mb-3 alert-status';
     alertDiv.setAttribute('role', 'alert');
 
-    // Tambahkan ikon dan pesan
+
     alertDiv.innerHTML = `
         <span class="alert-icon rounded me-2">
             <i class="ti ti-alert-circle"></i>
@@ -759,7 +755,7 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
         valid = false;
         const inputBaik = document.getElementById('inputBaik');
         inputBaik.setCustomValidity(getPesanValidasi('baik', 'input'));
-        inputBaik.reportValidity(); // Menampilkan pesan validasi segera
+        inputBaik.reportValidity();
         inputBaik.addEventListener('input', function() {
             if (this.value && this.value.trim() !== '') {
                 this.setCustomValidity('');
@@ -772,7 +768,7 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
         valid = false;
         const inputRusak = document.getElementById('inputRusak');
         inputRusak.setCustomValidity(getPesanValidasi('rusak', 'input'));
-        inputRusak.reportValidity(); // Menampilkan pesan validasi segera
+        inputRusak.reportValidity();
         inputRusak.addEventListener('input', function() {
             if (this.value && this.value.trim() !== '') {
                 this.setCustomValidity('');
@@ -785,7 +781,7 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
         valid = false;
         const inputPindah = document.getElementById('inputPindah');
         inputPindah.setCustomValidity(getPesanValidasi('pindah', 'input'));
-        inputPindah.reportValidity(); // Menampilkan pesan validasi segera
+        inputPindah.reportValidity();
         inputPindah.addEventListener('input', function() {
             if (this.value && this.value.trim() !== '') {
                 this.setCustomValidity('');
@@ -798,7 +794,7 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
         valid = false;
         const inputHilang = document.getElementById('inputHilang');
         inputHilang.setCustomValidity(getPesanValidasi('hilang', 'input'));
-        inputHilang.reportValidity(); // Menampilkan pesan validasi segera
+        inputHilang.reportValidity();
         inputHilang.addEventListener('input', function() {
             if (this.value && this.value.trim() !== '') {
                 this.setCustomValidity('');
@@ -816,14 +812,14 @@ document.getElementById('tambahKontrolForm').addEventListener('submit', function
             const labelTeks = labelElemen ? labelElemen.textContent : '';
             const jenisInput = elemen.tagName.toLowerCase();
             elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
-            elemen.reportValidity(); // Menampilkan pesan validasi segera
+            elemen.reportValidity();
         } else {
             elemen.setCustomValidity('');
         }
     });
 
     if (valid && this.checkValidity()) {
-        this.submit(); // Submit form hanya jika semua validasi berhasil
+        this.submit();
     }
 });
 
@@ -851,7 +847,7 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
             valid = false;
             const inputBaikEdit = document.getElementById(`inputBaikEdit${modalId}`);
             inputBaikEdit.setCustomValidity(getPesanValidasi('baik', 'input'));
-            inputBaikEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputBaikEdit.reportValidity();
             inputBaikEdit.addEventListener('input', function() {
                 if (this.value && this.value.trim() !== '') {
                     this.setCustomValidity('');
@@ -864,7 +860,7 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
             valid = false;
             const inputRusakEdit = document.getElementById(`inputRusakEdit${modalId}`);
             inputRusakEdit.setCustomValidity(getPesanValidasi('rusak', 'input'));
-            inputRusakEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputRusakEdit.reportValidity();
             inputRusakEdit.addEventListener('input', function() {
                 if (this.value && this.value.trim() !== '') {
                     this.setCustomValidity('');
@@ -877,7 +873,7 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
             valid = false;
             const inputPindahEdit = document.getElementById(`inputPindahEdit${modalId}`);
             inputPindahEdit.setCustomValidity(getPesanValidasi('pindah', 'input'));
-            inputPindahEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputPindahEdit.reportValidity();
             inputPindahEdit.addEventListener('input', function() {
                 if (this.value && this.value.trim() !== '') {
                     this.setCustomValidity('');
@@ -890,7 +886,7 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
             valid = false;
             const inputHilangEdit = document.getElementById(`inputHilangEdit${modalId}`);
             inputHilangEdit.setCustomValidity(getPesanValidasi('hilang', 'input'));
-            inputHilangEdit.reportValidity(); // Menampilkan pesan validasi segera
+            inputHilangEdit.reportValidity();
             inputHilangEdit.addEventListener('input', function() {
                 if (this.value && this.value.trim() !== '') {
                     this.setCustomValidity('');
@@ -909,14 +905,14 @@ document.querySelectorAll('[id^="editModal"]').forEach(modal => {
                 const labelTeks = labelElemen ? labelElemen.textContent : '';
                 const jenisInput = elemen.tagName.toLowerCase();
                 elemen.setCustomValidity(getPesanValidasi(labelTeks, jenisInput));
-                elemen.reportValidity(); // Menampilkan pesan validasi segera
+                elemen.reportValidity();
             } else {
                 elemen.setCustomValidity('');
             }
         });
 
         if (valid && this.checkValidity()) {
-            this.submit(); // Submit form hanya jika semua validasi berhasil
+            this.submit();
         }
     });
 });
